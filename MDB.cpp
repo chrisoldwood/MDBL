@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		MDB.CPP
 ** COMPONENT:	Memory Database Library.
@@ -114,8 +113,7 @@ CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const ch
 			pCursor->SetRow(oRow);
 
 			// Append to table.
-			pTable->InsertRow(oRow);
-			oRow.Status(CRow::ORIGINAL);
+			pTable->InsertRow(oRow, false);
 		}
 
 		// Cleanup.
@@ -165,7 +163,7 @@ int CMDB::AddTable(CTable& oTable)
 int CMDB::FindTable(const char* pszName)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Size(); i++)
+	for (int i = 0; i < m_vTables.Count(); i++)
 	{
 		if (m_vTables[i].Name() == pszName)
 			return i;
@@ -179,16 +177,93 @@ int CMDB::FindTable(const char* pszName)
 **
 ** Description:	Executes a query involving a join across tables.
 **
-** Parameters:	oJoin	The join query.
+** Parameters:	oQuery	The join query.
 **
 ** Returns:		The result set.
 **
 *******************************************************************************
 */
 
-CJoinedSet CMDB::Select(const CJoin& oJoin) const
+CJoinedSet CMDB::Select(const CJoin& oQuery) const
 {
-	return CJoinedSet(0);
+	// Create the joined result set.
+	CJoinedSet oJS(oQuery.Count());
+
+	ASSERT(oQuery.Count() > 1);
+
+	// Run the query.
+	DoJoin(oQuery, 0, *((CRow*)(NULL)), oJS);
+
+	return oJS;
+}
+
+/******************************************************************************
+** Method:		DoJoin()
+**
+** Description:	Internal method to perform a single join.
+**
+** Parameters:	oQuery	The join query.
+**				nJoin	The join to perform.
+**				oJS		The result set to append to.
+**
+** Returns:		The number of rows appended.
+**
+*******************************************************************************
+*/
+
+int CMDB::DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const
+{
+	// Get the table to join on.
+	CTable& oRHSTable = Table(oQuery[nJoin].m_nTable);
+
+	// Get the columns to join on.
+	int nLHSColumn = oQuery[nJoin].m_nLHSColumn;
+	int nRHSColumn = oQuery[nJoin].m_nRHSColumn;
+
+	int nMatches = 0;
+
+	// For all rows in the table.
+	for (int r = 0; r < oRHSTable.RowCount(); r++)
+	{
+		// Get the row.
+		CRow& oRHSRow = oRHSTable[r];
+
+		// Scanning first table OR this row matches?
+		if ( (nJoin == 0) || (oRHSRow[nRHSColumn] == oLHSRow[nLHSColumn]) )
+		{
+			int nRows = 1;
+
+			// More joins to process?
+			if (nJoin < (oQuery.Count()-1))
+				nRows = DoJoin(oQuery, nJoin+1, oRHSRow, oJS);
+
+			// Join succesful?
+			if (nRows > 0)
+			{
+				CResultSet& oRS = oJS[nJoin];
+
+				// Add this row 'nRows' times.
+				for (int i = 0; i < nRows; i++)
+					oRS.Add(oRHSRow);
+
+				nMatches += nRows;
+			}
+			// Join failed, but OUTER join requested?
+			else if (oQuery[nJoin+1].m_nType == CJoin::OUTER)
+			{
+				// Add this row.
+				oJS[nJoin].Add(oRHSRow);
+
+				// Add NULL row to all joins from here down.
+				for (int i = nJoin+1; i < oQuery.Count(); i++)
+					oJS[i].Add(Table(oQuery[i].m_nTable).NullRow());
+
+				nMatches++;
+			}
+		}
+	}
+
+	return nMatches;
 }
 
 /******************************************************************************
@@ -206,7 +281,7 @@ CJoinedSet CMDB::Select(const CJoin& oJoin) const
 bool CMDB::Modified() const
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Size(); i++)
+	for (int i = 0; i < m_vTables.Count(); i++)
 	{
 		if (m_vTables[i].Modified())
 			return true;
@@ -231,14 +306,14 @@ bool CMDB::Modified() const
 void CMDB::operator <<(CStream& rStream)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Size(); i++)
+	for (int i = 0; i < m_vTables.Count(); i++)
 		m_vTables[i] << rStream;
 }
 
 void CMDB::operator >>(CStream& rStream)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Size(); i++)
+	for (int i = 0; i < m_vTables.Count(); i++)
 		m_vTables[i] >> rStream;
 }
 
@@ -258,13 +333,13 @@ void CMDB::operator >>(CStream& rStream)
 void CMDB::operator <<(CSQLSource& rSource)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Size(); i++)
+	for (int i = 0; i < m_vTables.Count(); i++)
 		m_vTables[i] << rSource;
 }
 
 void CMDB::operator >>(CSQLSource& rSource)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Size(); i++)
+	for (int i = 0; i < m_vTables.Count(); i++)
 		m_vTables[i] >> rSource;
 }

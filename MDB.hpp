@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		MDB.HPP
 ** COMPONENT:	Memory Database Library.
@@ -43,7 +42,7 @@ public:
 	//
 	// Query methods.
 	//
-	virtual CJoinedSet Select(const CJoin& oJoin) const;
+	virtual CJoinedSet Select(const CJoin& oQuery) const;
 
 	//
 	// Persistance methods.
@@ -61,6 +60,11 @@ protected:
 	// Members.
 	//
 	CTableSet	m_vTables;		// The tables.
+
+	//
+	// Internal methods.
+	//
+	int DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const;
 };
 
 /******************************************************************************
@@ -72,7 +76,7 @@ protected:
 
 inline int CMDB::TableCount() const
 {
-	return m_vTables.Size();
+	return m_vTables.Count();
 }
 
 inline CTable& CMDB::Table(int n) const
