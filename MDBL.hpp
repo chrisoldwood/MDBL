@@ -41,17 +41,20 @@
 #include "Row.hpp"
 #include "RowSet.hpp"
 
+#include "Where.hpp"
+#include "WhereCmp.hpp"
+#include "WhereExp.hpp"
+#include "WhereIn.hpp"
+#include "WhereNot.hpp"
+
 #include "SortColumns.hpp"
 #include "ResultSet.hpp"
+#include "GroupSet.hpp"
 
 #include "Index.hpp"
 #include "UniqIndex.hpp"
 #include "IntMapIndex.hpp"
 #include "StrMapIndex.hpp"
-
-#include "Where.hpp"
-#include "Compare.hpp"
-#include "WhereExp.hpp"
 
 #include "JoinedSet.hpp"
 #include "Join.hpp"
