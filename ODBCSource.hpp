@@ -63,6 +63,12 @@ public:
 	static int         BufferSize(COLTYPE eColType, int nColSize);
 	static int         ColumnSize(COLTYPE eColType, int nColSize);
 
+	//
+	// Installation query methods.
+	//
+	static void InstalledDrivers(CStrArray& astrDrivers);
+	static void InstalledSources(CStrArray& astrSources);
+
 protected:
 	//
 	// Members.

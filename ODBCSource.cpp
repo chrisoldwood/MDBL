@@ -8,6 +8,7 @@
 */
 
 #include "MDBL.hpp"
+#include <odbcinst.h>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -628,4 +629,117 @@ void CODBCSource::RollbackTrans()
 		throw CODBCException(CODBCException::E_TRANS_FAILED, "End Transaction", m_hDBC, SQL_HANDLE_DBC);
 
 	m_bInTrans = false;
+}
+
+/******************************************************************************
+** Method:		InstalledDrivers()
+**
+** Description:	Gets a list of the currently installed drivers.
+**
+** Parameters:	astrDrivers		The return buffer for the list of drivers.
+**
+** Returns:		Nothing.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
+{
+	WORD  wBufSize  = 1024;
+	WORD  wRetSize  = 0;
+	char* pszBuffer = NULL;
+
+	// Until buffer big enough.
+	while(true)
+	{
+		pszBuffer = (char*) alloca(wBufSize);
+
+		// Try query.
+		if (!::SQLGetInstalledDrivers(pszBuffer, wBufSize, &wRetSize))
+			throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLGetInstalledDrivers", NULL, 0);
+
+		// Buffer big enough?
+		if (wRetSize < wBufSize)
+			break;
+
+		// Double buffer size, and try again.
+		wBufSize *= 2;
+	}
+
+	ASSERT(pszBuffer != NULL);
+
+	char* pszName = pszBuffer;
+
+	// Extract drivers.
+	while (*pszName != '\0')
+	{
+		astrDrivers.Add(pszName);
+
+		while (*pszName++ != '\0');
+	}
+}
+
+/******************************************************************************
+** Method:		InstalledSources()
+**
+** Description:	Gets a list of the currently installed data sources (DSNs).
+**
+** Parameters:	astrSources		The return buffer for the list of DSNs.
+**
+** Returns:		Nothing.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+void CODBCSource::InstalledSources(CStrArray& astrSources)
+{
+	SQLHENV		hEnv = SQL_NULL_HENV;
+	SQLRETURN	rc;
+	SQLCHAR		szDSN[256], szDesc[256];
+	SQLSMALLINT	nDSNSize  = sizeof(szDSN);
+	SQLSMALLINT	nDescSize = sizeof(szDesc);
+	SQLSMALLINT	nDSNRetSize;
+	SQLSMALLINT	nDescRetSize;
+	
+	// Allocate an environment handle.
+	rc = ::SQLAllocHandle(SQL_HANDLE_ENV, NULL, &hEnv);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLAllocHandle", NULL, 0);
+
+	// Say we're ODBC v3.x compliant.
+	rc = ::SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_CONNECT_FAILED, "SQLSetEnvAttr", hEnv, SQL_HANDLE_ENV);
+
+	// Fetch the first data source.
+	rc = ::SQLDataSources(hEnv, SQL_FETCH_FIRST, szDSN, nDSNSize, &nDSNRetSize, szDesc, nDescSize, &nDescRetSize);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) && (rc != SQL_NO_DATA) )
+	{
+		::SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLDataSources", hEnv, SQL_HANDLE_ENV);
+	}
+
+	// For all sources.
+	while (rc != SQL_NO_DATA)
+	{
+		astrSources.Add((char*)szDSN);
+
+		rc = ::SQLDataSources(hEnv, SQL_FETCH_NEXT, szDSN, nDSNSize, &nDSNRetSize, szDesc, nDescSize, &nDescRetSize);
+
+		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) && (rc != SQL_NO_DATA) )
+		{
+			::SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+			throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLDataSources", hEnv, SQL_HANDLE_ENV);
+		}
+	}
+
+	// Free environment.
+	::SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 }
