@@ -34,7 +34,7 @@ CSQLException::CSQLException(int eErrCode, const char* pszSQLStmt, const CString
 		case E_EXEC_FAILED:		m_strError  = "Failed to execute the statement:\n\n";	break;
 		case E_FETCH_FAILED:	m_strError  = "Failed to fetch result set:\n\n";		break;
 		case E_TRANS_FAILED:	m_strError  = "Failed to process transaction:\n\n";		break;
-		default:				ASSERT(false);											break;
+		default:				ASSERT_FALSE();											break;
 	}
 
 	// Append statement and reason.

@@ -370,7 +370,7 @@ COLTYPE CODBCSource::MDBType(SQLSMALLINT nODBCType)
 		default:					break;
 	}
 
-	ASSERT(false);
+	ASSERT_FALSE();
 
 	// Unsupported.
 	return MDCT_FXDSTR;
@@ -405,7 +405,7 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 		case MDCT_TIMESTAMP:	return SQL_TYPE_TIMESTAMP;
 	}
 
-	ASSERT(false);
+	ASSERT_FALSE();
 
 	// Unsupported.
 	return SQL_UNKNOWN_TYPE;
@@ -441,7 +441,7 @@ int CODBCSource::BufferSize(COLTYPE eColType, int nColSize)
 		case MDCT_DATE:			nSize = sizeof(CTimeStamp);		break;
 		case MDCT_TIME:			nSize = sizeof(CTimeStamp);		break;
 		case MDCT_TIMESTAMP:	nSize = sizeof(CTimeStamp);		break;
-		default:				ASSERT(false);					break;
+		default:				ASSERT_FALSE();					break;
 	}
 
 	// Adjust size for alignment.
@@ -479,8 +479,9 @@ int CODBCSource::ColumnSize(COLTYPE eColType, int nColSize)
 		case MDCT_DATE:			return 23;
 		case MDCT_TIME:			return 23;
 		case MDCT_TIMESTAMP:	return 23;
-		default:				ASSERT(false);	break;
 	}
+
+	ASSERT_FALSE();
 
 	// Unsupported.
 	return 0;
@@ -652,7 +653,7 @@ void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
 	char* pszBuffer = NULL;
 
 	// Until buffer big enough.
-	while(true)
+	for(;;)
 	{
 		pszBuffer = (char*) alloca(wBufSize);
 
