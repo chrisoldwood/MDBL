@@ -9,3 +9,7 @@
 - Meta tables (systables, syscolumns).
 
 - Aggregates on result sets.
+
+- Special asserts.
+
+- Change headers from .hpp to .h
