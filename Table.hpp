@@ -69,6 +69,7 @@ public:
 	virtual void  DeleteRow(CRow& oRow);
 	virtual void  DeleteRows(const CResultSet& oRS);
 	virtual void  Truncate();
+	virtual void  CopyTable(const CTable& oTable);
 
 	virtual CRow& NullRow();
 	virtual bool  IsNullRow(CRow& oRow) const;

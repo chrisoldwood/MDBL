@@ -138,7 +138,7 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 			break;
 
 		default:
-			ASSERT(false);
+			ASSERT_FALSE();
 			break;
 
 	}
@@ -287,7 +287,7 @@ void CTable::AddIndex(int nColumn)
 			break;
 
 		default:
-			ASSERT(false);
+			ASSERT_FALSE();
 			break;
 	}
 
@@ -501,6 +501,36 @@ void CTable::Truncate()
 }
 
 /******************************************************************************
+** Method:		CopyTable()
+**
+** Description:	Copies all the rows in the source table.
+**
+** Parameters:	oTable	The source table.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::CopyTable(const CTable& oTable)
+{
+	ASSERT(ColumnCount() == oTable.ColumnCount());
+
+	// For all rows...
+	for (int r = 0; r < oTable.RowCount(); ++r)
+	{
+		CRow& oSrcRow = oTable[r];
+		CRow& oDstRow = CreateRow();
+
+		// For all columns...
+		for (int c = 0; c < oTable.ColumnCount(); ++c)
+			oDstRow[c] = oSrcRow[c];
+
+		InsertRow(oDstRow);
+	}
+}
+
+/******************************************************************************
 ** Method:		NullRow()
 **
 ** Description:	Returns the NULL row for outer joins. This is a special row
@@ -619,7 +649,7 @@ CResultSet CTable::Select(const CWhere& oWhere) const
 /******************************************************************************
 ** Method:		Exists()
 **
-** Description:	Checks of at least one one matches the WHERE clause.
+** Description:	Queries if at least one row matches the WHERE clause.
 **
 ** Parameters:	oWhere	The where clause.
 **
@@ -1223,9 +1253,9 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 	}
 }
 
-void CTable::WriteDeletions(CSQLSource& rSource)
+void CTable::WriteDeletions(CSQLSource& /*rSource*/)
 {
-	ASSERT(false);
+	ASSERT_FALSE();
 }
 
 /******************************************************************************
@@ -1265,19 +1295,19 @@ void CTable::ResetRowFlags()
 *******************************************************************************
 */
 
-void CTable::OnBeforeInsert(CRow& oRow)
+void CTable::OnBeforeInsert(CRow& /*oRow*/)
 {
 }
 
-void CTable::OnAfterInsert(CRow& oRow)
+void CTable::OnAfterInsert(CRow& /*oRow*/)
 {
 }
 
-void CTable::OnBeforeDelete(CRow& oRow)
+void CTable::OnBeforeDelete(CRow& /*oRow*/)
 {
 }
 
-void CTable::OnAfterDelete(CRow& oRow)
+void CTable::OnAfterDelete(CRow& /*oRow*/)
 {
 }
 
@@ -1308,6 +1338,9 @@ void CTable::CheckIndexes() const
 	}
 #endif
 }
+
+// Unreferenced formal parameter.
+#pragma warning ( disable : 4100 )
 
 /******************************************************************************
 ** Method:		CheckRow()
@@ -1345,6 +1378,9 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 #endif
 }
 
+// Unreferenced formal parameter.
+#pragma warning ( default : 4100 )
+
 /******************************************************************************
 ** Method:		CheckColumn()
 **
@@ -1360,7 +1396,7 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 *******************************************************************************
 */
 
-void CTable::CheckColumn(CRow& oRow, int nColumn, const CValue& oValue, bool bUpdate) const
+void CTable::CheckColumn(CRow& /*oRow*/, int /*nColumn*/, const CValue& /*oValue*/, bool /*bUpdate*/) const
 {
 }
 
