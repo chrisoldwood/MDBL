@@ -25,6 +25,7 @@ public:
 	// Constructors/Destructor.
 	//
 	CValueSet();
+	CValueSet(const CStrArray& astrStrings);
 	CValueSet(const CValueSet& oRHS);
 	~CValueSet();
 	
@@ -60,6 +61,12 @@ private:
 
 inline CValueSet::CValueSet()
 {
+}
+
+inline CValueSet::CValueSet(const CStrArray& astrStrings)
+{
+	for (int i = 0; i < astrStrings.Size(); ++i)
+		TPtrArray<CValue>::Add(new CValue(astrStrings[i]));
 }
 
 inline CValueSet::CValueSet(const CValueSet& oRHS)
