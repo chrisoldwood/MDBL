@@ -11,6 +11,16 @@
 #include <odbcinst.h>
 
 /******************************************************************************
+**
+** Constants.
+**
+*******************************************************************************
+*/
+
+// Minimum length for connection string.
+const int MIN_CONN_STR_LEN = 1024;
+
+/******************************************************************************
 ** Method:		Constructor.
 **
 ** Description:	.
@@ -66,7 +76,7 @@ void CODBCSource::Open(const char* pszConnection)
 	ASSERT(InTrans() == false);
 
 	SQLRETURN	rc;
-	SQLCHAR		szConnection[MAX_PATH];
+	SQLCHAR		szConnection[MIN_CONN_STR_LEN];
 	SQLSMALLINT	nLength = 0;
 
 	// Allocate the environment handle.
@@ -89,14 +99,14 @@ void CODBCSource::Open(const char* pszConnection)
 
 	// Connect to the database.
 	rc = ::SQLDriverConnect(m_hDBC, NULL, (SQLCHAR*)pszConnection, SQL_NTS,
-							(SQLCHAR*)&szConnection, MAX_PATH, &nLength,
+							(SQLCHAR*)&szConnection, sizeof(szConnection), &nLength,
 							SQL_DRIVER_NOPROMPT);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, m_hDBC, SQL_HANDLE_DBC);
 
-	ASSERT(m_hEnv  != SQL_NULL_HENV);
-	ASSERT(m_hDBC  != SQL_NULL_HDBC);
+	ASSERT(m_hEnv != SQL_NULL_HENV);
+	ASSERT(m_hDBC != SQL_NULL_HDBC);
 }
 
 /******************************************************************************
