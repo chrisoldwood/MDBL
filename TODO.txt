@@ -11,3 +11,5 @@
 - Aggregates on result sets, e.g. Group By. (CGroupSet - Array of RS).
 
 - Query processor.
+
+- Support additional ODBC types like bit & binary (See Pubs db).
