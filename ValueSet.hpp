@@ -64,7 +64,7 @@ inline CValueSet::CValueSet()
 
 inline CValueSet::CValueSet(const CValueSet& oRHS)
 {
-	Copy(oRHS, true);
+	DeepCopy(oRHS);
 }
 
 inline CValueSet::~CValueSet()
