@@ -28,7 +28,7 @@ public:
 	//
 	// Accessors.
 	//
-	CTable& Table();
+	CTable& Table() const;
 	const CString& Name() const;
 	COLTYPE ColType() const;
 	STGTYPE StgType() const;
@@ -44,7 +44,7 @@ public:
 	CTable* FKTable() const;
 	int     FKColumn() const;
 	CIndex* Index() const;
-	int     DisplayWidth() const;
+	int     DisplayWidth(bool bDebug = false) const;
 
 	//
 	// Mutators.
@@ -56,21 +56,29 @@ public:
 	//
 	enum
 	{
-		NOT_NULLABLE = 0x00,
-		NULLABLE     = 0x01,
+		// Standard flags.
+		NOT_NULLABLE = 0x0000,
+		NULLABLE     = 0x0001,
 
-		NOT_UNIQUE   = 0x00,
-		UNIQUE       = 0x02,
+		NOT_UNIQUE   = 0x0000,
+		UNIQUE       = 0x0002,
 
-		NOT_KEY      = 0x00,
-		FOREIGN_KEY  = 0x04,
-		PRIMARY_KEY  = 0x08,
+		NOT_KEY      = 0x0000,
+		FOREIGN_KEY  = 0x0004,
+		PRIMARY_KEY  = 0x0008,
 
-		READ_WRITE   = 0x00,
-		READ_ONLY    = 0x10,
+		READ_WRITE   = 0x0000,
+		READ_ONLY    = 0x0010,
 
-		PERSISTENT   = 0x00,
-		TRANSIENT    = 0x20,
+		PERSISTENT   = 0x0000,
+		TRANSIENT    = 0x0020,
+
+		// Type specific flags.
+		IGNORE_CASE  = 0x0000,
+		COMPARE_CASE = 0x0100,
+
+		TZ_GMT       = 0x0000,
+		TZ_LOCAL     = 0x0100,
 
 		DEFAULTS     = (NOT_NULLABLE | NOT_UNIQUE | NOT_KEY     | READ_WRITE | PERSISTENT),
 		IDENTITY     = (NOT_NULLABLE | UNIQUE     | PRIMARY_KEY | READ_ONLY  | PERSISTENT),
@@ -118,7 +126,7 @@ protected:
 *******************************************************************************
 */
 
-inline CTable& CColumn::Table()
+inline CTable& CColumn::Table() const
 {
 	return m_oTable;
 }
