@@ -39,6 +39,8 @@
 
 #include "Row.hpp"
 #include "RowSet.hpp"
+
+#include "SortColumns.hpp"
 #include "ResultSet.hpp"
 
 #include "Index.hpp"
@@ -55,10 +57,13 @@
 
 #include "SQLException.hpp"
 #include "SQLCursor.hpp"
+#include "SQLParams.hpp"
 #include "SQLSource.hpp"
+#include "AutoTrans.hpp"
 
 #include "ODBCException.hpp"
 #include "ODBCCursor.hpp"
+#include "ODBCParams.hpp"
 #include "ODBCSource.hpp"
 
 #include "Table.hpp"
