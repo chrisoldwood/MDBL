@@ -33,7 +33,6 @@ CTable::CTable(CMDB& oDB, const char* pszName, int nFlags)
 	, m_pNullRow(NULL)
 {
 	ASSERT(pszName != NULL);
-	ASSERT(oDB.FindTable(pszName) == -1);
 }
 
 /******************************************************************************
