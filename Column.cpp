@@ -168,8 +168,8 @@ int CColumn::DisplayWidth() const
 		case MDST_CHAR:			return 1;
 		case MDST_STRING:		return m_nLength;
 		case MDST_BOOL:			return 1;
-		case MDST_TIME_T:		return 10;
-		case MDST_TIMESTAMP:	return 20;
+		case MDST_TIME_T:		return 17;
+		case MDST_TIMESTAMP:	return 17;
 		case MDST_POINTER:		return 10;
 	}
 
