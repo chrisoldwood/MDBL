@@ -24,7 +24,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CJoinedSet(int nTables);
+	CJoinedSet(int nTables, CTable* apTables[]);
 	CJoinedSet(const CJoinedSet& oJoinedSet);
 	~CJoinedSet();
 	

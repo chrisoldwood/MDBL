@@ -91,8 +91,7 @@ inline CResultSet CStrMapIndex::FindRows(const CValue& oValue) const
 {
 	ASSERT(oValue.m_eType == MDST_STRING);
 
-
-	return CResultSet(FindRow(oValue.m_sValue));
+	return CResultSet(m_oTable, FindRow(oValue.m_sValue));
 }
 
 #endif //STRMAPINDEX_HPP

@@ -91,7 +91,7 @@ inline CResultSet CIntMapIndex::FindRows(const CValue& oValue) const
 {
 	ASSERT(oValue.m_eType == MDST_INT);
 
-	return CResultSet(FindRow(oValue.m_iValue));
+	return CResultSet(m_oTable, FindRow(oValue.m_iValue));
 }
 
 #endif //INTMAPINDEX_HPP
