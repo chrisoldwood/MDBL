@@ -694,6 +694,7 @@ void CTable::Modified(bool bModified)
 
 void CTable::Read(CStream& rStream)
 {
+	// Remove all existing rows.
 	m_vRows.DeleteAll();
 	TruncateIndexes();
 
@@ -711,6 +712,15 @@ void CTable::Read(CStream& rStream)
 
 	// Read the row count.
 	rStream >> nRows;
+
+	// Prepare any indexes.
+	for (int n = 0; n < m_vColumns.Count(); n++)
+	{
+		CIndex* pIndex = m_vColumns[n].Index();
+
+		if (pIndex != NULL)
+			pIndex->Capacity(nRows);
+	}
 
 	// Read the actual rows.
 	for (int i = 0; i < nRows; i++)
@@ -865,6 +875,7 @@ CString CTable::SQLQuery() const
 
 void CTable::Read(CSQLSource& rSource)
 {
+	// Remove all existing rows.
 	m_vRows.DeleteAll();
 	TruncateIndexes();
 
