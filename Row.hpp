@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ROW.HPP
 ** COMPONENT:	Memory Database Library.
@@ -28,11 +27,11 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CRow(CTable& oTable);
+	CRow(CTable& oTable, bool bNull = false);
 	~CRow();
 	
 	//
-	// Accessors.
+	// Accessors & mutators.
 	//
 	CField& Field(int n) const;
 	CField& operator[](int n) const;
@@ -40,12 +39,16 @@ public:
 	CTable& Table() const;
 
 	int  Status() const;
-	void Status(int nStatus);
-	void AddStatus(int nStatus);
-
+	bool InTable() const;
 	bool Inserted() const;
 	bool Updated() const;
 	bool Deleted() const;
+
+	void ResetStatus();
+	void MarkOriginal();
+	void MarkInserted();
+	void MarkUpdated();
+	void MarkDeleted();
 
 	//
 	// Persistance methods.
@@ -119,20 +122,14 @@ inline int CRow::Status() const
 	return m_eStatus;
 }
 
-inline void CRow::Status(int nStatus)
+inline bool CRow::InTable() const
 {
-	m_eStatus = nStatus;
-}
-
-inline void CRow::AddStatus(int nStatus)
-{
-	if (m_eStatus != ALLOCATED)
-		m_eStatus |= nStatus;
+	return (m_eStatus != ALLOCATED);
 }
 
 inline bool CRow::Inserted() const
 {
-	return (m_eStatus != ALLOCATED);
+	return (m_eStatus & INSERTED);
 }
 
 inline bool CRow::Updated() const
@@ -143,6 +140,34 @@ inline bool CRow::Updated() const
 inline bool CRow::Deleted() const
 {
 	return (m_eStatus & DELETED);
+}
+
+inline void CRow::ResetStatus()
+{
+	m_eStatus = ORIGINAL;
+
+	for (int i = 0; i < m_nColumns; i++)
+		m_aFields[i].m_bModified = false;
+}
+
+inline void CRow::MarkOriginal()
+{
+	m_eStatus |= ORIGINAL;
+}
+
+inline void CRow::MarkInserted()
+{
+	m_eStatus |= INSERTED;
+}
+
+inline void CRow::MarkUpdated()
+{
+	m_eStatus |= UPDATED;
+}
+
+inline void CRow::MarkDeleted()
+{
+	m_eStatus |= DELETED;
 }
 
 inline bool CRow::Modified() const
