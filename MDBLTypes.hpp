@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		MDBLTYPES.HPP
 ** COMPONENT:	Memory Database Library.
@@ -11,6 +10,15 @@
 // Check for previous inclusion
 #ifndef MDBLTYPES_HPP
 #define MDBLTYPES_HPP
+
+/******************************************************************************
+**
+** Primitive type aliases.
+**
+*******************************************************************************
+*/
+
+typedef unsigned char	byte;
 
 /******************************************************************************
 **
@@ -29,6 +37,7 @@ enum STGTYPE
 	MDST_BOOL,      // True or False.
 	MDST_TIME_T,    // time_t.
 	MDST_TIMESTAMP, // CTimeStamp.
+	MDST_POINTER,	// Generic pointer.
 };
 
 /******************************************************************************
@@ -49,6 +58,9 @@ enum COLTYPE
 	MDCT_IDENTITY,	// MDST_INT (Identity column).
 	MDCT_DATETIME,	// MDST_TIME_T.
 	MDCT_TIMESTAMP, // CTimeStamp.
+	MDCT_VOIDPTR,	// MDST_POINTER (using void*).
+	MDCT_ROWPTR,	// MDST_POINTER (using CRow*).
+	MDCT_ROWSETPTR,	// MDST_POINTER (using CRow*[]).
 };
 
 /******************************************************************************
