@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ODBCCURSOR.CPP
 ** COMPONENT:	Memory Database Library.
@@ -22,8 +21,8 @@
 *******************************************************************************
 */
 
-CODBCCursor::CODBCCursor(const CODBCSource& oSource)
-	: m_pSource(&oSource)
+CODBCCursor::CODBCCursor(CODBCSource& oSource)
+	: m_oSource(oSource)
 	, m_hStmt(SQL_NULL_HSTMT)
 	, m_nColumns(0)
 	, m_pColumns(NULL)
@@ -61,28 +60,30 @@ CODBCCursor::~CODBCCursor()
 **
 ** Description:	Opens the result set generated from the SQL statment handle.
 **
-** Parameters:	hStmt	The statment handle.
+** Parameters:	pszStmt		The statment executed.
+**				hStmt		The statment handle.
 **
 ** Returns:		Nothing.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
 
-void CODBCCursor::Open(SQLHSTMT hStmt)
+void CODBCCursor::Open(const char* pszStmt, SQLHSTMT hStmt)
 {
 	ASSERT(IsOpen() == false);
 	ASSERT(hStmt    != SQL_NULL_HSTMT);
 
-	// Save statement handle.
-	m_hStmt = hStmt;
+	// Save statement and handle.
+	m_strStmt = pszStmt;
+	m_hStmt   = hStmt;
 
 	// Get the number of columns in the result set.
 	SQLRETURN rc = ::SQLNumResultCols(m_hStmt, &m_nColumns);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_FETCH_FAILED, m_pSource->LastError(m_hStmt, SQL_HANDLE_STMT));
+		throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 
 	ASSERT(m_nColumns > 0);
 
@@ -105,7 +106,7 @@ void CODBCCursor::Open(SQLHSTMT hStmt)
 								&nNameLen, &nType, &nSize, &nScale, &nNullable);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-			throw CSQLException(CSQLException::E_FETCH_FAILED, m_pSource->LastError(m_hStmt, SQL_HANDLE_STMT));
+			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 
 		ASSERT(nType     != SQL_UNKNOWN_TYPE);
 		ASSERT(nSize     != 0);
@@ -226,7 +227,7 @@ SQLColumn& CODBCCursor::Column(int n) const
 **
 ** Returns:		Nothing..
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -285,7 +286,7 @@ void CODBCCursor::Bind()
 		SQLRETURN rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, (SQLINTEGER*) pLenInd);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-			throw CSQLException(CSQLException::E_FETCH_FAILED, m_pSource->LastError(m_hStmt, SQL_HANDLE_STMT));
+			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 
 		// Update offset.
 		nOffset += (sizeof(SQLINTEGER) + nSize);
@@ -305,7 +306,7 @@ void CODBCCursor::Bind()
 **
 ** Returns:		true or false.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -327,7 +328,7 @@ bool CODBCCursor::Fetch()
 	SQLRETURN rc = ::SQLFetch(m_hStmt);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) && (rc != SQL_NO_DATA) )
-		throw CSQLException(CSQLException::E_FETCH_FAILED, m_pSource->LastError(m_hStmt, SQL_HANDLE_STMT));
+		throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 
 	// Reset batch index.
 	m_nCurRow = 0;
@@ -345,7 +346,7 @@ bool CODBCCursor::Fetch()
 **
 ** Returns:		Nothing.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -356,7 +357,7 @@ void CODBCCursor::SetRow(CRow& oRow)
 
 	// Check row status.
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_FETCH_FAILED, m_pSource->LastError(m_hStmt, SQL_HANDLE_STMT));
+		throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 
 	// Calculate pointer to the current row.
 	byte* pRowData = m_pRowData + (m_nCurRow * m_nRowLen);
@@ -375,18 +376,25 @@ void CODBCCursor::SetRow(CRow& oRow)
 		{
 			oRow[i] = null;
 		}
-		// Value is of native type?
-		else if (m_pColumns[i].m_eMDBColType != MDCT_DATETIME)
-		{
-			oRow[i].SetRaw(pValue + sizeof(SQLINTEGER));
-		}
-		// Requires conversion.
-		else
+		// Requires conversion to MDCT_DATETIME?
+		else if (m_pColumns[i].m_eMDBColType == MDCT_DATETIME)
 		{
 			CTimeStamp* pTimeStamp = (CTimeStamp*)(pValue + sizeof(SQLINTEGER));
 			time_t		tTime      = *pTimeStamp;
 
 			oRow[i].SetRaw(&tTime);
+		}
+		// Requires conversion to MDCT_CHAR?
+		else if (m_pColumns[i].m_eMDBColType == MDCT_CHAR)
+		{
+			char cChar = *((char*)(pValue + sizeof(SQLINTEGER)));
+
+			oRow[i].SetRaw(&cChar);
+		}
+		// Requires no conversion.
+		else
+		{
+			oRow[i].SetRaw(pValue + sizeof(SQLINTEGER));
 		}
 	}
 }

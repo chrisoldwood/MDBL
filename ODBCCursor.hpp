@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ODBCCURSOR.HPP
 ** COMPONENT:	Memory Database Library.
@@ -31,10 +30,10 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CODBCCursor(const CODBCSource& oSource);
+	CODBCCursor(CODBCSource& oSource);
 	virtual ~CODBCCursor();
 
-	virtual void Open(SQLHSTMT hStmt);
+	virtual void Open(const char* pszStmt, SQLHSTMT hStmt);
 	virtual void Close();
 	
 	//
@@ -54,18 +53,19 @@ protected:
 	//
 	// Members.
 	//
-	const CODBCSource*	m_pSource;		// The data source.
-	SQLHSTMT			m_hStmt;		// The statement handle.
-	SQLSMALLINT			m_nColumns;		// Number of columns returned.
-	SQLColumn*			m_pColumns;		// The array of column definitions.
-	int					m_nRowLen;		// Size of a row.
-	int					m_nTotalLen;	// Total size of the buffer.
-	int*				m_pOffsets;		// The array of value offsets.
-	byte*				m_pRowData;		// The row data.
-	SQLUSMALLINT*		m_pRowStatus;	// The array of status values.
-	bool				m_bDoneBind;	// Bind output buffers flag.
-	SQLUINTEGER			m_nFetched;		// Number of rows fetched.
-	SQLUINTEGER			m_nCurRow;		// Current row 
+	CODBCSource&	m_oSource;		// The data source.
+	CString			m_strStmt;		// The statment executed.
+	SQLHSTMT		m_hStmt;		// The statement handle.
+	SQLSMALLINT		m_nColumns;		// Number of columns returned.
+	SQLColumn*		m_pColumns;		// The array of column definitions.
+	int				m_nRowLen;		// Size of a row.
+	int				m_nTotalLen;	// Total size of the buffer.
+	int*			m_pOffsets;		// The array of value offsets.
+	byte*			m_pRowData;		// The row data.
+	SQLUSMALLINT*	m_pRowStatus;	// The array of status values.
+	bool			m_bDoneBind;	// Bind output buffers flag.
+	SQLUINTEGER		m_nFetched;		// Number of rows fetched.
+	SQLUINTEGER		m_nCurRow;		// Current row 
 
 	//
 	// Internal methods.
