@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		TABLE.CPP
 ** COMPONENT:	Memory Database Library.
@@ -22,14 +21,15 @@
 *******************************************************************************
 */
 
-CTable::CTable(CMDB& oDB, const char* pszName, bool bTemp)
+CTable::CTable(CMDB& oDB, const char* pszName, int nFlags)
 	: m_oDB(oDB)
 	, m_strName(pszName)
-	, m_bTemp(bTemp)
-	, m_bInserted(false)
-	, m_bDeleted(false)
+	, m_nFlags(nFlags)
+	, m_nInsertions(0)
+	, m_nDeletions(0)
 	, m_nIdentCol(-1)
 	, m_nIdentVal(0)
+	, m_pNullRow(NULL)
 {
 	ASSERT(pszName != NULL);
 	ASSERT(oDB.FindTable(pszName) == -1);
@@ -49,6 +49,7 @@ CTable::CTable(CMDB& oDB, const char* pszName, bool bTemp)
 
 CTable::~CTable()
 {
+	delete m_pNullRow;
 }
 
 /******************************************************************************
@@ -68,9 +69,13 @@ CTable::~CTable()
 
 int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlags)
 {
-	ASSERT(m_vRows.Size() == 0);
+	ASSERT(m_vRows.Count() == 0);
 	ASSERT(FindColumn(pszName) == -1);
 	ASSERT(!((eType == MDCT_IDENTITY) && (m_nIdentCol != -1)));
+
+	// Apply table settings to all columns.
+	if (ReadOnly())		nFlags |= CColumn::READ_ONLY;
+	if (Transient())	nFlags |= CColumn::TRANSIENT;
 
 	CColumn* pColumn = NULL;
 
@@ -80,27 +85,27 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 			pColumn = new CColumn(*this, pszName, MDCT_INT,       0,       sizeof(int),        nFlags);
 			break;
 
-		case MDCT_DOUBLE:	
+		case MDCT_DOUBLE:
 			pColumn = new CColumn(*this, pszName, MDCT_DOUBLE,    0,       sizeof(double),     nFlags);
 			break;
 
-		case MDCT_CHAR:		
+		case MDCT_CHAR:
 			pColumn = new CColumn(*this, pszName, MDCT_CHAR,      1,       sizeof(char),       nFlags);
 			break;
 
-		case MDCT_FXDSTR:	
+		case MDCT_FXDSTR:
 			pColumn = new CColumn(*this, pszName, MDCT_FXDSTR,    nLength, nLength+1,          nFlags);
 			break;
 
-//		case MDCT_VARSTR:	
-//			pColumn = new CColumn(*this, pszName, MDCT_FXDSTR,    nLength, sizeof(char*),      nFlags);
-//			break;
+		case MDCT_VARSTR:
+			pColumn = new CColumn(*this, pszName, MDCT_VARSTR,    nLength, 0,                  nFlags);
+			break;
 
-		case MDCT_BOOL:		
+		case MDCT_BOOL:
 			pColumn = new CColumn(*this, pszName, MDCT_BOOL,      0,       sizeof(bool),       nFlags);
 			break;
 
-		case MDCT_IDENTITY:	
+		case MDCT_IDENTITY:
 			pColumn = new CColumn(*this, pszName, MDCT_IDENTITY,  0,       sizeof(int),        CColumn::IDENTITY);
 			break;
 
@@ -110,6 +115,18 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 
 		case MDCT_TIMESTAMP:
 			pColumn = new CColumn(*this, pszName, MDCT_TIMESTAMP, 0,       sizeof(CTimeStamp), nFlags);
+			break;
+
+		case MDCT_VOIDPTR:
+			pColumn = new CColumn(*this, pszName, MDCT_VOIDPTR,   0,       0,                  nFlags);
+			break;
+
+		case MDCT_ROWPTR:
+			pColumn = new CColumn(*this, pszName, MDCT_ROWPTR,    0,       0,                  nFlags);
+			break;
+
+		case MDCT_ROWSETPTR:
+			pColumn = new CColumn(*this, pszName, MDCT_ROWSETPTR, 0,       0,                  nFlags);
 			break;
 
 		default:
@@ -125,12 +142,11 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 
 	// Is identity column?
 	if (pColumn->ColType() == MDCT_IDENTITY)
-	{
 		m_nIdentCol = i;
 
-		// Column is indexed by default.
-		pColumn->Index(new CIntIndex(*this, i, true));
-	}
+	// If unique add index.
+	if (nFlags & CColumn::UNIQUE)
+		AddIndex(i);
 
 	return i;
 }
@@ -141,27 +157,32 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 ** Description:	Appends a foreign key column to the table.
 **
 ** Parameters:	pszName		The name.
-**				nFlags		The flags.
 **				oTable		The foreign table.
 **				nColumn		The foreign tables' colummn.
+**				nFlags		The flags.
 **
 ** Returns:		The index of the new column.
 **
 *******************************************************************************
 */
 
-int CTable::AddColumn(const char* pszName, int nFlags, CTable& oTable, int nColumn)
+int CTable::AddColumn(const char* pszName, CTable& oTable, int nColumn, int nFlags)
 {
-	ASSERT(m_vRows.Size() == 0);
+	ASSERT(m_vRows.Count() == 0);
 	ASSERT(FindColumn(pszName) == -1);
 	ASSERT(oTable.m_vColumns[nColumn].Unique());
 	ASSERT(oTable.m_vColumns[nColumn].Index() != NULL);
+	ASSERT(nFlags & CColumn::FOREIGN_KEY);
 
 	// Create the column based on the foreign columns details.
-	CColumn* pColumn = new CColumn(*this, pszName, nFlags, oTable, nColumn, oTable.m_vColumns[nColumn]);
+	CColumn* pColumn = new CColumn(*this, pszName, oTable, nColumn, oTable.m_vColumns[nColumn], nFlags);
 
 	// Add to the table.
 	int i = m_vColumns.Add(*pColumn);
+
+	// If unique add index.
+	if (nFlags & CColumn::UNIQUE)
+		AddIndex(i);
 
 	return i;
 }
@@ -180,7 +201,7 @@ int CTable::AddColumn(const char* pszName, int nFlags, CTable& oTable, int nColu
 
 void CTable::DropColumn(int nColumn)
 {
-	ASSERT(m_vRows.Size() == 0);
+	ASSERT(m_vRows.Count() == 0);
 
 	// Drop the column.
 	m_vColumns.Delete(nColumn);
@@ -202,7 +223,7 @@ void CTable::DropColumn(int nColumn)
 
 void CTable::DropAllColumns()
 {
-	ASSERT(m_vRows.Size() == 0);
+	ASSERT(m_vRows.Count() == 0);
 
 	// Drop the columns.
 	m_vColumns.DeleteAll();
@@ -222,9 +243,9 @@ void CTable::DropAllColumns()
 *******************************************************************************
 */
 
-void CTable::AddIndex(int nColumn, CIndex::Type eIndexType, int nApproxRows)
+void CTable::AddIndex(int nColumn)
 {
-	ASSERT(m_vRows.Size() == 0);
+	ASSERT(m_vRows.Count() == 0);
 	ASSERT(m_vColumns[nColumn].Index() == NULL);
 
 	CIndex* pIndex = NULL;
@@ -237,9 +258,29 @@ void CTable::AddIndex(int nColumn, CIndex::Type eIndexType, int nApproxRows)
 
 	switch (eColType)
 	{
-		case MDCT_INT:		pIndex = new CIntIndex(*this, nColumn, bUnique);	break;
-		case MDCT_IDENTITY:	pIndex = new CIntIndex(*this, nColumn, true);		break;
-		default:			ASSERT(false);										break;
+		case MDCT_INT:	
+			if (bUnique)
+				pIndex = new CIntMapIndex(*this, nColumn);
+			break;
+
+		case MDCT_FXDSTR:
+			if (bUnique)
+				pIndex = new CStrMapIndex(*this, nColumn);
+			break;
+
+		case MDCT_VARSTR:
+			if (bUnique)
+				pIndex = new CStrMapIndex(*this, nColumn);
+			break;
+
+		case MDCT_IDENTITY:
+			ASSERT(bUnique);
+			pIndex = new CIntMapIndex(*this, nColumn);
+			break;
+
+		default:
+			ASSERT(false);
+			break;
 	}
 
 	ASSERT(pIndex != NULL);
@@ -289,17 +330,18 @@ CRow& CTable::CreateRow()
 ** Description:	Inserts a row into the table. If the table contains an identity
 **				column, its value is set.
 **
-** Parameters:	None.
+** Parameters:	oRow	The row to insert.
+**				bNew	Is a new row or being serialized in?
 **
 ** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-int CTable::InsertRow(CRow& oRow)
+int CTable::InsertRow(CRow& oRow, bool bNew)
 {
 	ASSERT(&oRow.Table()   == this);
-	ASSERT(oRow.Inserted() == false);
+	ASSERT(oRow.InTable() == false);
 
 	// Call "trigger".
 	OnBeforeInsert(oRow);
@@ -309,18 +351,15 @@ int CTable::InsertRow(CRow& oRow)
 		oRow[m_nIdentCol] = ++m_nIdentVal;
 
 #ifdef _DEBUG
-	// Check null flags.
-	for (int n = 0; n < m_vColumns.Size(); n++)
-	{
-		bool bCanBeNull = m_vColumns[n].Nullable();
-		bool bIsNull    = (oRow[n] == null);
+	// Check row nulls and fkeys.
+	CheckRow(oRow);
 
-		ASSERT(!(!bCanBeNull && bIsNull));
-	}
+	// Check index sizes.
+	CheckIndexes();
 #endif //_DEBUG
 
 	// Update any indexes.
-	for (int i=0; i < m_vColumns.Size(); i++)
+	for (int i=0; i < m_vColumns.Count(); i++)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
@@ -329,8 +368,15 @@ int CTable::InsertRow(CRow& oRow)
 	}
 
 	// Mark as inserted.
-	oRow.Status(CRow::INSERTED);
-	m_bInserted = true;
+	if (bNew)
+	{
+		oRow.MarkInserted();
+		m_nInsertions++;
+	}
+	else
+	{
+		oRow.MarkOriginal();
+	}
 
 	// Append it.
 	int nRow = m_vRows.Add(oRow);
@@ -361,7 +407,7 @@ void CTable::DeleteRow(int nRow)
 	OnBeforeDelete(oRow);
 
 	// Update any indexes.
-	for (int i=0; i < m_vColumns.Size(); i++)
+	for (int i=0; i < m_vColumns.Count(); i++)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
@@ -371,7 +417,7 @@ void CTable::DeleteRow(int nRow)
 
 	// Remove it.
 	m_vRows.Remove(nRow);
-	m_bDeleted = true;
+	m_nDeletions++;
 
 	// Call "trigger".
 	OnAfterDelete(oRow);
@@ -394,7 +440,7 @@ void CTable::DeleteRow(int nRow)
 
 void CTable::DeleteRow(CRow& oRow)
 {
-	for (int i=0; i < m_vRows.Size(); i++)
+	for (int i=0; i < m_vRows.Count(); i++)
 	{
 		if (&m_vRows[i] == &oRow)
 		{
@@ -419,20 +465,59 @@ void CTable::DeleteRow(CRow& oRow)
 void CTable::Truncate()
 {
 	// Anything to truncate?
-	if (m_vRows.Size() > 0)
+	if (m_vRows.Count() > 0)
 	{
-		// Update any indexes.
-		for (int i=0; i < m_vColumns.Size(); i++)
-		{
-			CIndex* pIndex = m_vColumns[i].Index();
-
-			if (pIndex != NULL)
-				pIndex->Truncate();
-		}
+		m_nDeletions += m_vRows.Count();
 
 		// Remove all.
 		m_vRows.DeleteAll();
-		m_bDeleted = true;
+		TruncateIndexes();
+	}
+}
+
+/******************************************************************************
+** Method:		NullRow()
+**
+** Description:	Returns the NULL row for outer joins. This is a special row
+**				where all fields are NULL.
+**
+** Parameters:	None.
+**
+** Returns:		The NULL row.
+**
+*******************************************************************************
+*/
+
+CRow& CTable::NullRow()
+{
+	// Create NUll row if not already.
+	if (m_pNullRow == NULL)
+		m_pNullRow = new CRow(*this, true);
+
+	return *m_pNullRow;
+}
+
+/******************************************************************************
+** Method:		TruncateIndexes()
+**
+** Description:	Deletes all rows in all indexes.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::TruncateIndexes()
+{
+	// For all indexes.
+	for (int i=0; i < m_vColumns.Count(); i++)
+	{
+		CIndex* pIndex = m_vColumns[i].Index();
+
+		if (pIndex != NULL)
+			pIndex->Truncate();
 	}
 }
 
@@ -456,7 +541,9 @@ CRow* CTable::SelectRow(int nColumn, const CValue& oValue) const
 	ASSERT(m_vColumns[nColumn].Index() != NULL);
 
 	// Use index, to find it.
-	return m_vColumns[nColumn].Index()->FindRow(oValue);
+	CUniqIndex* pIndex = static_cast<CUniqIndex*>(m_vColumns[nColumn].Index());
+
+	return pIndex->FindRow(oValue);
 }
 
 /******************************************************************************
@@ -476,7 +563,7 @@ CResultSet CTable::Select(const CWhere& oWhere) const
 	CResultSet oRS;
 
 	// For all rows, apply the clause,
-	for (int i = 0; i < m_vRows.Size(); i++)
+	for (int i = 0; i < m_vRows.Count(); i++)
 	{
 		CRow& oRow = m_vRows[i];
 
@@ -485,6 +572,32 @@ CResultSet CTable::Select(const CWhere& oWhere) const
 	}
 
 	return oRS;
+}
+
+/******************************************************************************
+** Method:		Exists()
+**
+** Description:	Checks of at least one one matches the WHERE clause.
+**
+** Parameters:	oWhere	The where clause.
+**
+** Returns:		true or false.
+**
+*******************************************************************************
+*/
+
+bool CTable::Exists(const CWhere& oWhere) const
+{
+	// For all rows, apply the clause,
+	for (int i = 0; i < m_vRows.Count(); i++)
+	{
+		CRow& oRow = m_vRows[i];
+
+		if (oWhere.Matches(oRow))
+			return true;
+	}
+
+	return false;
 }
 
 /******************************************************************************
@@ -502,12 +615,12 @@ CResultSet CTable::Select(const CWhere& oWhere) const
 
 bool CTable::Modified() const
 {
-	// Ignore if temporary table.
-	if (m_bTemp)
+	// Ignore if table transient or read-only.
+	if (Transient() || ReadOnly())
 		return false;
 
 	// Any insertions or deletions?
-	if (m_bInserted || m_bDeleted)
+	if (m_nInsertions || m_nDeletions)
 		return true;
 
 	// Check all rows.
@@ -530,18 +643,19 @@ bool CTable::Modified() const
 void CTable::operator <<(CStream& rStream)
 {
 	m_vRows.DeleteAll();
+	TruncateIndexes();
 
-	// Is a temporary table?
-	if (m_bTemp)
-	{
-		// Reset modified flags.
-		m_bInserted = false;
-		m_bDeleted  = false;
-
+	// Ignore if a temporary table.
+	if (Transient())
 		return;
-	}
 
+	int32 nColumns;
 	int32 nRows;
+
+	// Verify the column count.
+	rStream >> nColumns;
+
+	ASSERT(m_vColumns.Count() == nColumns);
 
 	// Read the row count.
 	rStream >> nRows;
@@ -554,28 +668,14 @@ void CTable::operator <<(CStream& rStream)
 		oRow << rStream;
 
 #ifdef _DEBUG
-		// Check null flags and foreign keys.
-		for (int k = 0; k < m_vColumns.Size(); k++)
-		{
-			bool bCanBeNull = m_vColumns[k].Nullable();
-			bool bIsNull    = (oRow[k] == null);
-
-			ASSERT(!(!bCanBeNull && bIsNull));
-
-			CTable* pFKTable  = m_vColumns[k].FKTable();
-			int     nFKColumn = m_vColumns[k].FKColumn();
-
-			if (pFKTable == NULL)
-				continue;
-
-			ASSERT(pFKTable->SelectRow(nFKColumn, oRow[k]) != NULL);
-		}
+		// Check row nulls and fkeys.
+		CheckRow(oRow);
 #endif //_DEBUG
 
 		m_vRows.Add(oRow);
 
 		// Update any indexes.
-		for (int n = 0; n < m_vColumns.Size(); n++)
+		for (int n = 0; n < m_vColumns.Count(); n++)
 		{
 			CIndex* pIndex = m_vColumns[n].Index();
 
@@ -584,27 +684,31 @@ void CTable::operator <<(CStream& rStream)
 		}
 	}
 
+#ifdef _DEBUG
+	// Check index sizes.
+	CheckIndexes();
+#endif //_DEBUG
+
 	// Read the identity value.
-	rStream >> m_nIdentVal;
+	rStream.Read(&m_nIdentVal, sizeof(m_nIdentVal));
 
 	// Reset modified flags.
-	m_bInserted = false;
-	m_bDeleted  = false;
+	m_nInsertions = 0;
+	m_nDeletions  = 0;
 }
 
 void CTable::operator >>(CStream& rStream)
 {
-	// Is a temporary table?
-	if (m_bTemp)
-	{
-		// Reset modified flags.
-		m_bInserted = false;
-		m_bDeleted  = false;
-
+	// Ignore if a temporary table.
+	if (Transient())
 		return;
-	}
 
-	int32 nRows = m_vRows.Size();
+	int32 nColumns = m_vColumns.Count();
+
+	// Write the column count.
+	rStream << nColumns;
+
+	int32 nRows = m_vRows.Count();
 
 	// Write the row count.
 	rStream << nRows;
@@ -614,11 +718,49 @@ void CTable::operator >>(CStream& rStream)
 		m_vRows[i] >> rStream;
 
 	// Write the identity value.
-	rStream << m_nIdentVal;
+	rStream.Write(&m_nIdentVal, sizeof(m_nIdentVal));
 
 	// Reset modified flags.
-	m_bInserted = false;
-	m_bDeleted  = false;
+	m_nInsertions = 0;
+	m_nDeletions  = 0;
+}
+
+/******************************************************************************
+** Method:		SQLQuery()
+**
+** Description:	Gets the SQL query required to load the table,
+**
+** Parameters:	None.
+**
+** Returns:		The query.
+**
+*******************************************************************************
+*/
+
+CString CTable::SQLQuery() const
+{
+	ASSERT(Transient() == false);
+	ASSERT(m_vColumns.Count() > 0);
+
+	CString strColumns;
+	CString strQuery;
+
+	// Get column list.
+	for (int i = 0; i < m_vColumns.Count(); i++)
+	{
+		// Ignore TRANSIENT columns.
+		if (!m_vColumns[i].Transient())
+		{
+			if (strColumns.Length())
+				strColumns += ',';
+
+			strColumns += m_vColumns[i].Name();
+		}
+	}
+
+	strQuery.Format("SELECT %s FROM %s", strColumns, Name());
+
+	return strQuery;
 }
 
 /******************************************************************************
@@ -636,40 +778,38 @@ void CTable::operator >>(CStream& rStream)
 
 void CTable::operator <<(CSQLSource& rSource)
 {
+	m_vRows.DeleteAll();
+	TruncateIndexes();
+
+	// Ignore if a temporary table.
+	if (Transient())
+		return;
+
 	ASSERT(rSource.IsOpen());
-
-	CString strBaseQuery = "SELECT %s FROM %s";
-	CString strColumns;
-	CString strQuery;
-
-	// Get column list.
-	for (int i = 0; i < m_vColumns.Size(); i++)
-	{
-		if (i > 0) strColumns += ',';
-		
-		strColumns += m_vColumns[i].Name();
-	}
-
-	strQuery.Format(strBaseQuery, strColumns, Name());
 
 	CSQLCursor*	pCursor = NULL;
 
 	try
 	{
-		pCursor = rSource.ExecQuery(strQuery);
+		pCursor = rSource.ExecQuery(SQLQuery());
 
 		// Set the output column types.
-		for (int i = 0; i < m_vColumns.Size(); i++)
+		for (int i = 0; i < m_vColumns.Count(); i++)
 		{
-			CColumn&   oTabColumn = m_vColumns[i];
-			SQLColumn& oSQLColumn = pCursor->Column(i);
+			CColumn& oTabColumn = m_vColumns[i];
 
-			ASSERT(oTabColumn.Name()     == oSQLColumn.m_strName);
-			ASSERT(oTabColumn.Nullable() == (oSQLColumn.m_nFlags & CColumn::NULLABLE));
-			ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
+			// Ignore TRANSIENT columns.
+			if (!oTabColumn.Transient())
+			{
+				SQLColumn& oSQLColumn = pCursor->Column(i);
 
-			oSQLColumn.m_eMDBColType = oTabColumn.ColType();
-			oSQLColumn.m_nSize       = oTabColumn.Length();
+				ASSERT(oTabColumn.Name()     == oSQLColumn.m_strName);
+				ASSERT(oTabColumn.Nullable() == (oSQLColumn.m_nFlags & CColumn::NULLABLE));
+				ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
+
+				oSQLColumn.m_eMDBColType = oTabColumn.ColType();
+				oSQLColumn.m_nSize       = oTabColumn.Length();
+			}
 		}
 
 		// For all rows.
@@ -682,8 +822,7 @@ void CTable::operator <<(CSQLSource& rSource)
 			pCursor->SetRow(oRow);
 
 			// Append to table.
-			InsertRow(oRow);
-			oRow.Status(CRow::ORIGINAL);
+			InsertRow(oRow, false);
 		}
 
 		// Cleanup.
@@ -698,6 +837,11 @@ void CTable::operator <<(CSQLSource& rSource)
 
 void CTable::operator >>(CSQLSource& rSource)
 {
+	// Ignore if a temporary table.
+	if (Transient())
+		return;
+
+	ASSERT(rSource.IsOpen());
 }
 
 /******************************************************************************
@@ -726,5 +870,86 @@ void CTable::OnBeforeDelete(CRow& oRow)
 }
 
 void CTable::OnAfterDelete(CRow& oRow)
+{
+}
+
+/******************************************************************************
+** Method:		CheckIndexes()
+**
+** Description:	Checks the row of the indexes.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::CheckIndexes() const
+{
+#ifdef _DEBUG
+	// For all indexes.
+	for (int i=0; i < m_vColumns.Count(); i++)
+	{
+		CIndex* pIndex = m_vColumns[i].Index();
+
+		if (pIndex == NULL)
+			continue;
+
+		ASSERT(pIndex->RowCount() == m_vRows.Count());
+	}
+#endif
+}
+
+/******************************************************************************
+** Method:		CheckRow()
+**
+** Description:	Checks the row is valid.
+**
+** Parameters:	oRow	The row to check.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::CheckRow(CRow& oRow) const
+{
+#ifdef _DEBUG
+	for (int k = 0; k < m_vColumns.Count(); k++)
+	{
+		bool bCanBeNull = m_vColumns[k].Nullable();
+		bool bIsNull    = (oRow[k] == null);
+
+		ASSERT(!(!bCanBeNull && bIsNull));
+
+		CheckColumn(oRow, k, oRow[k]);
+
+		CTable* pFKTable  = m_vColumns[k].FKTable();
+		int     nFKColumn = m_vColumns[k].FKColumn();
+
+		if ( (pFKTable == NULL) || (bIsNull) )
+			continue;
+
+		ASSERT(pFKTable->SelectRow(nFKColumn, oRow[k]) != NULL);
+	}
+#endif
+}
+
+/******************************************************************************
+** Method:		CheckColumn()
+**
+** Description:	Checks the column value is valid.
+**
+** Parameters:	oRow		The row being checked.
+**				nColumn		The column to check.
+**				oValue		The columns value.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::CheckColumn(CRow& oRow, int nColumn, const CValue& oValue) const
 {
 }
