@@ -127,7 +127,7 @@ void CODBCParams::Bind()
 	m_nRowLen = 0;
 
 	// Calculate the row buffer size.
-	for (i = 0; i < m_nParams; i++)
+	for (int i = 0; i < m_nParams; i++)
 	{
 		m_nRowLen += sizeof(SQLINTEGER);
 		m_nRowLen += m_pParams[i].m_nBufSize;
@@ -140,7 +140,7 @@ void CODBCParams::Bind()
 	int nOffset = 0;
 
 	// Bind all parameters.
-	for (i = 0; i < m_nParams; i++)
+	for (int i = 0; i < m_nParams; i++)
 	{
 		// Save buffer offset to value.
 		m_pOffsets[i] = nOffset;

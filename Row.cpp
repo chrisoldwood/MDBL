@@ -102,7 +102,7 @@ void CRow::Read(CStream& rStream)
 	rStream.Read(pData, nSize);
 
 	// Read any MDCT_VARSTR field values.
-	for (i = 0; i < m_nColumns; i++)
+	for (int i = 0; i < m_nColumns; i++)
 	{
 		if (m_aFields[i].m_oColumn.ColType() == MDCT_VARSTR)
 		{
@@ -137,7 +137,7 @@ void CRow::Write(CStream& rStream)
 	rStream.Write(pData, nSize);
 
 	// Write any MDCT_VARSTR field values.
-	for (i = 0; i < m_nColumns; i++)
+	for (int i = 0; i < m_nColumns; i++)
 	{
 		if (m_aFields[i].m_oColumn.ColType() == MDCT_VARSTR)
 		{

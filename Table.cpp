@@ -1018,18 +1018,20 @@ void CTable::Write(CSQLSource& rSource, RowTypes eRows)
 
 void CTable::WriteInsertions(CSQLSource& rSource)
 {
+	bool bAnyDirty = false;
+
 	// Perform a quick check to see if
 	// there is actually anything to write.
-	for (int i = 0; i < RowCount(); i++)
+	for (int i = 0; (i < RowCount()) && (!bAnyDirty); i++)
 	{
 		CRow& oRow = m_vRows[i];
 
 		if (oRow.Inserted() && !oRow.Deleted())
-			break;
+			bAnyDirty = true;
 	}
 
 	// Nothing to write?
-	if (i == RowCount())
+	if (!bAnyDirty)
 		return;
 
 	CString strColumns;
@@ -1038,7 +1040,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 	int		nParams = 0;
 
 	// Create column and parameter list.
-	for (i = 0; i < m_vColumns.Count(); i++)
+	for (int i = 0; i < m_vColumns.Count(); i++)
 	{
 		// Ignore TRANSIENT columns.
 		if (m_vColumns[i].Transient())
@@ -1089,7 +1091,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 		}
 
 		// For all rows.
-		for (i = 0; i < RowCount(); i++)
+		for (int i = 0; i < RowCount(); i++)
 		{
 			CRow& oRow = m_vRows[i];
 
@@ -1116,18 +1118,20 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 
 void CTable::WriteUpdates(CSQLSource& rSource)
 {
+	bool bAnyDirty = false;
+
 	// Perform a quick check to see if
 	// there is actually anything to write.
-	for (int i = 0; i < RowCount(); i++)
+	for (int i = 0; (i < RowCount()) && (!bAnyDirty); i++)
 	{
 		CRow& oRow = m_vRows[i];
 
 		if (oRow.Updated() && !(oRow.Inserted() || oRow.Deleted()) )
-			break;
+			bAnyDirty = true;
 	}
 
 	// Nothing to write?
-	if (i == RowCount())
+	if (!bAnyDirty)
 		return;
 
 	// For all rows.
@@ -1145,7 +1149,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 		int		nParams = 0;
 
 		// Create column and where clause list.
-		for (i = 0; i < m_vColumns.Count(); i++)
+		for (int i = 0; i < m_vColumns.Count(); i++)
 		{
 			const CColumn& oColumn = m_vColumns[i];
 
@@ -1192,8 +1196,10 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 			// Allocate the parameters object.
 			pParams = rSource.CreateParams(strQuery, nParams);
 
+			int iSQLParam = 0;
+
 			// Create modified column parameter definitions.
-			for (int iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+			for (int iTabCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
 			{
 				const CColumn& oColumn = m_vColumns[iTabCol];
 
@@ -1215,7 +1221,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 			}
 
 			// Create primary key column parameter definitions.
-			for (iTabCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+			for (int iTabCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
 			{
 				const CColumn& oColumn = m_vColumns[iTabCol];
 

@@ -258,7 +258,7 @@ void CODBCCursor::Bind()
 	m_nRowLen = 0;
 
 	// Calculate the row buffer size.
-	for (i = 0; i < m_nColumns; i++)
+	for (int i = 0; i < m_nColumns; i++)
 	{
 		m_nRowLen += sizeof(SQLINTEGER);
 		m_nRowLen += m_pColumns[i].m_nSize;
@@ -281,7 +281,7 @@ void CODBCCursor::Bind()
 	int nOffset = 0;
 
 	// Bind row buffers.
-	for (i = 0; i < m_nColumns; i++)
+	for (int i = 0; i < m_nColumns; i++)
 	{
 		// Save buffer offset to value.
 		m_pOffsets[i] = nOffset;
