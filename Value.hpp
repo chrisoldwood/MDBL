@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		VALUE.HPP
 ** COMPONENT:	Memory Database Library.
@@ -33,6 +32,7 @@ public:
 	CValue(const CString& sValue);
 	CValue(bool bValue);
 	CValue(time_t tValue);
+	CValue(void* pValue);
 	~CValue();
 
 	CValue(const CValue& oValue);
@@ -52,6 +52,7 @@ union
 	char*	m_sValue;		// Value if type is MDST_STRING
 	bool	m_bValue;		// Value if type is MDST_BOOL.
 	time_t	m_tValue;		// Value if type is MDST_TIME_T.
+	void*	m_pValue;		// Value if type is MDST_POINTER.
 	byte	m_uValue[8];	// Member used when copying.
 };
 
@@ -64,7 +65,7 @@ union
 *******************************************************************************
 */
 
-inline CValue::CValue(const CNull& oNull)
+inline CValue::CValue(const CNull&)
 	: m_eType(MDST_NULL)
 	, m_bNull(true)
 {
@@ -118,6 +119,13 @@ inline CValue::CValue(time_t tValue)
 	: m_eType(MDST_TIME_T)
 	, m_bNull(false)
 	, m_tValue(tValue)
+{
+}
+
+inline CValue::CValue(void* pValue)
+	: m_eType(MDST_POINTER)
+	, m_bNull(false)
+	, m_pValue(pValue)
 {
 }
 
