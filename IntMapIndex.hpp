@@ -39,6 +39,8 @@ public:
 	virtual CRow* FindRow(const CValue& oValue) const;
 	virtual CResultSet FindRows(const CValue& oValue) const;
 
+	virtual void Capacity(int nRows);
+
 protected:
 	//
 	// Members.
@@ -92,6 +94,11 @@ inline CResultSet CIntMapIndex::FindRows(const CValue& oValue) const
 	ASSERT(oValue.m_eType == MDST_INT);
 
 	return CResultSet(m_oTable, FindRow(oValue.m_iValue));
+}
+
+inline void CIntMapIndex::Capacity(int nRows)
+{
+	m_oMap.Reserve(nRows);
 }
 
 #endif //INTMAPINDEX_HPP

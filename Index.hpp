@@ -36,6 +36,8 @@ public:
 
 	virtual CResultSet FindRows(const CValue& oValue) const = 0;
 
+	virtual void Capacity(int nRows) = 0;
+
 protected:
 	//
 	// Constructors/Destructor.
