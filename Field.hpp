@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		FIELD.HPP
 ** COMPONENT:	Memory Database Library.
@@ -37,6 +36,9 @@ public:
 	time_t	          GetDateTime()  const;
 	const CTimeStamp& GetTimeStamp() const;
 	CValue            GetValue()     const;
+	void*             GetPtr()       const;
+	CRow*             GetRowPtr()    const;
+	CRow**            GetRowSetPtr() const;
 
 	//
 	// Mutators.
@@ -49,6 +51,10 @@ public:
 	void SetBool(bool bValue);
 	void SetDateTime(time_t tValue);
 	void SetTimeStamp(const CTimeStamp& tsValue);
+	void SetField(const CField& oValue);
+	void SetPtr(void* pValue);
+	void SetRowPtr(CRow* pValue);
+	void SetRowSetPtr(CRow** pValue);
 	void SetRaw(const void* pValue);
 
 	//
@@ -62,6 +68,10 @@ public:
 	operator time_t()            const;
 	operator const CTimeStamp&() const;
 	operator CValue()            const;
+	operator void*()             const;
+	operator CRow*()             const;
+	operator CRow**()            const;
+	
 
 	void operator=(const CNull& oNull);
 	void operator=(int iValue);
@@ -71,25 +81,42 @@ public:
 	void operator=(bool bValue);
 	void operator=(time_t tValue);
 	void operator=(const CTimeStamp& tsValue);
+	void operator=(const CField& oValue);
+	void operator=(void* pValue);
+	void operator=(CRow* pValue);
+	void operator=(CRow** pValue);
 
 	//
 	// Comparison operators.
 	//
 	bool operator==(const CNull& oNull) const;
 	bool operator!=(const CNull& oNull) const;
+	bool operator==(int  iValue) const;
+	bool operator!=(int  iValue) const;
+	bool operator==(double dValue) const;
+	bool operator!=(double dValue) const;
+	bool operator==(char cValue) const;
+	bool operator!=(char cValue) const;
+	bool operator==(const char* sValue) const;
+	bool operator!=(const char* sValue) const;
+	bool operator==(bool bValue) const;
+	bool operator!=(bool bValue) const;
 	bool operator==(const CValue& oValue) const;
 	bool operator!=(const CValue& oValue) const;
+	bool operator==(const CField& oValue) const;
+	bool operator!=(const CField& oValue) const;
 
 protected:
 	//
 	// Members.
 	//
-	CRow*		m_pRow;			// The parent row.
-	CColumn*	m_pColumn;		// The parent column.
+	CRow&		m_oRow;			// The parent row.
+	CColumn&	m_oColumn;		// The parent column.
+	int			m_nColumn;		// The parent column index.
+	bool		m_bModified;	// Modified flag.
 	bool		m_bNull;		// NULL flag.
 union
 {
-	void*		m_pVoid;		// Generic pointer to value.
 	int*		m_pInt;			// Pointer to value if type is MDCT_INT or MDCT_IDENTITY.
 	double*		m_pDouble;		// Pointer to value if type is MDCT_DOUBLE.
 	char*		m_pChar;		// Pointer to value if type is MDCT_CHAR.
@@ -97,6 +124,9 @@ union
 	bool*		m_pBool;		// Pointer to value if type is MDCT_BOOL.
 	time_t*		m_pTimeT;		// Pointer to value if type is MDCT_DATETIME.
 	CTimeStamp*	m_pTimeStamp;	// Pointer to value if type is MDCT_TIMESTAMP.
+	void*		m_pVoidPtr;		// Value if type is MDCT_VOIDPTR.
+	CRow*		m_pRowPtr;		// Value if type is MDCT_ROWPTR.
+	CRow**		m_pRowSetPtr;	// Value if type is MDCT_ROWSETPTR.
 };
 
 	//
@@ -108,14 +138,25 @@ private:
 	//
 	// Only allow CRow to create and destroy.
 	//
-	CField();
+	CField(CRow& oRow, CColumn& oColumn, int nColumn, bool bNull, void* pData);
 	~CField();
 
 	//
-	// Disallow copies & assignments for now.
+	// Placement new/delete operators.
+	//
+	void* operator new(size_t n, void* p);
+	void  operator delete(void* p, void* p2);
+	void  operator delete(void* p);
+
+	//
+	// Disallow copies for now.
 	//
 	CField(const CField& oValue);
-	CField& operator=(const CField& oValue);
+
+	//
+	// Internal methods.
+	//
+	void Updated();
 };
 
 /******************************************************************************
@@ -124,6 +165,19 @@ private:
 **
 *******************************************************************************
 */
+
+inline void* CField::operator new(size_t, void* p)
+{
+	return p;
+}
+
+inline void  CField::operator delete(void*, void*)
+{
+}
+
+inline void  CField::operator delete(void*)
+{
+}
 
 inline CField::operator int() const
 {
@@ -163,6 +217,21 @@ inline CField::operator const CTimeStamp&() const
 inline CField::operator CValue() const
 {
 	return GetValue();
+}
+
+inline CField::operator void*() const
+{
+	return GetPtr();
+}
+
+inline CField::operator CRow*() const
+{
+	return GetRowPtr();
+}
+
+inline CField::operator CRow**() const
+{
+	return GetRowSetPtr();
 }
 
 inline void CField::operator=(const CNull&)
@@ -205,17 +274,97 @@ inline void CField::operator=(const CTimeStamp& tsValue)
 	SetTimeStamp(tsValue);
 }
 
-inline bool CField::operator==(const CNull& oNull) const
+inline void CField::operator=(const CField& oValue)
+{
+	SetField(oValue);
+}
+
+inline void CField::operator=(void* pValue)
+{
+	SetPtr(pValue);
+}
+
+inline void CField::operator=(CRow* pValue)
+{
+	SetRowPtr(pValue);
+}
+
+inline void CField::operator=(CRow** pValue)
+{
+	SetRowSetPtr(pValue);
+}
+
+inline bool CField::operator==(const CNull&) const
 {
 	return m_bNull;
 }
 
-inline bool CField::operator!=(const CNull& oNull) const
+inline bool CField::operator!=(const CNull&) const
 {
 	return !m_bNull;
 }
 
+inline bool CField::operator==(int iValue) const
+{
+	return (iValue == GetInt());
+}
+
+inline bool CField::operator!=(int iValue) const
+{
+	return (iValue != GetInt());
+}
+
+inline bool CField::operator==(double dValue) const
+{
+	return (dValue == GetDouble());
+}
+
+inline bool CField::operator!=(double dValue) const
+{
+	return (dValue != GetDouble());
+}
+
+inline bool CField::operator==(char cValue) const
+{
+	return (cValue == GetChar());
+}
+
+inline bool CField::operator!=(char cValue) const
+{
+	return (cValue != GetChar());
+}
+
+inline bool CField::operator==(const char* sValue) const
+{
+	return (strcmp(sValue, GetString()) == 0);
+}
+
+inline bool CField::operator!=(const char* sValue) const
+{
+	return (strcmp(sValue, GetString()) != 0);
+}
+
+inline bool CField::operator==(bool bValue) const
+{
+	return (bValue == GetBool());
+}
+
+inline bool CField::operator!=(bool bValue) const
+{
+	return (bValue != GetBool());
+}
+
 inline bool CField::operator!=(const CValue& oValue) const
+{
+	return !operator==(oValue);
+}
+
+inline bool CField::operator==(const CField& oValue) const
+{
+	return operator==(oValue.GetValue());
+}
+
+inline bool CField::operator!=(const CField& oValue) const
 {
 	return !operator==(oValue);
 }

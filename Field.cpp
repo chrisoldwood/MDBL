@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		FIELD.CPP
 ** COMPONENT:	Memory Database Library.
@@ -16,9 +15,7 @@ CNull null;
 /******************************************************************************
 ** Method:		Constructor.
 **
-** Description:	WARNING: This is never actually called because CRow mallocs a
-**				buffer and casts the return. Should really use placement new
-**				syntax for this.
+** Description:	.
 **
 ** Parameters:	None.
 **
@@ -27,9 +24,21 @@ CNull null;
 *******************************************************************************
 */
 
-CField::CField()
+CField::CField(CRow& oRow, CColumn& oColumn, int nColumn, bool bNull, void* pData)
+	: m_oRow(oRow)
+	, m_oColumn(oColumn)
+	, m_nColumn(nColumn)
+	, m_bModified(false)
+	, m_bNull(bNull)
+	, m_pVoidPtr(pData)
 {
-	ASSERT(false);
+	// POINTER fields store their values 'in-place'.
+	if (m_oColumn.StgType() == MDST_POINTER)
+		m_pVoidPtr = NULL;
+
+	// VARSTR fields store their values in a separate buffer.
+	if (m_oColumn.ColType() == MDCT_VARSTR)
+		m_pString = (char*) calloc(1, sizeof(char));
 }
 
 /******************************************************************************
@@ -46,6 +55,9 @@ CField::CField()
 
 CField::~CField()
 {
+	// VARSTR fields store their values in a separate block.
+	if (m_oColumn.ColType() == MDCT_VARSTR)
+		free(m_pString);
 }
 
 /******************************************************************************
@@ -63,9 +75,7 @@ CField::~CField()
 int CField::GetInt() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_INT);
+	ASSERT(m_oColumn.StgType() == MDST_INT);
 
 	return *m_pInt;
 }
@@ -73,9 +83,7 @@ int CField::GetInt() const
 double CField::GetDouble() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_DOUBLE);
+	ASSERT(m_oColumn.StgType() == MDST_DOUBLE);
 
 	return *m_pDouble;
 }
@@ -83,9 +91,7 @@ double CField::GetDouble() const
 char CField::GetChar() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_CHAR);
+	ASSERT(m_oColumn.StgType() == MDST_CHAR);
 
 	return *m_pChar;
 }
@@ -93,9 +99,7 @@ char CField::GetChar() const
 const char* CField::GetString() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_STRING);
+	ASSERT(m_oColumn.StgType() == MDST_STRING);
 
 	return m_pString;
 }
@@ -103,9 +107,7 @@ const char* CField::GetString() const
 bool CField::GetBool() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_BOOL);
+	ASSERT(m_oColumn.StgType() == MDST_BOOL);
 
 	return *m_pBool;
 }
@@ -113,9 +115,7 @@ bool CField::GetBool() const
 time_t CField::GetDateTime() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_TIME_T);
+	ASSERT(m_oColumn.ColType() == MDCT_DATETIME);
 
 	return *m_pTimeT;
 }
@@ -123,24 +123,19 @@ time_t CField::GetDateTime() const
 const CTimeStamp& CField::GetTimeStamp() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->ColType() == MDCT_TIMESTAMP);
+	ASSERT(m_oColumn.ColType() == MDCT_TIMESTAMP);
 
 	return *m_pTimeStamp;
 }
 
 CValue CField::GetValue() const
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-
 	// Check for null first.
 	if (m_bNull)
 		return null;
 
 	// Decode type.
-	switch(m_pColumn->StgType())
+	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:		return *m_pInt;
 		case MDST_DOUBLE:	return *m_pDouble;
@@ -148,11 +143,37 @@ CValue CField::GetValue() const
 		case MDST_STRING:	return m_pString;
 		case MDST_BOOL:		return *m_pBool;
 		case MDST_TIME_T:	return *m_pTimeT;
+		case MDST_POINTER:	return m_pVoidPtr;
+		case MDST_TIMESTAMP:	return (time_t)*m_pTimeStamp;
 	}
 
 	ASSERT(false);
 
 	return null;
+}
+
+void* CField::GetPtr() const
+{
+	ASSERT(m_bNull   != true);
+	ASSERT(m_oColumn.ColType() == MDCT_VOIDPTR);
+
+	return m_pVoidPtr;
+}
+
+CRow* CField::GetRowPtr() const
+{
+	ASSERT(m_bNull   != true);
+	ASSERT(m_oColumn.ColType() == MDCT_ROWPTR);
+
+	return m_pRowPtr;
+}
+
+CRow** CField::GetRowSetPtr() const
+{
+	ASSERT(m_bNull   != true);
+	ASSERT(m_oColumn.ColType() == MDCT_ROWSETPTR);
+
+	return m_pRowSetPtr;
 }
 
 /******************************************************************************
@@ -169,27 +190,25 @@ CValue CField::GetValue() const
 
 void CField::SetNull()
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->Nullable());
+	ASSERT(m_oColumn.Nullable());
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if (m_bNull == true)
 		return;
 
 	m_bNull = true;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetInt(int iValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_INT);
+	ASSERT(m_oColumn.StgType() == MDST_INT);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 #ifdef _DEBUG
-	CTable* pFKTable  = m_pColumn->FKTable();
-	int     nFKColumn = m_pColumn->FKColumn();
+	CTable* pFKTable  = m_oColumn.FKTable();
+	int     nFKColumn = m_oColumn.FKColumn();
 
 	// If foreign key column, check value exists.
 	if (pFKTable != NULL)
@@ -201,102 +220,202 @@ void CField::SetInt(int iValue)
 	if ( (m_bNull == false) && (*m_pInt == iValue) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, iValue);
+#endif //_DEBUG
+
 	*m_pInt = iValue;
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetDouble(double dValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_DOUBLE);
+	ASSERT(m_oColumn.StgType() == MDST_DOUBLE);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pDouble == dValue) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, dValue);
+#endif //_DEBUG
+
 	*m_pDouble = dValue;
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetChar(char cValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_CHAR);
+	ASSERT(m_oColumn.StgType() == MDST_CHAR);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pChar == cValue) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, cValue);
+#endif //_DEBUG
+
 	*m_pChar = cValue;
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetString(const char* sValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_STRING);
-	ASSERT(m_pColumn->Length()  >= (int)strlen(sValue));
+	ASSERT(m_oColumn.StgType() == MDST_STRING);
+	ASSERT(m_oColumn.Length()  >= (int)strlen(sValue));
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (strcmp(m_pString, sValue) == 0) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, sValue);
+#endif //_DEBUG
+
+	// Variable buffer string?
+	if (m_oColumn.ColType() == MDCT_VARSTR)
+		m_pString = (char*) realloc(m_pString, strlen(sValue)+1);
+
 	strcpy(m_pString, sValue);
-	m_pString[m_pColumn->Length()] = '\0';
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetBool(bool bValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_BOOL);
+	ASSERT(m_oColumn.StgType() == MDST_BOOL);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pBool == bValue) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, bValue);
+#endif //_DEBUG
+
 	*m_pBool = bValue;
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetDateTime(time_t tValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->StgType() == MDST_TIME_T);
+	ASSERT(m_oColumn.ColType() == MDCT_DATETIME);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pTimeT == tValue) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tValue);
+#endif //_DEBUG
+
 	*m_pTimeT = tValue;
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
 }
 
 void CField::SetTimeStamp(const CTimeStamp& tsValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
-	ASSERT(m_pColumn->ColType() == MDCT_TIMESTAMP);
+	ASSERT(m_oColumn.ColType() == MDCT_TIMESTAMP);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pTimeStamp == tsValue) )
 		return;
 
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, (time_t)tsValue);
+#endif //_DEBUG
+
 	*m_pTimeStamp = tsValue;
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+	Updated();
+}
+
+void CField::SetField(const CField& oValue)
+{
+	ASSERT(m_oColumn.StgType() == oValue.m_oColumn.StgType());
+
+	if (oValue.m_bNull)
+	{
+		SetNull();
+	}
+	else
+	{
+		switch(oValue.m_oColumn.StgType())
+		{
+			case MDST_INT:		SetInt     (*oValue.m_pInt);	break;
+			case MDST_DOUBLE:	SetDouble  (*oValue.m_pDouble);	break;
+			case MDST_CHAR:		SetChar    (*oValue.m_pChar);	break;
+			case MDST_STRING:	SetString  (oValue.m_pString);	break;
+			case MDST_BOOL:		SetBool    (*oValue.m_pBool);	break;
+			case MDST_TIME_T:	SetDateTime(*oValue.m_pTimeT);	break;
+			default:			ASSERT(false);					break;
+		}
+	}
+}
+
+void CField::SetPtr(void* pValue)
+{
+	ASSERT(m_oColumn.StgType() == MDST_POINTER);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(pValue != NULL);
+
+	if ( (m_bNull == false) && (m_pVoidPtr == pValue) )
+		return;
+
+	m_pVoidPtr = pValue;
+	m_bNull = false;
+
+	Updated();
+}
+
+void CField::SetRowPtr(CRow* pValue)
+{
+	ASSERT(m_oColumn.StgType() == MDST_POINTER);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(pValue != NULL);
+
+	if ( (m_bNull == false) && (m_pRowPtr == pValue) )
+		return;
+
+	m_pRowPtr  = pValue;
+	m_bNull = false;
+
+	Updated();
+}
+
+void CField::SetRowSetPtr(CRow** pValue)
+{
+	ASSERT(m_oColumn.StgType() == MDST_POINTER);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(pValue != NULL);
+
+	if ( (m_bNull == false) && (m_pRowSetPtr == pValue) )
+		return;
+
+	m_pRowSetPtr  = pValue;
+	m_bNull = false;
+
+	Updated();
 }
 
 /******************************************************************************
@@ -313,21 +432,39 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 
 void CField::SetRaw(const void* pValue)
 {
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pRow    != NULL);
+	// Variable buffer string?
+	if (m_oColumn.ColType() == MDCT_VARSTR)
+	{
+		const char* pszValue = (const char*) pValue;
 
-	memcpy(m_pVoid, pValue, m_pColumn->AllocSize());
+		m_pString = (char*) realloc(m_pString, strlen(pszValue)+1);
+		strcpy(m_pString, pszValue);
+	}
+	// POINTER based type?
+	else if (m_oColumn.StgType() == MDST_POINTER)
+	{
+		ASSERT(m_oColumn.AllocSize() == 0);
+
+		m_pVoidPtr = const_cast<void*>(pValue);
+	}
+	else
+	{
+		ASSERT(m_oColumn.AllocSize() > 0);
+
+		memcpy(m_pVoidPtr, pValue, m_oColumn.AllocSize());
+	}
+
 	m_bNull = false;
 
-	m_pRow->AddStatus(CRow::UPDATED);
+//	Updated();
 }
 
 /******************************************************************************
-** Method:		operator==()
+** Methods:		operator==()
 **
-** Description:	Compares the field to a CValue object.
+** Description:	Compares the field to a value.
 **
-** Parameters:	oValue	The value to compare to.
+** Parameters:	Value	The value to compare to.
 **
 ** Returns:		true or false.
 **
@@ -343,21 +480,43 @@ bool CField::operator==(const CValue& oValue) const
 	if ( ((m_bNull) && (!oValue.m_bNull)) || ((!m_bNull) && (oValue.m_bNull)) )
 		return false;
 
-	ASSERT(m_pColumn != NULL);
-	ASSERT(m_pColumn->StgType() == oValue.m_eType);
+	ASSERT(m_oColumn.StgType() == oValue.m_eType);
 
 	// Compare according to storage type.
 	switch(oValue.m_eType)
 	{
-		case MDST_INT:		return (*m_pInt    == oValue.m_iValue);
-		case MDST_DOUBLE:	return (*m_pDouble == oValue.m_dValue);
-		case MDST_CHAR:		return (*m_pChar   == oValue.m_cValue);
+		case MDST_INT:		return (*m_pInt     == oValue.m_iValue);
+		case MDST_DOUBLE:	return (*m_pDouble  == oValue.m_dValue);
+		case MDST_CHAR:		return (*m_pChar    == oValue.m_cValue);
 		case MDST_STRING:	return (strcmp(m_pString, oValue.m_sValue) == 0);
-		case MDST_BOOL:		return (*m_pBool   == oValue.m_bValue);
-		case MDST_TIME_T:	return (*m_pTimeT  == oValue.m_tValue);
+		case MDST_BOOL:		return (*m_pBool    == oValue.m_bValue);
+		case MDST_TIME_T:	return (*m_pTimeT   == oValue.m_tValue);
+		case MDST_POINTER:	return (m_pVoidPtr  == oValue.m_pValue);
 	}
 
 	ASSERT(false);
 
 	return false;
+}
+
+/******************************************************************************
+** Methods:		Updated()
+**
+** Description:	Sets the modified flag for the field and its parent row.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CField::Updated()
+{
+	// Row is part of table AND is not a transient column?
+	if ( (m_oRow.InTable() == true) && (m_oColumn.Transient() == false))
+	{
+		m_bModified = true;
+		m_oRow.MarkUpdated();
+	}
 }
