@@ -1,4 +1,4 @@
-- (Non)Unique index support.
+- Non-Unique index support.
 
 - Support case insensitive indexes (CStrPtrMap).
 
@@ -8,8 +8,14 @@
 
 - Meta tables (systables, syscolumns).
 
-- Aggregates on result sets, e.g. Group By. (CGroupSet - Array of RS).
-
 - Query processor.
 
-- Support additional ODBC types like bit & binary (See Pubs db).
+- Support additional ODBC types like binary (See Pubs db).
+
+- Fix double comparison in CField.
+
+- Add LIKE and In where clauses.
+
+- Add CField operator= for CValue.
+
+- Fix updating of indexes when field changes.
