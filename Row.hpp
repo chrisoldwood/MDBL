@@ -55,8 +55,8 @@ public:
 	//
 	bool Modified() const;
 
-	void operator <<(CStream& rStream);
-	void operator >>(CStream& rStream);
+	void Read(CStream& rStream);
+	void Write(CStream& rStream);
 
 	//
 	// Row status flags.

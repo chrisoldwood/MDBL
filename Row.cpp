@@ -76,8 +76,8 @@ CRow::~CRow()
 }
 
 /******************************************************************************
-** Methods:		operator <<()
-**				operator >>()
+** Methods:		Read()
+**				Write()
 **
 ** Description:	Operators to read/write the data from/to a stream.
 **
@@ -88,7 +88,7 @@ CRow::~CRow()
 *******************************************************************************
 */
 
-void CRow::operator <<(CStream& rStream)
+void CRow::Read(CStream& rStream)
 {
 	// Get the row data size and start address.
 	int   nSize = m_oTable.m_vColumns.AllocSize();
@@ -123,7 +123,7 @@ void CRow::operator <<(CStream& rStream)
 	m_eStatus = ORIGINAL;
 }
 
-void CRow::operator >>(CStream& rStream)
+void CRow::Write(CStream& rStream)
 {
 	// Get the row data size and start address.
 	int   nSize = m_oTable.m_vColumns.AllocSize();
