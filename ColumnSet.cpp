@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		COLUMNSET.CPP
 ** COMPONENT:	Memory Database Library.
@@ -59,7 +58,7 @@ int CColumnSet::AllocSize() const
 {
 	int nSize = 0;
 
-	for (int i = 0; i < Size(); i++)
+	for (int i = 0; i < Count(); i++)
 		nSize += Column(i).AllocSize();
 
 	return nSize;
@@ -97,7 +96,7 @@ void CColumnSet::Delete(int n)
 
 void CColumnSet::DeleteAll()
 {
-	for (int i = 0; i < Size(); i++)
+	for (int i = 0; i < Count(); i++)
 		delete &Column(i);
 
 	RemoveAll();
@@ -119,7 +118,7 @@ int CColumnSet::Find(const char* pszName)
 {
 	ASSERT(pszName != NULL);
 
-	for (int i = 0; i < Size(); i++)
+	for (int i = 0; i < Count(); i++)
 	{
 		if (Column(i).Name() == pszName)
 			return i;

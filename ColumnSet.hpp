@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		COLUMNSET.HPP
 ** COMPONENT:	Memory Database Library.
@@ -19,7 +18,7 @@
 *******************************************************************************
 */
 
-class CColumnSet : public CPtrArray
+class CColumnSet : protected CPtrArray
 {
 public:
 	//
@@ -31,6 +30,7 @@ public:
 	//
 	// Methods.
 	//
+	int      Count() const;
 	CColumn& Column(int n) const;
 	CColumn& operator[](int n) const;
 
@@ -54,14 +54,19 @@ protected:
 *******************************************************************************
 */
 
+inline int CColumnSet::Count() const
+{
+	return CPtrArray::Size();
+}
+
 inline CColumn& CColumnSet::Column(int n) const
 {
-	return *((CColumn*) CPtrArray::Item(n));
+	return *((CColumn*)CPtrArray::Item(n));
 }
 
 inline CColumn& CColumnSet::operator[](int n) const
 {
-	return *((CColumn*) CPtrArray::Item(n));
+	return *((CColumn*)CPtrArray::Item(n));
 }
 
 inline int CColumnSet::Add(CColumn& oColumn)
