@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		COLUMN.CPP
 ** COMPONENT:	Memory Database Library.
@@ -36,9 +35,10 @@ CColumn::CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength
 {
 	ASSERT(pszName      != NULL);
 	ASSERT(m_eStgType   != MDST_NULL);
-	ASSERT(m_nAllocSize >  0);
 	ASSERT(!(Nullable() && Unique()));
-	ASSERT((nFlags & FOREIGN_KEY) == 0);
+	ASSERT(!(Nullable() && PrimaryKey()));
+	ASSERT(!ForeignKey());
+	ASSERT(!((m_eStgType == MDST_POINTER) && (!Transient())));
 }
 
 /******************************************************************************
@@ -53,7 +53,7 @@ CColumn::CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength
 *******************************************************************************
 */
 
-CColumn::CColumn(CTable& oTable, const char* pszName, int nFlags, CTable& oFKTable, int nFKColumn, const CColumn& oFKColumn)
+CColumn::CColumn(CTable& oTable, const char* pszName, CTable& oFKTable, int nFKColumn, const CColumn& oFKColumn, int nFlags)
 	: m_oTable(oTable)
 	, m_strName(pszName)
 	, m_eColType(oFKColumn.ColType())
@@ -69,7 +69,8 @@ CColumn::CColumn(CTable& oTable, const char* pszName, int nFlags, CTable& oFKTab
 	ASSERT(m_eStgType   != MDST_NULL);
 	ASSERT(m_nAllocSize >  0);
 	ASSERT(!(Nullable() && Unique()));
-	ASSERT((nFlags & FOREIGN_KEY) != 0);
+	ASSERT(ForeignKey());
+	ASSERT(m_eStgType != MDST_POINTER);
 
 	// If Identity, convert to int.
 	if (m_eColType == MDCT_IDENTITY)
@@ -118,6 +119,9 @@ STGTYPE CColumn::ColToStgType(COLTYPE eType)
 		case MDCT_IDENTITY:		return MDST_INT;
 		case MDCT_DATETIME:		return MDST_TIME_T;
 		case MDCT_TIMESTAMP:	return MDST_TIMESTAMP;
+		case MDCT_VOIDPTR:		return MDST_POINTER;
+		case MDCT_ROWPTR:		return MDST_POINTER;
+		case MDCT_ROWSETPTR:	return MDST_POINTER;
 	}
 
 	ASSERT(false);
@@ -141,4 +145,35 @@ void CColumn::Index(CIndex* pIndex)
 {
 	delete m_pIndex;
 	m_pIndex = pIndex;
+}
+
+/******************************************************************************
+** Method:		DisplayWidth()
+**
+** Description:	Gets the char width of the column for display.
+**
+** Parameters:	None.
+**
+** Returns:		The width.
+**
+*******************************************************************************
+*/
+
+int CColumn::DisplayWidth() const
+{
+	switch (m_eStgType)
+	{
+		case MDST_INT:			return 10;
+		case MDST_DOUBLE:		return 15;
+		case MDST_CHAR:			return 1;
+		case MDST_STRING:		return m_nLength;
+		case MDST_BOOL:			return 1;
+		case MDST_TIME_T:		return 10;
+		case MDST_TIMESTAMP:	return 20;
+		case MDST_POINTER:		return 10;
+	}
+
+	ASSERT(false);
+
+	return -1;
 }

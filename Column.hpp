@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		COLUMN.HPP
 ** COMPONENT:	Memory Database Library.
@@ -40,11 +39,12 @@ public:
 	bool    Unique() const;
 	bool    ForeignKey() const;
 	bool    PrimaryKey() const;
-	bool    Persistant() const;
-	bool    Writeable() const;
+	bool    ReadOnly() const;
+	bool	Transient() const;
 	CTable* FKTable() const;
 	int     FKColumn() const;
 	CIndex* Index() const;
+	int     DisplayWidth() const;
 
 	//
 	// Mutators.
@@ -66,15 +66,15 @@ public:
 		FOREIGN_KEY  = 0x04,
 		PRIMARY_KEY  = 0x08,
 
-		PERSISTANT   = 0x00,
-		TRANSIENT    = 0x10,
-
 		READ_WRITE   = 0x00,
-		READ_ONLY    = 0x20,
+		READ_ONLY    = 0x10,
 
-		DEFAULTS     = (NOT_NULLABLE | NOT_UNIQUE | NOT_KEY     | PERSISTANT | READ_WRITE),
-		IDENTITY     = (NOT_NULLABLE | UNIQUE     | PRIMARY_KEY | PERSISTANT | READ_ONLY ),
-		FOREIGNKEY   = (NOT_NULLABLE | NOT_UNIQUE | FOREIGN_KEY | PERSISTANT | READ_WRITE),
+		PERSISTENT   = 0x00,
+		TRANSIENT    = 0x20,
+
+		DEFAULTS     = (NOT_NULLABLE | NOT_UNIQUE | NOT_KEY     | READ_WRITE | PERSISTENT),
+		IDENTITY     = (NOT_NULLABLE | UNIQUE     | PRIMARY_KEY | READ_ONLY  | PERSISTENT),
+		FOREIGNKEY   = (NOT_NULLABLE | NOT_UNIQUE | FOREIGN_KEY | READ_WRITE | PERSISTENT),
 	};
 
 	//
@@ -86,8 +86,8 @@ protected:
 	//
 	// Constructors/Destructor.
 	//
-	CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength, int nAllocSize, int nFlags = DEFAULTS);
-	CColumn(CTable& oTable, const char* pszName, int nFlags, CTable& oFKTable, int nFKColumn, const CColumn& oFKColumn);
+	CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength, int nAllocSize, int nFlags);
+	CColumn(CTable& oTable, const char* pszName, CTable& oFKTable, int nFKColumn, const CColumn& oFKColumn, int nFlags);
 	virtual ~CColumn();
 
 	//
@@ -173,14 +173,14 @@ inline bool	CColumn::PrimaryKey() const
 	return (m_nFlags & PRIMARY_KEY);
 }
 
-inline bool	CColumn::Persistant() const
+inline bool	CColumn::ReadOnly() const
 {
-	return !(m_nFlags & TRANSIENT);
+	return (m_nFlags & READ_ONLY);
 }
 
-inline bool	CColumn::Writeable() const
+inline bool CColumn::Transient() const
 {
-	return !(m_nFlags & READ_ONLY);
+	return (m_nFlags & TRANSIENT);
 }
 
 inline CTable* CColumn::FKTable() const
