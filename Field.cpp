@@ -144,7 +144,6 @@ CValue CField::GetValue() const
 		case MDST_BOOL:		return *m_pBool;
 		case MDST_TIME_T:	return *m_pTimeT;
 		case MDST_POINTER:	return m_pVoidPtr;
-		case MDST_TIMESTAMP:	return (time_t)*m_pTimeStamp;
 	}
 
 	ASSERT(false);
@@ -174,6 +173,45 @@ CRow** CField::GetRowSetPtr() const
 	ASSERT(m_oColumn.ColType() == MDCT_ROWSETPTR);
 
 	return m_pRowSetPtr;
+}
+
+/******************************************************************************
+** Method:		GetRaw()
+**
+** Description:	Gets the value given into a raw buffer.
+**
+** Parameters:	pValue	The value to copy the field into.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CField::GetRaw(void* pValue) const
+{
+	// Variable buffer string?
+	if (m_oColumn.ColType() == MDCT_VARSTR)
+	{
+		char* pszValue = (char*) pValue;
+
+		strcpy(pszValue, m_pString);
+	}
+	// POINTER based type?
+	else if (m_oColumn.StgType() == MDST_POINTER)
+	{
+		ASSERT(m_oColumn.AllocSize() == 0);
+
+		memcpy(pValue, &m_pVoidPtr, sizeof(void*));
+
+		// Is this right?
+		ASSERT(false);
+	}
+	else
+	{
+		ASSERT(m_oColumn.AllocSize() > 0);
+
+		memcpy(pValue, m_pVoidPtr, m_oColumn.AllocSize());
+	}
 }
 
 /******************************************************************************
@@ -222,7 +260,7 @@ void CField::SetInt(int iValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, iValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, iValue, true);
 #endif //_DEBUG
 
 	*m_pInt = iValue;
@@ -241,7 +279,7 @@ void CField::SetDouble(double dValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, dValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, dValue, true);
 #endif //_DEBUG
 
 	*m_pDouble = dValue;
@@ -260,7 +298,7 @@ void CField::SetChar(char cValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, cValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, cValue, true);
 #endif //_DEBUG
 
 	*m_pChar = cValue;
@@ -280,7 +318,7 @@ void CField::SetString(const char* sValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, sValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, sValue, true);
 #endif //_DEBUG
 
 	// Variable buffer string?
@@ -303,7 +341,7 @@ void CField::SetBool(bool bValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, bValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, bValue, true);
 #endif //_DEBUG
 
 	*m_pBool = bValue;
@@ -322,7 +360,7 @@ void CField::SetDateTime(time_t tValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tValue, true);
 #endif //_DEBUG
 
 	*m_pTimeT = tValue;
@@ -341,7 +379,7 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, (time_t)tsValue);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, (time_t)tsValue, true);
 #endif //_DEBUG
 
 	*m_pTimeStamp = tsValue;
@@ -446,6 +484,9 @@ void CField::SetRaw(const void* pValue)
 		ASSERT(m_oColumn.AllocSize() == 0);
 
 		m_pVoidPtr = const_cast<void*>(pValue);
+
+		// Is this right?
+		ASSERT(false);
 	}
 	else
 	{
@@ -464,7 +505,7 @@ void CField::SetRaw(const void* pValue)
 **
 ** Description:	Compares the field to a value.
 **
-** Parameters:	Value	The value to compare to.
+** Parameters:	oValue	The value to compare to.
 **
 ** Returns:		true or false.
 **
@@ -500,6 +541,48 @@ bool CField::operator==(const CValue& oValue) const
 }
 
 /******************************************************************************
+** Methods:		Compare()
+**
+** Description:	Compares the field to another field.
+**
+** Parameters:	oValue		The value to compare to.
+**
+** Returns:		< 0		If less than.
+**				= 0		If equal.
+**				> 0		If greater than.
+**
+*******************************************************************************
+*/
+
+int CField::Compare(const CField& oValue) const
+{
+	ASSERT(m_oColumn.StgType() == oValue.m_oColumn.StgType());
+
+	// Handles nulls.
+	if (m_bNull)
+		return (oValue.m_bNull) ? 0 : -1;
+	else if (oValue.m_bNull)
+		return 1;
+
+	int nCmp = 0;
+
+	// Compare according to storage type.
+	switch(m_oColumn.StgType())
+	{
+		case MDST_INT:			nCmp = (*m_pInt    - *oValue.m_pInt);			break;
+		case MDST_DOUBLE:		ASSERT(false);									break;
+		case MDST_CHAR:			nCmp = (*m_pChar   - *oValue.m_pChar);			break;
+		case MDST_STRING:		nCmp = stricmp(m_pString, oValue.m_pString);	break;
+		case MDST_BOOL:			nCmp = (*m_pBool   - *oValue.m_pBool);			break;
+		case MDST_TIME_T:		nCmp = (*m_pTimeT  - *oValue.m_pTimeT);			break;
+		case MDST_TIMESTAMP:	ASSERT(false);	break;
+		case MDST_POINTER:		ASSERT(false);	break;
+	}
+
+	return nCmp;
+}
+
+/******************************************************************************
 ** Methods:		Updated()
 **
 ** Description:	Sets the modified flag for the field and its parent row.
@@ -518,5 +601,44 @@ void CField::Updated()
 	{
 		m_bModified = true;
 		m_oRow.MarkUpdated();
+		m_oRow.Table().m_nUpdates++;
 	}
+}
+
+/******************************************************************************
+** Methods:		DbgFormat()
+**
+** Description:	Convert the value to a debug string.
+**
+** Parameters:	None.
+**
+** Returns:		The value as a string.
+**
+*******************************************************************************
+*/
+
+CString CField::DbgFormat() const
+{
+	// Null?
+	if (m_bNull)
+		return "(null)";
+
+	char	szTime[50];
+	CString str;
+
+	// Compare according to storage type.
+	switch(m_oColumn.StgType())
+	{
+		case MDST_INT:			str.Format("%d", *m_pInt);		break;
+		case MDST_DOUBLE:		str.Format("%f", *m_pDouble);	break;
+		case MDST_CHAR:			str.Format("%c", *m_pChar);		break;
+		case MDST_STRING:		str = m_pString;				break;
+		case MDST_BOOL:			str = (*m_pBool) ? "T" : "F";	break;
+		case MDST_TIME_T:		strftime(szTime, sizeof(szTime), "%d/%m/%y %H:%M:%S", gmtime(m_pTimeT));
+								str = szTime;					break;
+		case MDST_TIMESTAMP:	str = "TODO:";					break;
+		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);	break;
+	}
+
+	return str;
 }

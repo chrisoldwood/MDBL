@@ -39,6 +39,7 @@ public:
 	void*             GetPtr()       const;
 	CRow*             GetRowPtr()    const;
 	CRow**            GetRowSetPtr() const;
+	void              GetRaw(void* pValue) const;
 
 	//
 	// Mutators.
@@ -105,6 +106,18 @@ public:
 	bool operator!=(const CValue& oValue) const;
 	bool operator==(const CField& oValue) const;
 	bool operator!=(const CField& oValue) const;
+
+	int Compare(const CField& oValue) const;
+
+	//
+	// Persistance methods.
+	//
+	bool Modified() const;
+
+	//
+	// DebugMethods methods.
+	//
+	CString DbgFormat() const;
 
 protected:
 	//
@@ -367,6 +380,11 @@ inline bool CField::operator==(const CField& oValue) const
 inline bool CField::operator!=(const CField& oValue) const
 {
 	return !operator==(oValue);
+}
+
+inline bool CField::Modified() const
+{
+	return m_bModified;
 }
 
 #endif //FIELD_HPP
