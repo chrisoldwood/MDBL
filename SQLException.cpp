@@ -23,7 +23,7 @@
 *******************************************************************************
 */
 
-CSQLException::CSQLException(int eErrCode, const CString& strSQLStmt, const CString& strSQLErr)
+CSQLException::CSQLException(int eErrCode, const char* pszSQLStmt, const CString& strSQLErr)
 	: m_eError(eErrCode)
 {
 	// Convert error to string.
@@ -38,7 +38,7 @@ CSQLException::CSQLException(int eErrCode, const CString& strSQLStmt, const CStr
 	}
 
 	// Append statement and reason.
-	m_strError += strSQLStmt;
+	m_strError += pszSQLStmt;
 	m_strError += "\n\nReason:\n\n";
 	m_strError += strSQLErr;
 }

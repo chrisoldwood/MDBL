@@ -24,7 +24,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CSQLException(int eErrCode, const CString& strSQLStmt, const CString& strSQLErr);
+	CSQLException(int eErrCode, const char* pszSQLStmt, const CString& strSQLErr);
 	virtual ~CSQLException();
 	
 	//
@@ -32,6 +32,7 @@ public:
 	//
 	enum
 	{
+		E_ENUMINFO_FAILED,	// Failed to enumerate drivers, sources etc.
 		E_CONNECT_FAILED,	// Failed to connect.
 		E_ALLOC_FAILED,		// Failed to allocate handle/buffer.
 		E_EXEC_FAILED,		// Failed to execute query.
