@@ -561,7 +561,7 @@ bool CField::operator==(const CValue& oValue) const
 /******************************************************************************
 ** Methods:		Compare()
 **
-** Description:	Compares the field to another field.
+** Description:	Compares the field to another field or value.
 **
 ** Parameters:	oValue		The value to compare to.
 **
@@ -587,12 +587,41 @@ int CField::Compare(const CField& oValue) const
 	// Compare according to storage type.
 	switch(m_oColumn.StgType())
 	{
-		case MDST_INT:			nCmp = (*m_pInt    - *oValue.m_pInt);			break;
-		case MDST_DOUBLE:		ASSERT(false);									break;
-		case MDST_CHAR:			nCmp = (*m_pChar   - *oValue.m_pChar);			break;
-		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);		break;
-		case MDST_BOOL:			nCmp = (*m_pBool   - *oValue.m_pBool);			break;
-		case MDST_TIME_T:		nCmp = (*m_pTimeT  - *oValue.m_pTimeT);			break;
+		case MDST_INT:			nCmp = (*m_pInt   - *oValue.m_pInt);			break;
+		case MDST_DOUBLE:		nCmp = (int)(*m_pDouble - *oValue.m_pDouble);	break;
+		case MDST_CHAR:			nCmp = (*m_pChar  - *oValue.m_pChar);			break;
+		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);				break;
+		case MDST_BOOL:			nCmp = (*m_pBool  - *oValue.m_pBool);			break;
+		case MDST_TIME_T:		nCmp = (*m_pTimeT - *oValue.m_pTimeT);			break;
+		case MDST_TIMESTAMP:	ASSERT(false);									break;
+		case MDST_POINTER:		ASSERT(false);									break;
+		default:				ASSERT(false);									break;
+	}
+
+	return nCmp;
+}
+
+int CField::Compare(const CValue& oValue) const
+{
+	ASSERT(m_oColumn.StgType() == oValue.m_eType);
+
+	// Handles nulls.
+	if (m_bNull)
+		return (oValue.m_bNull) ? 0 : -1;
+	else if (oValue.m_bNull)
+		return 1;
+
+	int nCmp = 0;
+
+	// Compare according to storage type.
+	switch(m_oColumn.StgType())
+	{
+		case MDST_INT:			nCmp = (*m_pInt   - oValue.m_iValue);			break;
+		case MDST_DOUBLE:		nCmp = (int)(*m_pDouble - oValue.m_dValue);		break;
+		case MDST_CHAR:			nCmp = (*m_pChar  - oValue.m_cValue);			break;
+		case MDST_STRING:		nCmp = StrCmp(oValue.m_sValue);					break;
+		case MDST_BOOL:			nCmp = (*m_pBool  - oValue.m_bValue);			break;
+		case MDST_TIME_T:		nCmp = (*m_pTimeT - oValue.m_tValue);			break;
 		case MDST_TIMESTAMP:	ASSERT(false);									break;
 		case MDST_POINTER:		ASSERT(false);									break;
 		default:				ASSERT(false);									break;

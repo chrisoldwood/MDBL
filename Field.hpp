@@ -114,6 +114,7 @@ public:
 	bool operator!=(const CField& oValue) const;
 
 	int Compare(const CField& oValue) const;
+	int Compare(const CValue& oValue) const;
 
 	//
 	// Persistance methods.
