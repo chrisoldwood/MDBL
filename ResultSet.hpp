@@ -24,10 +24,10 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CResultSet();
-	CResultSet(CRow* pRow);
+	CResultSet(const CTable& oTable);
+	CResultSet(const CTable& oTable, CRow* pRow);
 	CResultSet(const CResultSet& oResultSet);
-	CResultSet(const CRowSet& oRowSet);
+	CResultSet(const CTable& oTable, const CRowSet& oRowSet);
 	~CResultSet();
 	
 	//
@@ -39,11 +39,30 @@ public:
 
 	int   Add(CRow& oRow);
 
+	void  OrderBy(const CSortColumns& oColumns);
+
+	//
+	// Debug methods.
+	//
+	void Dump(CStream& rStream) const;
+
+protected:
+	//
+	// Members.
+	//
+	const CTable*	m_pTable;	// The table the rows belong to.
+
 private:
 	//
-	// Disallow assignment.
+	// Disallow array constructs except via friends and assignment.
 	//
+	CResultSet();
 	void operator=(const CResultSet&);
+
+	//
+	// Friends.
+	//
+	friend class CJoinedSet;
 };
 
 /******************************************************************************
