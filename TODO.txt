@@ -1,23 +1,5 @@
-- Implement String column types.
-
 - (Non)Unique index support.
 
-- Join query type.
+- Add foreign key checking code for referes on delete.
 
-- Join based select.
-
-- Join result set type.
-
-- Column default values.
-
-- Transient/Read-Only tables flags.
-
-- Add TimeStamp type.
-
-- CRow Set to SetRaw allowing conversions.
-
-- Validate index/row count consistency.
-
-- Update triggers?
-
-- Update more than 1 value at a time?
+- Dump database to text file.
