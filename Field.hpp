@@ -26,6 +26,12 @@ class CField
 {
 public:
 	//
+	// Parents.
+	//
+	CRow&    Row() const;
+	CColumn& Column() const;
+
+	//
 	// Accessors.
 	//
 	int               GetInt()       const;
@@ -115,8 +121,9 @@ public:
 	bool Modified() const;
 
 	//
-	// DebugMethods methods.
+	// String formatting methods.
 	//
+	CString Format(const char* pszFormat = NULL) const;
 	CString DbgFormat() const;
 
 protected:
@@ -135,7 +142,7 @@ union
 	char*		m_pChar;		// Pointer to value if type is MDCT_CHAR.
 	char*		m_pString;		// Pointer to value if type is MDCT_FXDSTR or MDCT_VARSTR.
 	bool*		m_pBool;		// Pointer to value if type is MDCT_BOOL.
-	time_t*		m_pTimeT;		// Pointer to value if type is MDCT_DATETIME.
+	time_t*		m_pTimeT;		// Pointer to value if type is MDCT_DATETIME or MDCT_DATE or MDCT_TIME.
 	CTimeStamp*	m_pTimeStamp;	// Pointer to value if type is MDCT_TIMESTAMP.
 	void*		m_pVoidPtr;		// Value if type is MDCT_VOIDPTR.
 	CRow*		m_pRowPtr;		// Value if type is MDCT_ROWPTR.
@@ -169,7 +176,10 @@ private:
 	//
 	// Internal methods.
 	//
-	void Updated();
+	void    Updated();
+	CString FormatTimeT(const char* pszFormat) const;
+	CString FormatBool(const char* pszFormat) const;
+	int     StrCmp(const char* pszRHS) const;
 };
 
 /******************************************************************************
@@ -178,6 +188,16 @@ private:
 **
 *******************************************************************************
 */
+
+inline CRow& CField::Row() const
+{
+	return m_oRow;
+}
+
+inline CColumn& CField::Column() const
+{
+	return m_oColumn;
+}
 
 inline void* CField::operator new(size_t, void* p)
 {

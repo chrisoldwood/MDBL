@@ -12,6 +12,25 @@
 // The special null value.
 CNull null;
 
+// Default format specifiers.
+static const char* pszFormats[] = 
+{
+	"%d",					// MDCT_INT
+	"%.2f",					// MDCT_DOUBLE
+	"%c",					// MDCT_CHAR
+	"%s",					// MDCT_FXDSTR
+	"%s",					// MDCT_VARSTR
+	"Yes|No",				// MDCT_BOOL
+	"%d",					// MDCT_IDENTITY
+	"%d/%m/%y %H:%M:%S",	// MDCT_DATETIME
+	"%d/%m/%y",				// MDCT_DATE
+	"%H:%M:%S",				// MDCT_TIME
+	"%d/%m/%y %H:%M:%S",	// MDCT_TIMESTAMP
+	"%p",					// MDCT_VOIDPTR
+	"%p",					// MDCT_ROWPTR
+	"%p"					// MDCT_ROWSETPTR
+};
+
 /******************************************************************************
 ** Method:		Constructor.
 **
@@ -115,7 +134,7 @@ bool CField::GetBool() const
 time_t CField::GetDateTime() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_oColumn.ColType() == MDCT_DATETIME);
+	ASSERT(m_oColumn.StgType() == MDST_TIME_T);
 
 	return *m_pTimeT;
 }
@@ -123,7 +142,7 @@ time_t CField::GetDateTime() const
 const CTimeStamp& CField::GetTimeStamp() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_oColumn.ColType() == MDCT_TIMESTAMP);
+	ASSERT(m_oColumn.StgType() == MDST_TIMESTAMP);
 
 	return *m_pTimeStamp;
 }
@@ -144,9 +163,8 @@ CValue CField::GetValue() const
 		case MDST_BOOL:		return *m_pBool;
 		case MDST_TIME_T:	return *m_pTimeT;
 		case MDST_POINTER:	return m_pVoidPtr;
+		default:			ASSERT(false);	break;
 	}
-
-	ASSERT(false);
 
 	return null;
 }
@@ -352,7 +370,7 @@ void CField::SetBool(bool bValue)
 
 void CField::SetDateTime(time_t tValue)
 {
-	ASSERT(m_oColumn.ColType() == MDCT_DATETIME);
+	ASSERT(m_oColumn.StgType() == MDST_TIME_T);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pTimeT == tValue) )
@@ -371,7 +389,7 @@ void CField::SetDateTime(time_t tValue)
 
 void CField::SetTimeStamp(const CTimeStamp& tsValue)
 {
-	ASSERT(m_oColumn.ColType() == MDCT_TIMESTAMP);
+	ASSERT(m_oColumn.StgType() == MDST_TIMESTAMP);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 
 	if ( (m_bNull == false) && (*m_pTimeStamp == tsValue) )
@@ -529,13 +547,12 @@ bool CField::operator==(const CValue& oValue) const
 		case MDST_INT:		return (*m_pInt     == oValue.m_iValue);
 		case MDST_DOUBLE:	return (*m_pDouble  == oValue.m_dValue);
 		case MDST_CHAR:		return (*m_pChar    == oValue.m_cValue);
-		case MDST_STRING:	return (strcmp(m_pString, oValue.m_sValue) == 0);
+		case MDST_STRING:	return (StrCmp(oValue.m_sValue) == 0);
 		case MDST_BOOL:		return (*m_pBool    == oValue.m_bValue);
 		case MDST_TIME_T:	return (*m_pTimeT   == oValue.m_tValue);
 		case MDST_POINTER:	return (m_pVoidPtr  == oValue.m_pValue);
+		default:			ASSERT(false);	break;
 	}
-
-	ASSERT(false);
 
 	return false;
 }
@@ -572,11 +589,12 @@ int CField::Compare(const CField& oValue) const
 		case MDST_INT:			nCmp = (*m_pInt    - *oValue.m_pInt);			break;
 		case MDST_DOUBLE:		ASSERT(false);									break;
 		case MDST_CHAR:			nCmp = (*m_pChar   - *oValue.m_pChar);			break;
-		case MDST_STRING:		nCmp = stricmp(m_pString, oValue.m_pString);	break;
+		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);		break;
 		case MDST_BOOL:			nCmp = (*m_pBool   - *oValue.m_pBool);			break;
 		case MDST_TIME_T:		nCmp = (*m_pTimeT  - *oValue.m_pTimeT);			break;
-		case MDST_TIMESTAMP:	ASSERT(false);	break;
-		case MDST_POINTER:		ASSERT(false);	break;
+		case MDST_TIMESTAMP:	ASSERT(false);									break;
+		case MDST_POINTER:		ASSERT(false);									break;
+		default:				ASSERT(false);									break;
 	}
 
 	return nCmp;
@@ -606,6 +624,56 @@ void CField::Updated()
 }
 
 /******************************************************************************
+** Methods:		Format()
+**
+** Description:	Convert the value to a string.
+**
+** Parameters:	pszFormat	The format specifiers
+**							NB: If NULL uses the default.
+**
+** Returns:		The value as a string.
+**
+*******************************************************************************
+*/
+
+CString CField::Format(const char* pszFormat) const
+{
+	// Null?
+	if (m_bNull)
+		return "";
+
+	// Use default specifier, if not supplied.
+	if (pszFormat == NULL)
+		pszFormat = pszFormats[m_oColumn.ColType()];
+
+	ASSERT(pszFormat != NULL);
+
+	CString str;
+
+	// Format according to column type.
+	switch(m_oColumn.ColType())
+	{
+		case MDCT_INT:			str.Format(pszFormat, *m_pInt);		break;
+		case MDCT_DOUBLE:		str.Format(pszFormat, *m_pDouble);	break;
+		case MDCT_CHAR:			str.Format(pszFormat, *m_pChar);	break;
+		case MDCT_FXDSTR:		str = m_pString;					break;
+		case MDCT_VARSTR:		str = m_pString;					break;
+		case MDCT_BOOL:			str = FormatBool(pszFormat);		break;                                  
+		case MDCT_IDENTITY:		str.Format(pszFormat, *m_pInt);		break;
+		case MDCT_DATETIME:		str = FormatTimeT(pszFormat);		break;
+		case MDCT_DATE:			str = FormatTimeT(pszFormat);		break;
+		case MDCT_TIME:			str = FormatTimeT(pszFormat);		break;
+		case MDCT_TIMESTAMP:	ASSERT(false);						break;
+		case MDCT_VOIDPTR:		str.Format(pszFormat, m_pVoidPtr);	break;
+		case MDCT_ROWPTR:		str.Format(pszFormat, m_pVoidPtr);	break;
+		case MDCT_ROWSETPTR:	str.Format(pszFormat, m_pVoidPtr);	break;
+		default:				ASSERT(false);						break;
+	}
+
+	return str;
+}
+
+/******************************************************************************
 ** Methods:		DbgFormat()
 **
 ** Description:	Convert the value to a debug string.
@@ -623,22 +691,112 @@ CString CField::DbgFormat() const
 	if (m_bNull)
 		return "(null)";
 
-	char	szTime[50];
 	CString str;
 
-	// Compare according to storage type.
+	// Format according to storage type.
 	switch(m_oColumn.StgType())
 	{
-		case MDST_INT:			str.Format("%d", *m_pInt);		break;
-		case MDST_DOUBLE:		str.Format("%f", *m_pDouble);	break;
-		case MDST_CHAR:			str.Format("%c", *m_pChar);		break;
-		case MDST_STRING:		str = m_pString;				break;
-		case MDST_BOOL:			str = (*m_pBool) ? "T" : "F";	break;
-		case MDST_TIME_T:		strftime(szTime, sizeof(szTime), "%d/%m/%y %H:%M:%S", gmtime(m_pTimeT));
-								str = szTime;					break;
-		case MDST_TIMESTAMP:	str = "TODO:";					break;
-		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);	break;
+		case MDST_INT:			str.Format("%d", *m_pInt);				break;
+		case MDST_DOUBLE:		str.Format("%f", *m_pDouble);			break;
+		case MDST_CHAR:			str.Format("%c", *m_pChar);				break;
+		case MDST_STRING:		str = m_pString;						break;
+		case MDST_BOOL:			str = FormatBool("Y|N");				break;
+		case MDST_TIME_T:		str = FormatTimeT("%d/%m/%y %H:%M:%S");	break;
+		case MDST_TIMESTAMP:	ASSERT(false);							break;
+		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);			break;
+		default:				ASSERT(false);							break;
+	}
+
+	// Replace any CRs or LFs with a '.'.
+	for (char* psz = const_cast<char*>((const char*)str); *psz != '\0'; psz++)
+	{
+		if (iscntrl(*psz))
+			*psz = '.';
 	}
 
 	return str;
+}
+
+/******************************************************************************
+** Methods:		FormatTimeT()
+**
+** Description:	Convert the time_t value to a string.
+**
+** Parameters:	pszFormat	The format string.
+**
+** Returns:		The value as a string.
+**
+*******************************************************************************
+*/
+
+CString CField::FormatTimeT(const char* pszFormat) const
+{
+	ASSERT(pszFormat != NULL);
+
+	char szTime[100];
+	tm*  pTM = NULL;
+
+	// Convert the tm struct.
+	if (m_oColumn.Flags() & CColumn::TZ_GMT)
+		pTM = gmtime(m_pTimeT);
+	else
+		pTM = localtime(m_pTimeT);
+
+	// Format.
+	strftime(szTime, sizeof(szTime), pszFormat, pTM);
+
+	return szTime;
+}
+
+/******************************************************************************
+** Methods:		FormatBool()
+**
+** Description:	Convert the bool value to a string.
+**
+** Parameters:	pszFormat	The format string which contains two strings
+**							separated by a | character.
+**
+** Returns:		The value as a string.
+**
+*******************************************************************************
+*/
+
+CString CField::FormatBool(const char* pszFormat) const
+{
+	ASSERT(pszFormat != NULL);
+	ASSERT(strchr(pszFormat, '|') != NULL);
+
+	// Copy the whole string and find
+	// the length and pos of the separator.
+	CString str  = pszFormat;
+	int     nLen = str.Length();
+	int     nSep = str.Find('|');
+
+	// Delete either the 1st or 2nd substring.
+	if (*m_pBool == false)
+		str.Delete(nSep, nLen-nSep);
+	else
+		str.Delete(0, nSep + 1);
+
+	return str;
+}
+
+/******************************************************************************
+** Methods:		StrCmp()
+**
+** Description:	Compares the string to another, using either a case sensitive
+**				or case insensitive compare.
+**
+** Parameters:	pszRHS	The string to compare to.
+**
+** Returns:		As str(i)cmp.
+**
+*******************************************************************************
+*/
+
+int CField::StrCmp(const char* pszRHS) const
+{
+	bool bCmpCase = (m_oColumn.Flags() & CColumn::COMPARE_CASE);
+
+	return (bCmpCase) ? strcmp(m_pString, pszRHS) : stricmp(m_pString, pszRHS);
 }
