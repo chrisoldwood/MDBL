@@ -45,6 +45,13 @@ protected:
 	//
 	// Members.
 	//
+
+private:
+	//
+	// Disallow copy and assignment.
+	//
+	CColumnSet(const CColumnSet&);
+	void operator=(const CColumnSet&);
 };
 
 /******************************************************************************

@@ -46,6 +46,13 @@ protected:
 	//
 	// Members.
 	//
+
+private:
+	//
+	// Disallow copy and assignment.
+	//
+	CRowSet(const CRowSet&);
+	void operator=(const CRowSet&);
 };
 
 /******************************************************************************

@@ -42,6 +42,13 @@ protected:
 	//
 	// Members.
 	//
+
+private:
+	//
+	// Disallow copy and assignment.
+	//
+	CTableSet(const CTableSet&);
+	void operator=(const CTableSet&);
 };
 
 /******************************************************************************
