@@ -73,23 +73,39 @@ public:
 	//
 	// Query methods.
 	//
+	virtual CResultSet SelectAll() const;
 	virtual CRow*      SelectRow(int nColumn, const CValue& oValue) const;
 	virtual CResultSet Select(const CWhere& oQuery) const;
 	virtual bool       Exists(const CWhere& oQuery) const;
 
 	//
+	// Save type flags.
+	//
+	enum RowTypes
+	{
+		INSERTED = 0x01,
+		UPDATED  = 0x02,
+		DELETED  = 0x04,
+
+		ALL      = (INSERTED | UPDATED | DELETED),
+	};
+
+	//
 	// Persistance methods.
 	//
 	virtual bool Modified() const;
+	virtual void Modified(bool bModified);
 
-	virtual void operator <<(CStream& rStream);
-	virtual void operator >>(CStream& rStream);
+	virtual void Read(CStream& rStream);
+	virtual void Write(CStream& rStream);
 
-	virtual void operator <<(CSQLSource& rSource);
-	virtual void operator >>(CSQLSource& rSource);
+	virtual void Read(CSQLSource& rSource);
+	virtual void Write(CSQLSource& rSource, RowTypes eRows = ALL);
+
+	virtual void ResetRowFlags();
 
 	//
-	// Flags.
+	// Table type flags.
 	//
 	enum
 	{
@@ -102,6 +118,11 @@ public:
 		DEFAULTS   = (PERSISTENT | READ_WRITE),
 	};
 
+	//
+	// Debug methods.
+	//
+	virtual void Dump(CStream& rStream) const;
+
 protected:
 	//
 	// Members.
@@ -112,10 +133,15 @@ protected:
 	CColumnSet	m_vColumns;		// The set of columns.
 	CRowSet		m_vRows;		// The set of rows.
 	int			m_nInsertions;	// Rows inserted.
+	int			m_nUpdates;		// Fields updated.
 	int			m_nDeletions;	// Rows removed.
 	int			m_nIdentCol;	// Identity column, if one.
 	int			m_nIdentVal;	// Next identity value.
 	CRow*		m_pNullRow;		// The null row, if created.
+	CString		m_strSQLTable;	// SQL table name, if different.
+	CString		m_strSQLWhere;	// SQL WHERE clause.
+	CString		m_strSQLGroup;	// SQL GROUP BY clause.
+	CString		m_strSQLOrder;	// SQL ORDER BY clause.
 
 	//
 	// Friends.
@@ -134,15 +160,19 @@ protected:
 	//
 	// Internal methods.
 	//
+	virtual CString SQLColumnList() const;
 	virtual CString SQLQuery() const;
 	virtual void    TruncateIndexes();
+	virtual void    WriteInsertions(CSQLSource& rSource);
+	virtual void    WriteUpdates(CSQLSource& rSource);
+	virtual void    WriteDeletions(CSQLSource& rSource);
 
 	//
 	// Debug methods.
 	//
 	virtual void CheckIndexes() const;
-	virtual void CheckRow(CRow& oRow) const;
-	virtual void CheckColumn(CRow& oRow, int nColumn, const CValue& oValue) const;
+	virtual void CheckRow(CRow& oRow, bool bUpdate) const;
+	virtual void CheckColumn(CRow& oRow, int nColumn, const CValue& oValue, bool bUpdate) const;
 };
 
 /******************************************************************************

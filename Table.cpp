@@ -26,6 +26,7 @@ CTable::CTable(CMDB& oDB, const char* pszName, int nFlags)
 	, m_strName(pszName)
 	, m_nFlags(nFlags)
 	, m_nInsertions(0)
+	, m_nUpdates(0)
 	, m_nDeletions(0)
 	, m_nIdentCol(-1)
 	, m_nIdentVal(0)
@@ -352,7 +353,7 @@ int CTable::InsertRow(CRow& oRow, bool bNew)
 
 #ifdef _DEBUG
 	// Check row nulls and fkeys.
-	CheckRow(oRow);
+	CheckRow(oRow, false);
 
 	// Check index sizes.
 	CheckIndexes();
@@ -367,12 +368,13 @@ int CTable::InsertRow(CRow& oRow, bool bNew)
 			pIndex->AddRow(oRow);
 	}
 
-	// Mark as inserted.
+	// New row?
 	if (bNew)
 	{
 		oRow.MarkInserted();
 		m_nInsertions++;
 	}
+	// Serialised row.
 	else
 	{
 		oRow.MarkOriginal();
@@ -467,8 +469,6 @@ void CTable::Truncate()
 	// Anything to truncate?
 	if (m_vRows.Count() > 0)
 	{
-		m_nDeletions += m_vRows.Count();
-
 		// Remove all.
 		m_vRows.DeleteAll();
 		TruncateIndexes();
@@ -522,6 +522,23 @@ void CTable::TruncateIndexes()
 }
 
 /******************************************************************************
+** Method:		SelectAll()
+**
+** Description:	Selects all rows from the table.
+**
+** Parameters:	None.
+**
+** Returns:		The result set.
+**
+*******************************************************************************
+*/
+
+CResultSet CTable::SelectAll() const
+{
+	return CResultSet(*this, m_vRows);
+}
+
+/******************************************************************************
 ** Method:		SelectRow()
 **
 ** Description:	Selects the first row from the table where the column matches
@@ -560,7 +577,7 @@ CRow* CTable::SelectRow(int nColumn, const CValue& oValue) const
 
 CResultSet CTable::Select(const CWhere& oWhere) const
 {
-	CResultSet oRS;
+	CResultSet oRS(*this);
 
 	// For all rows, apply the clause,
 	for (int i = 0; i < m_vRows.Count(); i++)
@@ -619,17 +636,44 @@ bool CTable::Modified() const
 	if (Transient() || ReadOnly())
 		return false;
 
-	// Any insertions or deletions?
-	if (m_nInsertions || m_nDeletions)
+	// Any insertions/updates/deletions?
+	if (m_nInsertions || m_nUpdates || m_nDeletions)
 		return true;
 
-	// Check all rows.
-	return m_vRows.Modified();
+	return false;
 }
 
 /******************************************************************************
-** Methods:		operator <<()
-**				operator >>()
+** Method:		Modified()
+**
+** Description:	Sets or resets the table and row modified flags.
+**
+** Parameters:	bModified	Set or Reset flags?
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::Modified(bool bModified)
+{
+	if (bModified)
+	{
+		// Set modified flags.
+		m_nInsertions++;
+		m_nUpdates++;
+		m_nDeletions++;
+	}
+	else
+	{
+		// Reset table and row flags.
+		ResetRowFlags();
+	}
+}
+
+/******************************************************************************
+** Methods:		Read()
+**				Write()
 **
 ** Description:	Operators to read/write the data from/to a stream.
 **
@@ -640,7 +684,7 @@ bool CTable::Modified() const
 *******************************************************************************
 */
 
-void CTable::operator <<(CStream& rStream)
+void CTable::Read(CStream& rStream)
 {
 	m_vRows.DeleteAll();
 	TruncateIndexes();
@@ -665,11 +709,11 @@ void CTable::operator <<(CStream& rStream)
 	{
 		CRow& oRow = CTable::CreateRow();
 
-		oRow << rStream;
+		oRow.Read(rStream);
 
 #ifdef _DEBUG
 		// Check row nulls and fkeys.
-		CheckRow(oRow);
+		CheckRow(oRow, false);
 #endif //_DEBUG
 
 		m_vRows.Add(oRow);
@@ -694,10 +738,11 @@ void CTable::operator <<(CStream& rStream)
 
 	// Reset modified flags.
 	m_nInsertions = 0;
+	m_nUpdates    = 0;
 	m_nDeletions  = 0;
 }
 
-void CTable::operator >>(CStream& rStream)
+void CTable::Write(CStream& rStream)
 {
 	// Ignore if a temporary table.
 	if (Transient())
@@ -715,14 +760,47 @@ void CTable::operator >>(CStream& rStream)
 
 	// Write the actual rows.
 	for (int i = 0; i < nRows; i++)
-		m_vRows[i] >> rStream;
+		m_vRows[i].Write(rStream);
 
 	// Write the identity value.
 	rStream.Write(&m_nIdentVal, sizeof(m_nIdentVal));
 
 	// Reset modified flags.
 	m_nInsertions = 0;
+	m_nUpdates    = 0;
 	m_nDeletions  = 0;
+}
+
+/******************************************************************************
+** Method:		SQLColumnList()
+**
+** Description:	Gets the comma separated column list.
+**
+** Parameters:	None.
+**
+** Returns:		The column list.
+**
+*******************************************************************************
+*/
+
+CString CTable::SQLColumnList() const
+{
+	CString strColumns;
+
+	// Get column list.
+	for (int i = 0; i < m_vColumns.Count(); i++)
+	{
+		// Ignore TRANSIENT columns.
+		if (!m_vColumns[i].Transient())
+		{
+			if (!strColumns.Empty())
+				strColumns += ',';
+
+			strColumns += m_vColumns[i].Name();
+		}
+	}
+
+	return strColumns;
 }
 
 /******************************************************************************
@@ -742,41 +820,42 @@ CString CTable::SQLQuery() const
 	ASSERT(Transient() == false);
 	ASSERT(m_vColumns.Count() > 0);
 
-	CString strColumns;
-	CString strQuery;
+	// Get the SQL table name, if different.
+	CString strTable = (m_strSQLTable.Empty()) ? m_strName : m_strSQLTable;
 
-	// Get column list.
-	for (int i = 0; i < m_vColumns.Count(); i++)
-	{
-		// Ignore TRANSIENT columns.
-		if (!m_vColumns[i].Transient())
-		{
-			if (strColumns.Length())
-				strColumns += ',';
+	// Build basic SELECT query.
+	CString strQuery = "SELECT " + SQLColumnList() + " FROM " + strTable;
 
-			strColumns += m_vColumns[i].Name();
-		}
-	}
+	// Append WHERE, if set.
+	if (m_strSQLWhere.Empty() == false)
+		strQuery += " WHERE " + m_strSQLWhere;
 
-	strQuery.Format("SELECT %s FROM %s", strColumns, Name());
+	// Append GROUP BY, if set.
+	if (m_strSQLGroup.Empty() == false)
+		strQuery += " GROUP BY " + m_strSQLGroup;
+
+	// Append ORDER BY, if set.
+	if (m_strSQLOrder.Empty() == false)
+		strQuery += " ORDER BY " + m_strSQLOrder;
 
 	return strQuery;
 }
 
 /******************************************************************************
-** Methods:		operator <<()
-**				operator >>()
+** Methods:		Read()
+**				Write()
 **
 ** Description:	Operators to read/write the data from/to a Database.
 **
 ** Parameters:	rSource		The data source.
+**				eRows		The type of rows to write.
 **
 ** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-void CTable::operator <<(CSQLSource& rSource)
+void CTable::Read(CSQLSource& rSource)
 {
 	m_vRows.DeleteAll();
 	TruncateIndexes();
@@ -794,21 +873,23 @@ void CTable::operator <<(CSQLSource& rSource)
 		pCursor = rSource.ExecQuery(SQLQuery());
 
 		// Set the output column types.
-		for (int i = 0; i < m_vColumns.Count(); i++)
+		for (int iTabCol = 0, iSQLCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
 		{
-			CColumn& oTabColumn = m_vColumns[i];
+			CColumn& oTabColumn = m_vColumns[iTabCol];
 
 			// Ignore TRANSIENT columns.
 			if (!oTabColumn.Transient())
 			{
-				SQLColumn& oSQLColumn = pCursor->Column(i);
+				SQLColumn& oSQLColumn = pCursor->Column(iSQLCol);
 
-				ASSERT(oTabColumn.Name()     == oSQLColumn.m_strName);
-				ASSERT(oTabColumn.Nullable() == (oSQLColumn.m_nFlags & CColumn::NULLABLE));
+				ASSERT(oTabColumn.Name() == oSQLColumn.m_strName);
 				ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
 
+				oSQLColumn.m_nDstColumn  = iTabCol;
 				oSQLColumn.m_eMDBColType = oTabColumn.ColType();
 				oSQLColumn.m_nSize       = oTabColumn.Length();
+
+				iSQLCol++;
 			}
 		}
 
@@ -819,7 +900,7 @@ void CTable::operator <<(CSQLSource& rSource)
 			CRow& oRow = CreateRow();
 
 			// Copy the data.
-			pCursor->SetRow(oRow);
+			pCursor->GetRow(oRow);
 
 			// Append to table.
 			InsertRow(oRow, false);
@@ -835,13 +916,304 @@ void CTable::operator <<(CSQLSource& rSource)
 	}
 }
 
-void CTable::operator >>(CSQLSource& rSource)
+void CTable::Write(CSQLSource& rSource, RowTypes eRows)
 {
 	// Ignore if a temporary table.
 	if (Transient())
 		return;
 
+	ASSERT(m_vColumns.Count() > 0);
 	ASSERT(rSource.IsOpen());
+
+	// Write inserted rows AND there are some?
+	if ( (eRows & INSERTED) && (m_nInsertions > 0) )
+		WriteInsertions(rSource);
+
+	// Write updated rows?
+	if ( (eRows & UPDATED) && (m_nUpdates > 0) )
+		WriteUpdates(rSource);
+
+	// Write deleted rows?
+	if ( (eRows & DELETED) && (m_nDeletions > 0) )
+		WriteDeletions(rSource);
+}
+
+/******************************************************************************
+** Method:		Write*()
+**
+** Description:	Internal methods to writes the row changes.
+**
+** Parameters:	rSource		The connection.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::WriteInsertions(CSQLSource& rSource)
+{
+	// Perform a quick check to see if
+	// there is actually anything to write.
+	for (int i = 0; i < RowCount(); i++)
+	{
+		CRow& oRow = m_vRows[i];
+
+		if (oRow.Inserted() && !oRow.Deleted())
+			break;
+	}
+
+	// Nothing to write?
+	if (i == RowCount())
+		return;
+
+	CString strColumns;
+	CString strParams;
+	CString strQuery;
+	int		nParams = 0;
+
+	// Create column and parameter list.
+	for (i = 0; i < m_vColumns.Count(); i++)
+	{
+		// Ignore TRANSIENT columns.
+		if (m_vColumns[i].Transient())
+			continue;
+
+		// Not first column?
+		if (!strColumns.Empty())
+		{
+			strColumns += ", ";
+			strParams  += ", ";
+		}
+
+		strColumns += m_vColumns[i].Name();
+		strParams  += '?';
+
+		nParams++;
+	}
+
+	// Create the full statement.
+	strQuery.Format("INSERT INTO %s (%s) VALUES (%s)", Name(), strColumns, strParams);
+
+	ASSERT(nParams > 0);
+
+	CSQLParams* pParams = NULL;
+
+	try
+	{
+		// Allocate the parameters object.
+		pParams = rSource.CreateParams(strQuery, nParams);
+
+		// Create parameter definitions.
+		for (int iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+		{
+			const CColumn& oColumn = m_vColumns[iTabCol];
+
+			// Ignore TRANSIENT columns.
+			if (oColumn.Transient())
+				continue;
+
+			SQLParam& oParam = pParams->Param(iSQLParam);
+
+			// Set the details.
+			oParam.m_nSrcColumn  = iTabCol;
+			oParam.m_eMDBColType = oColumn.ColType();
+			oParam.m_nMDBColSize = oColumn.Length();
+
+			iSQLParam++;
+		}
+
+		// For all rows.
+		for (i = 0; i < RowCount(); i++)
+		{
+			CRow& oRow = m_vRows[i];
+
+			// Ignore if not inserted OR already deleted.
+			if (!oRow.Inserted() || oRow.Deleted())
+				continue;
+
+			// Set the params and execute.
+			pParams->SetRow(oRow);
+			rSource.ExecStmt(strQuery, *pParams);
+		}
+
+		// Cleanup.
+		delete pParams;
+	}
+	catch(CODBCException&)
+	{
+		// Cleanup and rethrow.
+		delete pParams;
+
+		throw;
+	}
+}
+
+void CTable::WriteUpdates(CSQLSource& rSource)
+{
+	// Perform a quick check to see if
+	// there is actually anything to write.
+	for (int i = 0; i < RowCount(); i++)
+	{
+		CRow& oRow = m_vRows[i];
+
+		if (oRow.Updated() && !(oRow.Inserted() || oRow.Deleted()) )
+			break;
+	}
+
+	// Nothing to write?
+	if (i == RowCount())
+		return;
+
+	// For all rows.
+	for (int r = 0; r < RowCount(); r++)
+	{
+		CRow& oRow = m_vRows[r];
+
+		// Ignore row if unchanged OR handled by insert OR delete.
+		if (!oRow.Updated() || oRow.Inserted() || oRow.Deleted())
+			continue;
+
+		CString strModColumns;
+		CString strPKColumns;
+		CString strQuery;
+		int		nParams = 0;
+
+		// Create column and where clause list.
+		for (i = 0; i < m_vColumns.Count(); i++)
+		{
+			const CColumn& oColumn = m_vColumns[i];
+
+			// Ignore TRANSIENT columns.
+			if (oColumn.Transient())
+				continue;
+
+			// Value modified?
+			if (oRow[i].Modified())
+			{
+				if (!strModColumns.Empty())
+					strModColumns += ", ";
+
+				strModColumns += m_vColumns[i].Name();
+				strModColumns += " = ?";
+
+				nParams++;
+			}
+
+			// Part of primary key?
+			if (oColumn.PrimaryKey())
+			{
+				ASSERT(oRow[i].Modified() == false);
+
+				if (!strPKColumns.Empty())
+					strPKColumns += " AND ";
+
+				strPKColumns += m_vColumns[i].Name();
+				strPKColumns += " = ?";
+
+				nParams++;
+			}
+		}
+
+		// Create the full statement.
+		strQuery.Format("UPDATE %s SET %s WHERE %s", Name(), strModColumns, strPKColumns);
+
+		ASSERT(nParams > 0);
+
+		CSQLParams* pParams = NULL;
+
+		try
+		{
+			// Allocate the parameters object.
+			pParams = rSource.CreateParams(strQuery, nParams);
+
+			// Create modified column parameter definitions.
+			for (int iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+			{
+				const CColumn& oColumn = m_vColumns[iTabCol];
+
+				// Ignore TRANSIENT columns.
+				if (oColumn.Transient())
+					continue;
+
+				if (oRow[iTabCol].Modified())
+				{
+					SQLParam& oParam = pParams->Param(iSQLParam);
+
+					// Set the details.
+					oParam.m_nSrcColumn  = iTabCol;
+					oParam.m_eMDBColType = oColumn.ColType();
+					oParam.m_nMDBColSize = oColumn.Length();
+
+					iSQLParam++;
+				}
+			}
+
+			// Create primary key column parameter definitions.
+			for (iTabCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+			{
+				const CColumn& oColumn = m_vColumns[iTabCol];
+
+				// Ignore TRANSIENT columns.
+				if (oColumn.Transient())
+					continue;
+
+				if (oColumn.PrimaryKey())
+				{
+					SQLParam& oParam = pParams->Param(iSQLParam);
+
+					// Set the details.
+					oParam.m_nSrcColumn  = iTabCol;
+					oParam.m_eMDBColType = oColumn.ColType();
+					oParam.m_nMDBColSize = oColumn.Length();
+
+					iSQLParam++;
+				}
+			}
+
+			// Set the params and execute.
+			pParams->SetRow(oRow);
+			rSource.ExecStmt(strQuery, *pParams);
+
+			// Cleanup.
+			delete pParams;
+		}
+		catch(CODBCException&)
+		{
+			// Cleanup and rethrow.
+			delete pParams;
+
+			throw;
+		}
+	}
+}
+
+void CTable::WriteDeletions(CSQLSource& rSource)
+{
+	ASSERT(false);
+}
+
+/******************************************************************************
+** Method:		ResetRowFlags()
+**
+** Description:	Resets the modified flag on all rows.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::ResetRowFlags()
+{
+	// Update all rows.
+	for (int i = 0; i < RowCount(); i++)
+		m_vRows[i].ResetStatus();
+
+	// Update table counters.
+	m_nInsertions = 0;
+	m_nUpdates    = 0;
+	m_nDeletions  = 0;
 }
 
 /******************************************************************************
@@ -907,13 +1279,14 @@ void CTable::CheckIndexes() const
 ** Description:	Checks the row is valid.
 **
 ** Parameters:	oRow	The row to check.
+**				bUpdate	Is an UPDATE or an INSERT?
 **
 ** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-void CTable::CheckRow(CRow& oRow) const
+void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 {
 #ifdef _DEBUG
 	for (int k = 0; k < m_vColumns.Count(); k++)
@@ -923,7 +1296,7 @@ void CTable::CheckRow(CRow& oRow) const
 
 		ASSERT(!(!bCanBeNull && bIsNull));
 
-		CheckColumn(oRow, k, oRow[k]);
+		CheckColumn(oRow, k, oRow[k], bUpdate);
 
 		CTable* pFKTable  = m_vColumns[k].FKTable();
 		int     nFKColumn = m_vColumns[k].FKColumn();
@@ -944,12 +1317,136 @@ void CTable::CheckRow(CRow& oRow) const
 ** Parameters:	oRow		The row being checked.
 **				nColumn		The column to check.
 **				oValue		The columns value.
+**				bUpdate		Is an UPDATE or an INSERT?
 **
 ** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-void CTable::CheckColumn(CRow& oRow, int nColumn, const CValue& oValue) const
+void CTable::CheckColumn(CRow& oRow, int nColumn, const CValue& oValue, bool bUpdate) const
 {
+}
+
+/******************************************************************************
+** Method:		Dump()
+**
+** Description:	Dump the contents of the table to the stream as text.
+**
+** Parameters:	rStream		The stream to dump into.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::Dump(CStream& rStream) const
+{
+	CIntArray	aiColWidths;
+	CString		strColList;
+	int			nRowWidth = 0;
+
+	// Get the column widths and name list.
+	for (int i = 0; i < m_vColumns.Count(); i++)
+	{
+		CColumn& oColumn = m_vColumns[i];
+
+		// Get the column value width and name.
+		int     nWidth   = oColumn.DisplayWidth();
+		CString strName  = oColumn.Name();
+		int     nNameLen = strName.Length();
+
+		// Truncate long fields to 20 chars.
+		if (nWidth > 20)
+			nWidth = 20;
+
+		// Name longer than value?
+		if (nNameLen > nWidth)
+		{
+			// Truncate name.
+			strName = strName.Left(nWidth);
+		}
+		// Value longer than name?
+		else if (nWidth > nNameLen)
+		{
+			int nPadChars = (nWidth - nNameLen);
+
+			// Create padding with spaces.
+			char* pszPad = (char*) _alloca(nPadChars+1);
+			memset(pszPad, ' ', nPadChars);
+			pszPad[nPadChars] = '\0';
+
+			// Pad out name.
+			strName += pszPad;
+		}
+
+		// Write column name and separator.
+		rStream.Write(strName, nWidth);
+		rStream.Write(" ", 1);
+
+		// Track widths.
+		aiColWidths.Add(nWidth);
+		nRowWidth += ++nWidth;
+	}
+
+	// Write EOL.
+	rStream.Write("\r\n", 2);
+
+	// Create the heading underline.
+	char* psUnderline = (char*) _alloca(nRowWidth);
+	memset(psUnderline, '=', nRowWidth);
+
+	for (int j = 0, pos = 0; j < aiColWidths.Size(); j++)
+	{
+		pos += aiColWidths[j];
+		psUnderline[pos++] = ' ';
+	}
+
+	// Write heading underline.
+	rStream.Write(psUnderline, nRowWidth);
+	rStream.Write("\r\n", 2);
+
+	// Reuse underline for padding.
+	char* psPad = psUnderline;
+	memset(psPad, ' ', nRowWidth);
+
+	// For all rows.
+	for (int r = 0; r < RowCount(); r++)
+	{
+		CRow& oRow = m_vRows[r];
+
+		// For all columns in the row.
+		for (int c = 0; c < m_vColumns.Count(); c++)
+		{
+			CString strValue  = oRow[c].DbgFormat();
+			int     nValueLen = strValue.Length();
+			int     nColWidth = aiColWidths[c];
+
+			// Value longer than field?
+			if (nValueLen > nColWidth)
+			{
+				// Write truncated value.
+				rStream.Write(strValue, nColWidth);
+			}
+			else if (nColWidth > nValueLen)
+			{
+				// Write value and padding.
+				rStream.Write(strValue, nValueLen);
+				rStream.Write(psPad, (nColWidth-nValueLen));
+			}
+			else // nColWidth == nValueLen
+			{
+				// Write value and padding.
+				rStream.Write(strValue, nValueLen);
+			}
+
+			rStream.Write(" ", 1);
+		}
+
+		// Write EOL.
+		rStream.Write("\r\n", 2);
+	}
+
+	// Write EOL.
+	rStream.Write("\r\n", 2);
 }
