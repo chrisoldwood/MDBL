@@ -124,8 +124,9 @@ STGTYPE CColumn::ColToStgType(COLTYPE eType)
 		case MDCT_VOIDPTR:		return MDST_POINTER;
 		case MDCT_ROWPTR:		return MDST_POINTER;
 		case MDCT_ROWSETPTR:	return MDST_POINTER;
-		default:				ASSERT(false);	break;
 	}
+
+	ASSERT_FALSE();
 
 	return MDST_NULL;
 }
@@ -181,7 +182,6 @@ int CColumn::DisplayWidth(bool bDebug) const
 			case MDCT_VOIDPTR:		return 8;
 			case MDCT_ROWPTR:		return 8;
 			case MDCT_ROWSETPTR:	return 8;
-			default:				ASSERT(false);	break;
 		}
 	}
 	// Debug format?
@@ -199,9 +199,10 @@ int CColumn::DisplayWidth(bool bDebug) const
 			case MDST_TIME_T:		return max(nMin, 17);
 			case MDST_TIMESTAMP:	return max(nMin, 17);
 			case MDST_POINTER:		return max(nMin, 10);
-			default:				ASSERT(false); break;
 		}
 	}
+
+	ASSERT_FALSE();
 
 	return -1;
 }
