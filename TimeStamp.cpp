@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		TIMESTAMP.CPP
 ** COMPONENT:	Memory Database Library.
@@ -115,7 +114,7 @@ CTimeStamp::operator time_t() const
 **
 ** Description:	Convert the time_t to a timestamp.
 **
-** Parameters:	tTime the date & time as a time_t.
+** Parameters:	tTime	The date & time as a time_t.
 **
 ** Returns:		Nothing.
 **
@@ -124,5 +123,13 @@ CTimeStamp::operator time_t() const
 
 void CTimeStamp::operator=(time_t tTime)
 {
-	ASSERT(false);
+	struct tm* pTime = localtime(&tTime);
+
+	year     = (SQLSMALLINT)  (pTime->tm_year + 1900);
+	month    = (SQLUSMALLINT) (pTime->tm_mon  + 1);
+	day      = (SQLUSMALLINT) pTime->tm_mday;
+	hour     = (SQLUSMALLINT) pTime->tm_hour;
+	minute   = (SQLUSMALLINT) pTime->tm_min;
+	second   = (SQLUSMALLINT) pTime->tm_sec;
+	fraction = 0;
 }
