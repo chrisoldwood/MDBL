@@ -97,6 +97,10 @@ SOURCE=.\Field.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\GroupSet.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\IntMapIndex.cpp
 # End Source File
 # Begin Source File
@@ -151,6 +155,22 @@ SOURCE=.\TableSet.cpp
 
 SOURCE=.\TimeStamp.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\WhereCmp.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\WhereExp.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\WhereIn.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\WhereNot.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -169,11 +189,11 @@ SOURCE=.\ColumnSet.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Compare.hpp
+SOURCE=.\Field.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Field.hpp
+SOURCE=.\GroupSet.hpp
 # End Source File
 # Begin Source File
 
@@ -285,7 +305,19 @@ SOURCE=.\Where.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\WhereCmp.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\WhereExp.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\WhereIn.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\WhereNot.hpp
 # End Source File
 # End Group
 # Begin Source File
