@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		SQLSOURCE.HPP
 ** COMPONENT:	Memory Database Library.

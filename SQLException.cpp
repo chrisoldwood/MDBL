@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		SQLEXCEPTION.CPP
 ** COMPONENT:	Memory Database Library.
@@ -15,33 +14,31 @@
 **
 ** Description:	.
 **
-** Parameters:	None.
+** Parameters:	eErrCode	The exception code.
+**				strSQLStmt	The statement\connection being executed.
+**				strSQLErr	The error returned by the source.
 **
 ** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-CSQLException::CSQLException(int eErrCode, const CString& strSQLErr)
+CSQLException::CSQLException(int eErrCode, const CString& strSQLStmt, const CString& strSQLErr)
+	: m_eError(eErrCode)
 {
-	m_nErrorCode = eErrCode;
-
 	// Convert error to string.
 	switch(eErrCode)
 	{
 		case E_CONNECT_FAILED:
-			m_strErrorText  = "Failed to connect to Database:\n\n";
-			m_strErrorText += strSQLErr;
+			m_strError  = "Failed to connect to Database:\n\n";
 			break;
 
 		case E_EXEC_FAILED:
-			m_strErrorText  = "Failed to execute statement:\n\n";
-			m_strErrorText += strSQLErr;
+			m_strError  = "Failed to execute the statement:\n\n";
 			break;
 
 		case E_FETCH_FAILED:
-			m_strErrorText  = "Failed to fetch result set:\n\n";
-			m_strErrorText += strSQLErr;
+			m_strError  = "Failed to fetch result set:\n\n";
 			break;
 
 		// Shouldn't happen!
@@ -49,6 +46,11 @@ CSQLException::CSQLException(int eErrCode, const CString& strSQLErr)
 			ASSERT(false);
 			break;
 	}
+
+	// Append statement and reason.
+	m_strError += strSQLStmt;
+	m_strError += "\n\nReason:\n\n";
+	m_strError += strSQLErr;
 }
 
 /******************************************************************************

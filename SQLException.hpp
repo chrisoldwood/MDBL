@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		SQLEXCEPTION.HPP
 ** COMPONENT:	Memory Database Library.
@@ -19,13 +18,13 @@
 *******************************************************************************
 */
 
-class CSQLException : public CException
+class CSQLException
 {
 public:
 	//
 	// Constructors/Destructor.
 	//
-	CSQLException(int eErrCode, const CString& strSQLErr);
+	CSQLException(int eErrCode, const CString& strSQLStmt, const CString& strSQLErr);
 	virtual ~CSQLException();
 	
 	//
@@ -38,10 +37,11 @@ public:
 		E_FETCH_FAILED,		// Failed to fetch result set data.
 	};
 
-protected:
 	//
 	// Members.
 	//
+	int		m_eError;		// Error code.
+	CString	m_strError;		// Human readable error message.
 };
 
 /******************************************************************************
