@@ -147,8 +147,8 @@ void CResultSet::OrderBy(const CSortColumns& oColumns)
 		for (int j = 1; j < nRows; j++)
 		{
 			// Compare the next two rows.
-			CRow* pRow1 = (CRow*) CPtrArray::Item(j-1);
-			CRow* pRow2 = (CRow*) CPtrArray::Item(j);
+			CRow* pRow1 = TPtrArray<CRow>::At(j-1);
+			CRow* pRow2 = TPtrArray<CRow>::At(j);
 			bool  bSwap = false;
 
 			// Compare all columns.
@@ -176,8 +176,8 @@ void CResultSet::OrderBy(const CSortColumns& oColumns)
 			// Swap required?
 			if (bSwap)
 			{
-				CPtrArray::Set(j-1, pRow2);
-				CPtrArray::Set(j,   pRow1);
+				TPtrArray<CRow>::Set(j-1, pRow2);
+				TPtrArray<CRow>::Set(j,   pRow1);
 
 				nExgs++;
 			}
@@ -201,7 +201,7 @@ void CResultSet::Dump(CStream& rStream) const
 {
 	ASSERT(m_pTable != NULL);
 
-	CIntArray	aiColWidths;
+	TArray<int>	aiColWidths;
 	CString		strColList;
 	int			nRowWidth = 0;
 
