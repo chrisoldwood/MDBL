@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		MDBL.HPP
 ** COMPONENT:	Memory Database Library.
@@ -20,7 +19,6 @@
 */
 
 #include "wcl.hpp"
-
 #include <time.h>
 
 /******************************************************************************
@@ -41,21 +39,25 @@
 
 #include "Row.hpp"
 #include "RowSet.hpp"
+#include "ResultSet.hpp"
 
 #include "Index.hpp"
-#include "IntIndex.hpp"
+#include "UniqIndex.hpp"
+#include "IntMapIndex.hpp"
+#include "StrMapIndex.hpp"
 
-#include "ResultSet.hpp"
-#include "JoinedSet.hpp"
 #include "Where.hpp"
 #include "Compare.hpp"
 #include "WhereExp.hpp"
+
+#include "JoinedSet.hpp"
 #include "Join.hpp"
 
 #include "SQLException.hpp"
 #include "SQLCursor.hpp"
 #include "SQLSource.hpp"
 
+#include "ODBCException.hpp"
 #include "ODBCCursor.hpp"
 #include "ODBCSource.hpp"
 
