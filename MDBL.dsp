@@ -101,10 +101,6 @@ SOURCE=.\IntMapIndex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Join.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\JoinedSet.cpp
 # End Source File
 # Begin Source File
@@ -134,10 +130,6 @@ SOURCE=.\ResultSet.cpp
 # Begin Source File
 
 SOURCE=.\Row.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\RowSet.cpp
 # End Source File
 # Begin Source File
 
