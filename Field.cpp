@@ -164,8 +164,9 @@ CValue CField::GetValue() const
 		case MDST_TIME_T:		return *m_pTimeT;
 		case MDST_TIMESTAMP:	return (time_t) *m_pTimeStamp;
 		case MDST_POINTER:		return m_pVoidPtr;
-		default:				ASSERT(false);	break;
 	}
+
+	ASSERT_FALSE();
 
 	return null;
 }
@@ -223,7 +224,7 @@ void CField::GetRaw(void* pValue) const
 		memcpy(pValue, &m_pVoidPtr, sizeof(void*));
 
 		// Is this right?
-		ASSERT(false);
+		ASSERT_FALSE();
 	}
 	else
 	{
@@ -249,6 +250,7 @@ void CField::SetNull()
 {
 	ASSERT(m_oColumn.Nullable());
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if (m_bNull == true)
 		return;
@@ -262,6 +264,7 @@ void CField::SetInt(int iValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_INT);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 #ifdef _DEBUG
 	CTable* pFKTable  = m_oColumn.FKTable();
@@ -292,6 +295,7 @@ void CField::SetDouble(double dValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_DOUBLE);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if ( (m_bNull == false) && (*m_pDouble == dValue) )
 		return;
@@ -311,6 +315,7 @@ void CField::SetChar(char cValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_CHAR);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if ( (m_bNull == false) && (*m_pChar == cValue) )
 		return;
@@ -331,6 +336,7 @@ void CField::SetString(const char* sValue)
 	ASSERT(m_oColumn.StgType() == MDST_STRING);
 	ASSERT(m_oColumn.Length()  >= (int)strlen(sValue));
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if ( (m_bNull == false) && (strcmp(m_pString, sValue) == 0) )
 		return;
@@ -354,6 +360,7 @@ void CField::SetBool(bool bValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_BOOL);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if ( (m_bNull == false) && (*m_pBool == bValue) )
 		return;
@@ -373,6 +380,7 @@ void CField::SetDateTime(time_t tValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_TIME_T);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if ( (m_bNull == false) && (*m_pTimeT == tValue) )
 		return;
@@ -392,6 +400,7 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_TIMESTAMP);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
 	if ( (m_bNull == false) && (*m_pTimeStamp == tsValue) )
 		return;
@@ -425,7 +434,7 @@ void CField::SetField(const CField& oValue)
 			case MDST_STRING:	SetString  (oValue.m_pString);	break;
 			case MDST_BOOL:		SetBool    (*oValue.m_pBool);	break;
 			case MDST_TIME_T:	SetDateTime(*oValue.m_pTimeT);	break;
-			default:			ASSERT(false);					break;
+			default:			ASSERT_FALSE();					break;
 		}
 	}
 }
@@ -505,7 +514,7 @@ void CField::SetRaw(const void* pValue)
 		m_pVoidPtr = const_cast<void*>(pValue);
 
 		// Is this right?
-		ASSERT(false);
+		ASSERT_FALSE();
 	}
 	else
 	{
@@ -552,8 +561,9 @@ bool CField::operator==(const CValue& oValue) const
 		case MDST_BOOL:		return (*m_pBool    == oValue.m_bValue);
 		case MDST_TIME_T:	return (*m_pTimeT   == oValue.m_tValue);
 		case MDST_POINTER:	return (m_pVoidPtr  == oValue.m_pValue);
-		default:			ASSERT(false);	break;
 	}
+
+	ASSERT_FALSE();
 
 	return false;
 }
@@ -593,9 +603,9 @@ int CField::Compare(const CField& oValue) const
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);				break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - *oValue.m_pBool);			break;
 		case MDST_TIME_T:		nCmp = (*m_pTimeT - *oValue.m_pTimeT);			break;
-		case MDST_TIMESTAMP:	ASSERT(false);									break;
-		case MDST_POINTER:		ASSERT(false);									break;
-		default:				ASSERT(false);									break;
+		case MDST_TIMESTAMP:	ASSERT_FALSE();									break;
+		case MDST_POINTER:		ASSERT_FALSE();									break;
+		default:				ASSERT_FALSE();									break;
 	}
 
 	return nCmp;
@@ -622,9 +632,9 @@ int CField::Compare(const CValue& oValue) const
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_sValue);					break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - oValue.m_bValue);			break;
 		case MDST_TIME_T:		nCmp = (*m_pTimeT - oValue.m_tValue);			break;
-		case MDST_TIMESTAMP:	ASSERT(false);									break;
-		case MDST_POINTER:		ASSERT(false);									break;
-		default:				ASSERT(false);									break;
+		case MDST_TIMESTAMP:	ASSERT_FALSE();									break;
+		case MDST_POINTER:		ASSERT_FALSE();									break;
+		default:				ASSERT_FALSE();									break;
 	}
 
 	return nCmp;
@@ -697,7 +707,7 @@ CString CField::Format(const char* pszFormat) const
 		case MDCT_VOIDPTR:		str.Format(pszFormat, m_pVoidPtr);	break;
 		case MDCT_ROWPTR:		str.Format(pszFormat, m_pVoidPtr);	break;
 		case MDCT_ROWSETPTR:	str.Format(pszFormat, m_pVoidPtr);	break;
-		default:				ASSERT(false);						break;
+		default:				ASSERT_FALSE();						break;
 	}
 
 	return str;
@@ -734,7 +744,7 @@ CString CField::DbgFormat() const
 		case MDST_TIME_T:		str = FormatTimeT("%d/%m/%y %H:%M:%S");		break;
 		case MDST_TIMESTAMP:	str = FormatTimeStamp("%d/%m/%y %H:%M:%S");	break;
 		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);				break;
-		default:				ASSERT(false);								break;
+		default:				ASSERT_FALSE();								break;
 	}
 
 	// Replace any CRs or LFs with a '.'.
