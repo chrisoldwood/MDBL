@@ -42,17 +42,17 @@ public:
 
 	bool  Modified() const;
 
-protected:
-	//
-	// Members.
-	//
-
 private:
 	//
 	// Disallow copy and assignment.
 	//
 	CRowSet(const CRowSet&);
 	void operator=(const CRowSet&);
+
+	//
+	// Friends.
+	//
+	friend class CResultSet;
 };
 
 /******************************************************************************
