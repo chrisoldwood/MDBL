@@ -211,7 +211,7 @@ void CResultSet::Dump(CStream& rStream) const
 		const CColumn& oColumn = m_pTable->Column(i);
 
 		// Get the column value width and name.
-		int     nWidth   = oColumn.DisplayWidth();
+		int     nWidth   = oColumn.DisplayWidth(true);
 		CString strName  = oColumn.Name();
 		int     nNameLen = strName.Length();
 

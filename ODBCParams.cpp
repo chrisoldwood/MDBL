@@ -203,7 +203,9 @@ void CODBCParams::SetRow(CRow& oRow)
 			*pLenInd = SQL_NULL_DATA;
 		}
 		// Requires conversion from MDCT_DATETIME?
-		else if (m_pParams[iParam].m_eMDBColType == MDCT_DATETIME)
+		else if ( (m_pParams[iParam].m_eMDBColType == MDCT_DATETIME)
+			   || (m_pParams[iParam].m_eMDBColType == MDCT_DATE)
+			   || (m_pParams[iParam].m_eMDBColType == MDCT_TIME) )
 		{
 			CTimeStamp* pTimeStamp = (CTimeStamp*)(pValue + sizeof(SQLINTEGER));
 

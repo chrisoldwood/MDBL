@@ -114,6 +114,14 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 			pColumn = new CColumn(*this, pszName, MDCT_DATETIME,  0,       sizeof(time_t),     nFlags);
 			break;
 
+		case MDCT_DATE:
+			pColumn = new CColumn(*this, pszName, MDCT_DATE,      0,       sizeof(time_t),     nFlags);
+			break;
+
+		case MDCT_TIME:
+			pColumn = new CColumn(*this, pszName, MDCT_TIME,      0,       sizeof(time_t),     nFlags);
+			break;
+
 		case MDCT_TIMESTAMP:
 			pColumn = new CColumn(*this, pszName, MDCT_TIMESTAMP, 0,       sizeof(CTimeStamp), nFlags);
 			break;
@@ -1352,7 +1360,7 @@ void CTable::Dump(CStream& rStream) const
 		CColumn& oColumn = m_vColumns[i];
 
 		// Get the column value width and name.
-		int     nWidth   = oColumn.DisplayWidth();
+		int     nWidth   = oColumn.DisplayWidth(true);
 		CString strName  = oColumn.Name();
 		int     nNameLen = strName.Length();
 

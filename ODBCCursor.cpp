@@ -395,7 +395,9 @@ void CODBCCursor::GetRow(CRow& oRow)
 			oRow[iRowCol] = null;
 		}
 		// Requires conversion to MDCT_DATETIME?
-		else if (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATETIME)
+		else if ( (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATETIME)
+			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATE)
+			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_TIME) )
 		{
 			CTimeStamp* pTimeStamp = (CTimeStamp*)(pValue + sizeof(SQLINTEGER));
 			time_t		tTime      = *pTimeStamp;

@@ -399,6 +399,8 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 		case MDCT_BOOL:			break;
 		case MDCT_IDENTITY:		return SQL_INTEGER;
 		case MDCT_DATETIME:		return SQL_TYPE_TIMESTAMP;
+		case MDCT_DATE:			return SQL_TYPE_TIMESTAMP;
+		case MDCT_TIME:			return SQL_TYPE_TIMESTAMP;
 		case MDCT_TIMESTAMP:	return SQL_TYPE_TIMESTAMP;
 	}
 
@@ -435,6 +437,8 @@ int CODBCSource::BufferSize(COLTYPE eColType, int nColSize)
 		case MDCT_BOOL:			ASSERT(false);					break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
+		case MDCT_DATE:			nSize = sizeof(CTimeStamp);		break;
+		case MDCT_TIME:			nSize = sizeof(CTimeStamp);		break;
 		case MDCT_TIMESTAMP:	nSize = sizeof(CTimeStamp);		break;
 		default:				ASSERT(false);					break;
 	}
@@ -471,10 +475,11 @@ int CODBCSource::ColumnSize(COLTYPE eColType, int nColSize)
 //		case MDCT_BOOL:			
 		case MDCT_IDENTITY:		return 0;
 		case MDCT_DATETIME:		return 23;
+		case MDCT_DATE:			return 23;
+		case MDCT_TIME:			return 23;
 		case MDCT_TIMESTAMP:	return 23;
+		default:				ASSERT(false);	break;
 	}
-
-	ASSERT(false);
 
 	// Unsupported.
 	return 0;
