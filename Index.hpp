@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		INDEX.HPP
 ** COMPONENT:	Memory Database Library.
@@ -30,26 +29,18 @@ public:
 	//
 	int Column() const;
 
+	virtual int  RowCount() const = 0;
 	virtual void AddRow(CRow& oRow) = 0;
 	virtual void RemoveRow(CRow& oRow) = 0;
 	virtual void Truncate() = 0;
 
-	virtual CRow* FindRow(const CValue& oValue) const = 0;
-
-	//
-	// Index types.
-	//
-	enum Type
-	{
-		MAP  = 0,	// Map based for very unique data.
-		TREE = 1,	// Tree based for less unique data.
-	};
+	virtual CResultSet FindRows(const CValue& oValue) const = 0;
 
 protected:
 	//
 	// Constructors/Destructor.
 	//
-	CIndex(CTable& oTable, int nColumn, bool bUnique);
+	CIndex(CTable& oTable, int nColumn);
 	virtual ~CIndex();
 	
 	//
@@ -57,7 +48,6 @@ protected:
 	//
 	CTable&	m_oTable;		// The parent table.
 	int		m_nColumn;		// The column to be indexed.
-	bool	m_bUnique;		// Only accept unique values.
 
 	//
 	// Friends.
@@ -71,6 +61,16 @@ protected:
 **
 *******************************************************************************
 */
+
+inline CIndex::CIndex(CTable& oTable, int nColumn)
+	: m_oTable(oTable)
+	, m_nColumn(nColumn)
+{
+}
+
+inline CIndex::~CIndex()
+{
+}
 
 inline int CIndex::Column() const
 {
