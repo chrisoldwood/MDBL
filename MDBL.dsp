@@ -23,8 +23,8 @@ CFG=MDBL - Win32 Debug
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName ""
-# PROP Scc_LocalPath ""
+# PROP Scc_ProjName ""$/Win32/MDBL", OAAAAAAA"
+# PROP Scc_LocalPath "."
 CPP=cl.exe
 RSC=rc.exe
 
@@ -97,11 +97,7 @@ SOURCE=.\Field.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Index.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\IntIndex.cpp
+SOURCE=.\IntMapIndex.cpp
 # End Source File
 # Begin Source File
 
@@ -118,6 +114,10 @@ SOURCE=.\MDB.cpp
 # Begin Source File
 
 SOURCE=.\ODBCCursor.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ODBCException.cpp
 # End Source File
 # Begin Source File
 
@@ -138,6 +138,10 @@ SOURCE=.\RowSet.cpp
 # Begin Source File
 
 SOURCE=.\SQLException.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\StrMapIndex.cpp
 # End Source File
 # Begin Source File
 
@@ -177,7 +181,7 @@ SOURCE=.\Index.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\IntIndex.hpp
+SOURCE=.\IntMapIndex.hpp
 # End Source File
 # Begin Source File
 
@@ -202,6 +206,10 @@ SOURCE=.\MDBLTypes.hpp
 # Begin Source File
 
 SOURCE=.\ODBCCursor.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ODBCException.hpp
 # End Source File
 # Begin Source File
 
@@ -233,6 +241,10 @@ SOURCE=.\SQLSource.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\StrMapIndex.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Table.hpp
 # End Source File
 # Begin Source File
@@ -242,6 +254,10 @@ SOURCE=.\TableSet.hpp
 # Begin Source File
 
 SOURCE=.\TimeStamp.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\UniqIndex.hpp
 # End Source File
 # Begin Source File
 
