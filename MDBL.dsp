@@ -121,6 +121,10 @@ SOURCE=.\ODBCException.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\ODBCParams.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ODBCSource.cpp
 # End Source File
 # Begin Source File
@@ -159,6 +163,10 @@ SOURCE=.\TimeStamp.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\AutoTrans.hpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\Column.hpp
@@ -213,6 +221,10 @@ SOURCE=.\ODBCException.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\ODBCParams.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ODBCSource.hpp
 # End Source File
 # Begin Source File
@@ -229,11 +241,19 @@ SOURCE=.\RowSet.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\SortColumns.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\SQLCursor.hpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\SQLException.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\SQLParams.hpp
 # End Source File
 # Begin Source File
 
