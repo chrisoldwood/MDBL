@@ -24,6 +24,7 @@
 CODBCSource::CODBCSource()
 	: m_hEnv(SQL_NULL_HENV)
 	, m_hDBC(SQL_NULL_HDBC)
+	, m_bInTrans(false)
 {
 }
 
@@ -60,7 +61,8 @@ CODBCSource::~CODBCSource()
 
 void CODBCSource::Open(const char* pszConnection)
 {
-	ASSERT(IsOpen() == false);
+	ASSERT(IsOpen()  == false);
+	ASSERT(InTrans() == false);
 
 	SQLRETURN	rc;
 	SQLCHAR		szConnection[MAX_PATH];
@@ -126,6 +128,9 @@ void CODBCSource::Close()
 
 		m_hEnv = SQL_NULL_HENV;
 	}
+
+	// Reset members.
+	m_bInTrans = false;
 }
 
 /******************************************************************************
@@ -191,6 +196,40 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 		::SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
 		throw;
 	}
+}
+
+/******************************************************************************
+** Method:		ExecStmt()
+**
+** Description:	Executes the given parameterised statement.
+**
+** Parameters:	pszStmt		The SQL statement.
+**				oParams		The parameters.
+**
+** Returns:		Nothing.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+void CODBCSource::ExecStmt(const char* pszStmt, CSQLParams& oParams)
+{
+	ASSERT(IsOpen() == true);
+
+	// Downcast to get real parameters type.
+	CODBCParams& oODBCParams = static_cast<CODBCParams&>(oParams);
+
+	SQLRETURN	rc;
+	SQLHSTMT	hStmt = oODBCParams.StmtHandle();
+
+	ASSERT(hStmt != SQL_NULL_HSTMT);
+
+	// Execute the query.
+	rc = ::SQLExecDirect(hStmt, (SQLCHAR*)pszStmt, SQL_NTS);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_EXEC_FAILED, pszStmt, hStmt, SQL_HANDLE_STMT);
 }
 
 /******************************************************************************
@@ -374,33 +413,214 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 **
 ** Description:	Calculates the buffer size required for the data type.
 **
-** Parameters:	oColumn		The column definition.
+** Parameters:	eType	The MDB column type.
+**				nSize	The column size.
 **
 ** Returns:		The buffer size.
 **
 *******************************************************************************
 */
 
-int CODBCSource::BufferSize(const SQLColumn& oColumn)
+int CODBCSource::BufferSize(COLTYPE eColType, int nColSize)
 {
 	int nSize = 0;
 
-	switch (oColumn.m_eMDBColType)
+	switch (eColType)
 	{
 		case MDCT_INT:			nSize = sizeof(int);			break;
 		case MDCT_DOUBLE:		nSize = sizeof(double);			break;
 		case MDCT_CHAR:			nSize = sizeof(char) + 1;		break;
-		case MDCT_FXDSTR:		nSize = oColumn.m_nSize + 1;	break;
-		case MDCT_VARSTR:		nSize = oColumn.m_nSize + 1;	break;
+		case MDCT_FXDSTR:		nSize = nColSize + 1;			break;
+		case MDCT_VARSTR:		nSize = nColSize + 1;			break;
 		case MDCT_BOOL:			ASSERT(false);					break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
 		case MDCT_TIMESTAMP:	nSize = sizeof(CTimeStamp);		break;
+		default:				ASSERT(false);					break;
 	}
 
 	// Adjust size for alignment.
 	nSize = (nSize + 3) & ~3;
 
-	// Unsupported.
 	return nSize;
+}
+
+/******************************************************************************
+** Method:		ColumnSize()
+**
+** Description:	Calculates the SQL column size for the data type.
+**				NB: smalldatetime is 16 datetime is 23
+**
+** Parameters:	eType	The MDB column type.
+**				nSize	The column size.
+**
+** Returns:		The column size.
+**
+*******************************************************************************
+*/
+
+int CODBCSource::ColumnSize(COLTYPE eColType, int nColSize)
+{
+	switch (eColType)
+	{
+		case MDCT_INT:			return 0;
+		case MDCT_DOUBLE:		return 0;
+		case MDCT_CHAR:			return 1;
+		case MDCT_FXDSTR:		return nColSize;
+		case MDCT_VARSTR:		return nColSize;
+//		case MDCT_BOOL:			
+		case MDCT_IDENTITY:		return 0;
+		case MDCT_DATETIME:		return 23;
+		case MDCT_TIMESTAMP:	return 23;
+	}
+
+	ASSERT(false);
+
+	// Unsupported.
+	return 0;
+}
+
+/******************************************************************************
+** Method:		CreateParams()
+**
+** Description:	Creates a parameters object for use with a parameterised
+**				statement.
+**
+** Parameters:	pszStmt		The statment that will be executed.
+**				nParams		The expected number of parameters.
+**
+** Returns:		The params object.
+**
+*******************************************************************************
+*/
+
+CSQLParams* CODBCSource::CreateParams(const char* pszStmt, int nParams)
+{
+	SQLHSTMT hStmt = SQL_NULL_HSTMT;
+
+	// Allocate a statement handle.
+	SQLRETURN rc = ::SQLAllocHandle(SQL_HANDLE_STMT, m_hDBC, &hStmt);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_ALLOC_FAILED, pszStmt, m_hDBC, SQL_HANDLE_DBC);
+
+	ASSERT(hStmt != SQL_NULL_HSTMT);
+
+	return new CODBCParams(*this, pszStmt, hStmt, nParams);
+}
+
+/******************************************************************************
+** Method:		InTrans()
+**
+** Description:	Queries if the connection is in a transaction.
+**
+** Parameters:	None.
+**
+** Returns:		true or false.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+bool CODBCSource::InTrans()
+{
+	return m_bInTrans;
+}
+
+/******************************************************************************
+** Method:		BeginTrans()
+**
+** Description:	Start a new transaction.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+void CODBCSource::BeginTrans()
+{
+	ASSERT(m_bInTrans == false);
+
+	// Start the transaction.
+	SQLRETURN rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_TRANS_FAILED, "Begin Transaction", m_hDBC, SQL_HANDLE_DBC);
+
+	m_bInTrans = true;
+}
+
+/******************************************************************************
+** Method:		CommitTrans()
+**
+** Description:	Commit the current transaction.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+void CODBCSource::CommitTrans()
+{
+	ASSERT(m_bInTrans == true);
+
+	SQLRETURN rc;
+
+	// Commit the transaction.
+	rc = ::SQLEndTran(SQL_HANDLE_DBC, m_hDBC, SQL_COMMIT);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_TRANS_FAILED, "Commit Transaction", m_hDBC, SQL_HANDLE_DBC);
+
+	// End the transaction.
+	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_TRANS_FAILED, "End Transaction", m_hDBC, SQL_HANDLE_DBC);
+
+	m_bInTrans = false;
+}
+
+/******************************************************************************
+** Method:		Trans()
+**
+** Description:	Rollback the current transaction.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+** Exceptions:	CODBCException on error.
+**
+*******************************************************************************
+*/
+
+void CODBCSource::RollbackTrans()
+{
+	ASSERT(m_bInTrans == true);
+
+	SQLRETURN rc;
+
+	// Rollback transaction.
+	rc = ::SQLEndTran(SQL_HANDLE_DBC, m_hDBC, SQL_ROLLBACK);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_TRANS_FAILED, "Rollback Transaction", m_hDBC, SQL_HANDLE_DBC);
+
+	// End the transaction.
+	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
+
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+		throw CODBCException(CODBCException::E_TRANS_FAILED, "End Transaction", m_hDBC, SQL_HANDLE_DBC);
+
+	m_bInTrans = false;
 }

@@ -38,8 +38,18 @@ public:
 	//
 	// Statement methods.
 	//
+	virtual CSQLParams* CreateParams(const char* pszStmt, int nParams) = 0;
 	virtual void        ExecStmt(const char* pszStmt) = 0;
+	virtual void        ExecStmt(const char* pszStmt, CSQLParams& oParams) = 0;
 	virtual CSQLCursor* ExecQuery(const char* pszQuery) = 0;
+
+	//
+	// Transaction methods.
+	//
+	virtual bool InTrans() = 0;
+	virtual void BeginTrans() = 0;
+	virtual void CommitTrans() = 0;
+	virtual void RollbackTrans() = 0;
 
 protected:
 	//

@@ -41,16 +41,27 @@ public:
 	//
 	// Statement methods.
 	//
+	virtual CSQLParams* CreateParams(const char* pszStmt, int nParams);
 	virtual void        ExecStmt(const char* pszStmt);
+	virtual void        ExecStmt(const char* pszStmt, CSQLParams& oParams);
 	virtual CSQLCursor* ExecQuery(const char* pszQuery);
 	virtual void        ExecQuery(const char* pszQuery, CODBCCursor& oCursor);
+
+	//
+	// Transaction methods.
+	//
+	virtual bool InTrans();
+	virtual void BeginTrans();
+	virtual void CommitTrans();
+	virtual void RollbackTrans();
 
 	//
 	// Data type conversion methods.
 	//
 	static COLTYPE     MDBType(SQLSMALLINT nODBCType);
 	static SQLSMALLINT ODBCType(COLTYPE eMDBType);
-	static int         BufferSize(const SQLColumn& oColumn);
+	static int         BufferSize(COLTYPE eColType, int nColSize);
+	static int         ColumnSize(COLTYPE eColType, int nColSize);
 
 protected:
 	//
@@ -58,6 +69,7 @@ protected:
 	//
 	SQLHENV		m_hEnv;		// Environment handle.
 	SQLHDBC		m_hDBC;		// Connection handle.
+	bool		m_bInTrans;	// In a transaction?
 
 	//
 	// Friends.
