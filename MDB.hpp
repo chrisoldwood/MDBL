@@ -49,11 +49,18 @@ public:
 	//
 	virtual bool Modified() const;
 
-	virtual void operator <<(CStream& rStream);
-	virtual void operator >>(CStream& rStream);
+	virtual void Read(CStream& rStream);
+	virtual void Write(CStream& rStream);
 
-	virtual void operator <<(CSQLSource& rSource);
-	virtual void operator >>(CSQLSource& rSource);
+	virtual void Read(CSQLSource& rSource);
+	virtual void Write(CSQLSource& rSource, CTable::RowTypes eRows = CTable::ALL);
+
+	virtual void ResetRowFlags();
+
+	//
+	// Debug methods.
+	//
+	virtual void Dump(CStream& rStream) const;
 
 protected:
 	//

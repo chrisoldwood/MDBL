@@ -110,7 +110,7 @@ CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const ch
 			CRow& oRow = pTable->CreateRow();
 
 			// Copy the data.
-			pCursor->SetRow(oRow);
+			pCursor->GetRow(oRow);
 
 			// Append to table.
 			pTable->InsertRow(oRow, false);
@@ -186,10 +186,18 @@ int CMDB::FindTable(const char* pszName)
 
 CJoinedSet CMDB::Select(const CJoin& oQuery) const
 {
-	// Create the joined result set.
-	CJoinedSet oJS(oQuery.Count());
-
 	ASSERT(oQuery.Count() > 1);
+
+	int nJoins = oQuery.Count();
+
+	// Create the table list.
+	CTable** apTables = (CTable**) _alloca(sizeof(CTable*) * nJoins);
+
+	for (int i = 0; i < nJoins; i++)
+		apTables[i] = &Table(oQuery[i].m_nTable);;
+
+	// Create the joined result set.
+	CJoinedSet oJS(nJoins, apTables);
 
 	// Run the query.
 	DoJoin(oQuery, 0, *((CRow*)(NULL)), oJS);
@@ -291,8 +299,8 @@ bool CMDB::Modified() const
 }
 
 /******************************************************************************
-** Methods:		operator <<()
-**				operator >>()
+** Methods:		Read()
+**				Write()
 **
 ** Description:	Operators to read/write the data from/to a stream.
 **
@@ -303,43 +311,106 @@ bool CMDB::Modified() const
 *******************************************************************************
 */
 
-void CMDB::operator <<(CStream& rStream)
+void CMDB::Read(CStream& rStream)
 {
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)
-		m_vTables[i] << rStream;
+		m_vTables[i].Read(rStream);
 }
 
-void CMDB::operator >>(CStream& rStream)
+void CMDB::Write(CStream& rStream)
 {
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)
-		m_vTables[i] >> rStream;
+		m_vTables[i].Write(rStream);
 }
 
 /******************************************************************************
-** Methods:		operator <<()
-**				operator >>()
+** Methods:		Read()
+**				Write()
 **
 ** Description:	Operators to read/write the data from/to a Database.
 **
 ** Parameters:	rSource		The data source.
+**				eRows		The type of rows to write.
 **
 ** Returns:		Nothing.
 **
 *******************************************************************************
 */
 
-void CMDB::operator <<(CSQLSource& rSource)
+void CMDB::Read(CSQLSource& rSource)
 {
+	ASSERT(rSource.IsOpen());
+
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)
-		m_vTables[i] << rSource;
+		m_vTables[i].Read(rSource);
 }
 
-void CMDB::operator >>(CSQLSource& rSource)
+void CMDB::Write(CSQLSource& rSource, CTable::RowTypes eRows)
+{
+	ASSERT(rSource.IsOpen());
+
+	// Write inserted rows?
+	if (eRows & CTable::INSERTED)
+	{
+		// Process insertions from table 1 to n.
+		for (int i = 0; i < m_vTables.Count(); i++)
+			m_vTables[i].Write(rSource, CTable::INSERTED);
+	}
+
+	// Write updated rows?
+	if (eRows & CTable::UPDATED)
+	{
+		// Process updates from table 1 to n.
+		for (int i = 0; i < m_vTables.Count(); i++)
+			m_vTables[i].Write(rSource, CTable::UPDATED);
+	}
+
+	// Write deleted rows?
+	if (eRows & CTable::DELETED)
+	{
+		// Process deletions from table n to 1.
+		for (int i = m_vTables.Count()-1; i >= 0; i--)
+			m_vTables[i].Write(rSource, CTable::DELETED);
+	}
+}
+
+/******************************************************************************
+** Method:		ResetRowFlags()
+**
+** Description:	Resets the modified flag on all rows for all tables.
+**
+** Parameters:	None.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CMDB::ResetRowFlags()
 {
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)
-		m_vTables[i] >> rSource;
+		m_vTables[i].ResetRowFlags();
+}
+
+/******************************************************************************
+** Method:		Dump()
+**
+** Description:	Dump the contents of all tables to the stream in text format.
+**
+** Parameters:	rStream		The stream to dump into.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CMDB::Dump(CStream& rStream) const
+{
+	// For all tables.
+	for (int i = 0; i < m_vTables.Count(); i++)
+		m_vTables[i].Dump(rStream);
 }
