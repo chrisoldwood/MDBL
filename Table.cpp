@@ -461,6 +461,24 @@ void CTable::DeleteRow(CRow& oRow)
 }
 
 /******************************************************************************
+** Method:		DeleteRows()
+**
+** Description:	Deletes the rows in the result set from the table.
+**
+** Parameters:	oRS		The set of rows to delete.
+**
+** Returns:		Nothing.
+**
+*******************************************************************************
+*/
+
+void CTable::DeleteRows(const CResultSet& oRS)
+{
+	for (int i =0; i < oRS.Count(); i++)
+		DeleteRow(oRS[i]);
+}
+
+/******************************************************************************
 ** Method:		Truncate()
 **
 ** Description:	Deletes all rows in the table.
@@ -1361,7 +1379,7 @@ void CTable::CheckColumn(CRow& oRow, int nColumn, const CValue& oValue, bool bUp
 
 void CTable::Dump(CStream& rStream) const
 {
-	CIntArray	aiColWidths;
+	TArray<int>	aiColWidths;
 	CString		strColList;
 	int			nRowWidth = 0;
 

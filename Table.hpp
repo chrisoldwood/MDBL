@@ -67,6 +67,7 @@ public:
 	virtual int   InsertRow(CRow& oRow, bool bNew = true);
 	virtual void  DeleteRow(int nRow);
 	virtual void  DeleteRow(CRow& oRow);
+	virtual void  DeleteRows(const CResultSet& oRS);
 	virtual void  Truncate();
 
 	virtual CRow& NullRow();
