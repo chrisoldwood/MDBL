@@ -40,6 +40,12 @@ public:
 	int   Add(CRow& oRow);
 
 	void  OrderBy(const CSortColumns& oColumns);
+	void  OrderBy(int nColumn, CSortColumns::Dir eDir);
+
+	CValue    Sum(int nColumn) const;
+	CValue    Min(int nColumn) const;
+	CValue    Max(int nColumn) const;
+	CValueSet Distinct(int nColumn) const;
 
 	//
 	// Debug methods.
@@ -94,6 +100,11 @@ inline CRow& CResultSet::operator[](int n) const
 inline int CResultSet::Add(CRow& oRow)
 {
 	return TPtrArray<CRow>::Add(&oRow);
+}
+
+inline void CResultSet::OrderBy(int nColumn, CSortColumns::Dir eDir)
+{
+	OrderBy(CSortColumns(nColumn, eDir));
 }
 
 #endif //RESULTSET_HPP

@@ -186,6 +186,135 @@ void CResultSet::OrderBy(const CSortColumns& oColumns)
 }
 
 /******************************************************************************
+** Methods:		Sum() Min() Max()
+**
+** Description:	Calculates the Sum/Finds the Min or Max values of a column.
+**
+** Parameters:	nColumn		The index of the column to sum/search.
+**
+** Returns:		The result.
+**
+*******************************************************************************
+*/
+
+CValue CResultSet::Sum(int nColumn) const
+{
+	const CColumn& oColumn = m_pTable->Column(nColumn);
+	STGTYPE eType     = oColumn.StgType();
+	bool    bNullable = oColumn.Nullable();
+	CValue  oSum(null);
+
+	ASSERT( (eType == MDST_INT) || (eType == MDST_DOUBLE) );
+
+	// Initialise the result.
+	if      (eType == MDST_INT)		oSum = CValue(0);
+	else if (eType == MDST_DOUBLE)	oSum = CValue(0.0);
+
+	// Sum the rows.
+	for (int i = 0; i < Count(); i++)
+	{
+		const CField& oField = (*this)[i][nColumn];
+
+		// Ignore null values.
+		if ( (bNullable) && (oField == null) )
+			continue;
+
+		if      (eType == MDST_INT)		oSum.m_iValue += oField.GetInt();
+		else if (eType == MDST_DOUBLE)	oSum.m_dValue += oField.GetDouble();
+	}
+
+	return oSum;
+}
+
+CValue CResultSet::Min(int nColumn) const
+{
+	const CColumn& oColumn = m_pTable->Column(nColumn);
+	bool    bNullable = oColumn.Nullable();
+	CValue  oSum(null);
+
+	// For all rows.
+	for (int i = 0; i < Count(); i++)
+	{
+		const CField& oField = (*this)[i][nColumn];
+
+		// Ignore null values.
+		if ( (bNullable) && (oField == null) )
+			continue;
+
+		// Is first non-null value OR smaller?
+		if ( (oSum.m_bNull) || (oField.Compare(oSum) < 0) )
+			oSum = oField;
+	}
+
+	return oSum;
+}
+
+CValue CResultSet::Max(int nColumn) const
+{
+	const CColumn& oColumn = m_pTable->Column(nColumn);
+	bool    bNullable = oColumn.Nullable();
+	CValue  oSum(null);
+
+	// For all rows.
+	for (int i = 0; i < Count(); i++)
+	{
+		const CField& oField = (*this)[i][nColumn];
+
+		// Ignore null values.
+		if ( (bNullable) && (oField == null) )
+			continue;
+
+		// Is first non-null value OR smaller?
+		if ( (oSum.m_bNull) || (oField.Compare(oSum) > 0) )
+			oSum = oField;
+	}
+
+	return oSum;
+}
+
+/******************************************************************************
+** Method:		Distinct()
+**
+** Description:	Finds the distinct set of values for a column.
+**
+** Parameters:	nColumn		The index of the column to search.
+**
+** Returns:		The set of values.
+**
+*******************************************************************************
+*/
+
+CValueSet CResultSet::Distinct(int nColumn) const
+{
+	CValueSet oSet;
+
+	// Result set not empty?
+	if (Count() > 0)
+	{
+		CResultSet    oRS(*this);
+		const CField* pCurrValue = NULL;
+
+		// Sort a copy of the result set.
+		oRS.OrderBy(nColumn, CSortColumns::ASC);
+
+		// For all rows.
+		for (int i = 0; i < oRS.Count(); i++)
+		{
+			CRow& oRow = oRS[i];
+
+			// First value OR row value differs?
+			if ( (pCurrValue == NULL) || (oRow[nColumn] != *pCurrValue) )
+			{
+				oSet.Add(oRow[nColumn]);
+				pCurrValue = &oRow[nColumn];
+			}
+		}
+	}
+
+	return oSet;
+}
+
+/******************************************************************************
 ** Method:		Dump()
 **
 ** Description:	Dump the contents of the result set to the stream as text.
