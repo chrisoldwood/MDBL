@@ -77,10 +77,8 @@ CResultSet::CResultSet(const CTable& oTable, CRow* pRow)
 CResultSet::CResultSet(const CResultSet& oResultSet)
 	: m_pTable(oResultSet.m_pTable)
 {
-	Reserve(oResultSet.Count());
-
-	for (int i = 0; i < oResultSet.Count(); i++)
-		Add(oResultSet[i]);
+	// Copy rows.
+	ShallowCopy(oResultSet);
 }
 
 /******************************************************************************
@@ -98,10 +96,8 @@ CResultSet::CResultSet(const CResultSet& oResultSet)
 CResultSet::CResultSet(const CTable& oTable, const CRowSet& oRowSet)
 	: m_pTable(&oTable)
 {
-	Reserve(oRowSet.Count());
-
-	for (int i = 0; i < oRowSet.Count(); i++)
-		Add(oRowSet[i]);
+	// Copy rows.
+	ShallowCopy(oRowSet);
 }
 
 /******************************************************************************
@@ -118,6 +114,34 @@ CResultSet::CResultSet(const CTable& oTable, const CRowSet& oRowSet)
 
 CResultSet::~CResultSet()
 {
+}
+
+/******************************************************************************
+** Method:		Assignment operator.
+**
+** Description:	.
+**
+** Parameters:	oRHS	The object to copy.
+**
+** Returns:		itself.
+**
+*******************************************************************************
+*/
+
+CResultSet& CResultSet::operator=(const CResultSet& oRHS)
+{
+	ASSERT(this != &oRHS);
+
+	// Clear state.
+	RemoveAll();
+
+	// Copy members.
+	m_pTable = oRHS.m_pTable;
+
+	// Copy rows.
+	ShallowCopy(oRHS);
+
+	return *this;
 }
 
 /******************************************************************************
@@ -319,6 +343,116 @@ CValueSet CResultSet::Distinct(int nColumn) const
 	}
 
 	return oSet;
+}
+
+/******************************************************************************
+** Method:		GroupBy()
+**
+** Description:	Groups the rows by the given column.
+**
+** Parameters:	nColumn		The index of the column to group on.
+**
+** Returns:		The set of grouped rows.
+**
+*******************************************************************************
+*/
+
+CGroupSet CResultSet::GroupBy(int nColumn) const
+{
+	CGroupSet oGS;
+
+	// Simple set?
+	if (Count() < 2)
+	{
+		if (Count() == 1)
+			oGS.Add(*this);
+
+		return oGS;
+	}
+
+	CResultSet oRS(*this);
+
+	// Sort by the column.
+	oRS.OrderBy(nColumn, CSortColumns::ASC);
+
+	// Create a set for the group.
+	CResultSet oGroup(*m_pTable);
+
+	// Start the first group.
+	oGroup.Add(oRS[0]);
+
+	// For all subsequent rows
+	for (int i = 1; i < oRS.Count(); ++i)
+	{
+		// Start of new group?
+		if (oRS[i][nColumn] != oGroup[0][nColumn])
+		{
+			// Add group to set and clear.
+			oGS.Add(oGroup);
+			oGroup.Truncate();
+		}
+
+		oGroup.Add(oRS[i]);
+	}
+
+	// Add the final group to the set.
+	oGS.Add(oGroup);
+
+	return oGS;
+}
+
+/******************************************************************************
+** Method:		Select()
+**
+** Description:	Runs a generic SELECT query on the set.
+**
+** Parameters:	oWhere	The where clause.
+**
+** Returns:		The result set.
+**
+*******************************************************************************
+*/
+
+CResultSet CResultSet::Select(const CWhere& oQuery) const
+{
+	CResultSet oRS(*m_pTable);
+
+	// For all rows, apply the clause,
+	for (int i = 0; i < Count(); i++)
+	{
+		CRow& oRow = Row(i);
+
+		if (oQuery.Matches(oRow))
+			oRS.Add(oRow);
+	}
+
+	return oRS;
+}
+
+/******************************************************************************
+** Method:		Exists()
+**
+** Description:	Queries if at least one row matches the WHERE clause.
+**
+** Parameters:	oWhere	The where clause.
+**
+** Returns:		true or false.
+**
+*******************************************************************************
+*/
+
+bool CResultSet::Exists(const CWhere& oQuery) const
+{
+	// For all rows, apply the clause,
+	for (int i = 0; i < Count(); i++)
+	{
+		CRow& oRow = Row(i);
+
+		if (oQuery.Matches(oRow))
+			return true;
+	}
+
+	return false;
 }
 
 /******************************************************************************

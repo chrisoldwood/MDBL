@@ -11,6 +11,9 @@
 #ifndef RESULTSET_HPP
 #define RESULTSET_HPP
 
+// Forward declarations.
+class CGroupSet;
+
 /******************************************************************************
 ** 
 ** This is an array based class used to store the results of a table query.
@@ -29,23 +32,39 @@ public:
 	CResultSet(const CResultSet& oResultSet);
 	CResultSet(const CTable& oTable, const CRowSet& oRowSet);
 	~CResultSet();
+
+	CResultSet& operator=(const CResultSet& oRHS);
 	
 	//
-	// Methods.
+	// Accessors/Mutators.
 	//
 	int   Count() const;
 	CRow& Row(int n) const;
 	CRow& operator[](int n) const;
 
 	int   Add(CRow& oRow);
+	void  Truncate();
 
+	//
+	// Sorting methods.
+	//
 	void  OrderBy(const CSortColumns& oColumns);
 	void  OrderBy(int nColumn, CSortColumns::Dir eDir);
 
+	//
+	// Aggregation methods.
+	//
 	CValue    Sum(int nColumn) const;
 	CValue    Min(int nColumn) const;
 	CValue    Max(int nColumn) const;
 	CValueSet Distinct(int nColumn) const;
+	CGroupSet GroupBy(int nColumn) const;
+
+	//
+	// Query methods.
+	//
+	CResultSet Select(const CWhere& oQuery) const;
+	bool       Exists(const CWhere& oQuery) const;
 
 	//
 	// Debug methods.
@@ -63,7 +82,6 @@ private:
 	// Disallow array constructs except via friends and assignment.
 	//
 	CResultSet();
-	void operator=(const CResultSet&);
 
 	//
 	// Friends.
@@ -106,6 +124,11 @@ inline CRow& CResultSet::operator[](int n) const
 inline int CResultSet::Add(CRow& oRow)
 {
 	return TPtrArray<CRow>::Add(&oRow);
+}
+
+inline void CResultSet::Truncate()
+{
+	TPtrArray<CRow>::RemoveAll();
 }
 
 inline void CResultSet::OrderBy(int nColumn, CSortColumns::Dir eDir)
