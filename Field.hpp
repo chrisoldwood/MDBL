@@ -178,6 +178,7 @@ private:
 	//
 	void    Updated();
 	CString FormatTimeT(const char* pszFormat) const;
+	CString FormatTimeStamp(const char* pszFormat) const;
 	CString FormatBool(const char* pszFormat) const;
 	int     StrCmp(const char* pszRHS) const;
 };

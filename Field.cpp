@@ -20,7 +20,7 @@ static const char* pszFormats[] =
 	"%c",					// MDCT_CHAR
 	"%s",					// MDCT_FXDSTR
 	"%s",					// MDCT_VARSTR
-	"Yes|No",				// MDCT_BOOL
+	"No|Yes",				// MDCT_BOOL
 	"%d",					// MDCT_IDENTITY
 	"%d/%m/%y %H:%M:%S",	// MDCT_DATETIME
 	"%d/%m/%y",				// MDCT_DATE
@@ -156,14 +156,15 @@ CValue CField::GetValue() const
 	// Decode type.
 	switch(m_oColumn.StgType())
 	{
-		case MDST_INT:		return *m_pInt;
-		case MDST_DOUBLE:	return *m_pDouble;
-		case MDST_CHAR:		return *m_pChar;
-		case MDST_STRING:	return m_pString;
-		case MDST_BOOL:		return *m_pBool;
-		case MDST_TIME_T:	return *m_pTimeT;
-		case MDST_POINTER:	return m_pVoidPtr;
-		default:			ASSERT(false);	break;
+		case MDST_INT:			return *m_pInt;
+		case MDST_DOUBLE:		return *m_pDouble;
+		case MDST_CHAR:			return *m_pChar;
+		case MDST_STRING:		return m_pString;
+		case MDST_BOOL:			return *m_pBool;
+		case MDST_TIME_T:		return *m_pTimeT;
+		case MDST_TIMESTAMP:	return (time_t) *m_pTimeStamp;
+		case MDST_POINTER:		return m_pVoidPtr;
+		default:				ASSERT(false);	break;
 	}
 
 	return null;
@@ -663,7 +664,7 @@ CString CField::Format(const char* pszFormat) const
 		case MDCT_DATETIME:		str = FormatTimeT(pszFormat);		break;
 		case MDCT_DATE:			str = FormatTimeT(pszFormat);		break;
 		case MDCT_TIME:			str = FormatTimeT(pszFormat);		break;
-		case MDCT_TIMESTAMP:	ASSERT(false);						break;
+		case MDCT_TIMESTAMP:	str = FormatTimeStamp(pszFormat);	break;
 		case MDCT_VOIDPTR:		str.Format(pszFormat, m_pVoidPtr);	break;
 		case MDCT_ROWPTR:		str.Format(pszFormat, m_pVoidPtr);	break;
 		case MDCT_ROWSETPTR:	str.Format(pszFormat, m_pVoidPtr);	break;
@@ -696,15 +697,15 @@ CString CField::DbgFormat() const
 	// Format according to storage type.
 	switch(m_oColumn.StgType())
 	{
-		case MDST_INT:			str.Format("%d", *m_pInt);				break;
-		case MDST_DOUBLE:		str.Format("%f", *m_pDouble);			break;
-		case MDST_CHAR:			str.Format("%c", *m_pChar);				break;
-		case MDST_STRING:		str = m_pString;						break;
-		case MDST_BOOL:			str = FormatBool("Y|N");				break;
-		case MDST_TIME_T:		str = FormatTimeT("%d/%m/%y %H:%M:%S");	break;
-		case MDST_TIMESTAMP:	ASSERT(false);							break;
-		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);			break;
-		default:				ASSERT(false);							break;
+		case MDST_INT:			str.Format("%d", *m_pInt);					break;
+		case MDST_DOUBLE:		str.Format("%f", *m_pDouble);				break;
+		case MDST_CHAR:			str.Format("%c", *m_pChar);					break;
+		case MDST_STRING:		str = m_pString;							break;
+		case MDST_BOOL:			str = FormatBool("N|Y");					break;
+		case MDST_TIME_T:		str = FormatTimeT("%d/%m/%y %H:%M:%S");		break;
+		case MDST_TIMESTAMP:	str = FormatTimeStamp("%d/%m/%y %H:%M:%S");	break;
+		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);				break;
+		default:				ASSERT(false);								break;
 	}
 
 	// Replace any CRs or LFs with a '.'.
@@ -744,6 +745,42 @@ CString CField::FormatTimeT(const char* pszFormat) const
 
 	// Format.
 	strftime(szTime, sizeof(szTime), pszFormat, pTM);
+
+	return szTime;
+}
+
+/******************************************************************************
+** Methods:		FormatTimeT()
+**
+** Description:	Convert the TimeStamp value to a string.
+**
+** Parameters:	pszFormat	The format string as for time_t types.
+**
+** Returns:		The value as a string.
+**
+*******************************************************************************
+*/
+
+CString CField::FormatTimeStamp(const char* pszFormat) const
+{
+	ASSERT(pszFormat != NULL);
+
+	char szTime[100];
+	tm	 oTM;
+
+	// Initialise the struct.
+	memset(&oTM, 0, sizeof(oTM));
+
+	oTM.tm_mday  = m_pTimeStamp->day;
+	oTM.tm_mon   = m_pTimeStamp->month-1;
+	oTM.tm_year  = m_pTimeStamp->year;
+	oTM.tm_hour  = m_pTimeStamp->hour;
+	oTM.tm_min   = m_pTimeStamp->minute;
+	oTM.tm_sec   = m_pTimeStamp->second;
+	oTM.tm_isdst = (m_oColumn.Flags() & CColumn::TZ_GMT) ? 0 : 1;
+
+	// Format.
+	strftime(szTime, sizeof(szTime), pszFormat, &oTM);
 
 	return szTime;
 }
