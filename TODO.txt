@@ -2,4 +2,10 @@
 
 - Add foreign key checking code for referes on delete.
 
-- Dump database to text file.
+- Where clause on joins.
+
+- Multiple joins on same table.
+
+- Meta tables (systables, syscolumns).
+
+- Aggregates on result sets.
