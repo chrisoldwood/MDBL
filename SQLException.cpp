@@ -29,22 +29,12 @@ CSQLException::CSQLException(int eErrCode, const CString& strSQLStmt, const CStr
 	// Convert error to string.
 	switch(eErrCode)
 	{
-		case E_CONNECT_FAILED:
-			m_strError  = "Failed to connect to Database:\n\n";
-			break;
-
-		case E_EXEC_FAILED:
-			m_strError  = "Failed to execute the statement:\n\n";
-			break;
-
-		case E_FETCH_FAILED:
-			m_strError  = "Failed to fetch result set:\n\n";
-			break;
-
-		// Shouldn't happen!
-		default:
-			ASSERT(false);
-			break;
+		case E_CONNECT_FAILED:	m_strError  = "Failed to connect to Database:\n\n";		break;
+		case E_ALLOC_FAILED:	m_strError  = "Failed to allocate handle/memory:\n\n";	break;
+		case E_EXEC_FAILED:		m_strError  = "Failed to execute the statement:\n\n";	break;
+		case E_FETCH_FAILED:	m_strError  = "Failed to fetch result set:\n\n";		break;
+		case E_TRANS_FAILED:	m_strError  = "Failed to process transaction:\n\n";		break;
+		default:				ASSERT(false);											break;
 	}
 
 	// Append statement and reason.

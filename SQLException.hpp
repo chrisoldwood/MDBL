@@ -33,8 +33,10 @@ public:
 	enum
 	{
 		E_CONNECT_FAILED,	// Failed to connect.
+		E_ALLOC_FAILED,		// Failed to allocate handle/buffer.
 		E_EXEC_FAILED,		// Failed to execute query.
 		E_FETCH_FAILED,		// Failed to fetch result set data.
+		E_TRANS_FAILED,		// Failed to process transaction.
 	};
 
 	//
