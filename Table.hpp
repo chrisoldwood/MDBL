@@ -37,6 +37,8 @@ public:
 	bool Transient() const;
 	bool ReadOnly() const;
 
+	CMDB& DB() const;
+
 	//
 	// Column methods.
 	//
@@ -195,6 +197,11 @@ inline bool CTable::Transient() const
 inline bool CTable::ReadOnly() const
 {
 	return (m_nFlags & READ_ONLY);
+}
+
+inline CMDB& CTable::DB() const
+{
+	return m_oDB;
 }
 
 inline int CTable::ColumnCount() const
