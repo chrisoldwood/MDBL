@@ -20,6 +20,7 @@
 
 struct SQLColumn
 {
+	int		m_nDstColumn;		// The destination column.
 	CString	m_strName;			// The name.
 	int		m_nSQLColType;		// The native SQL column type.
 	COLTYPE	m_eMDBColType;		// The nearest MDB column type.
@@ -51,7 +52,7 @@ public:
 	virtual SQLColumn& Column(int n) const = 0;
 
 	virtual bool Fetch() = 0;
-	virtual void SetRow(CRow& oRow) = 0;
+	virtual void GetRow(CRow& oRow) = 0;
 
 protected:
 	//
