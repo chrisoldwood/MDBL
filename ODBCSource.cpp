@@ -351,7 +351,7 @@ COLTYPE CODBCSource::MDBType(SQLSMALLINT nODBCType)
 		case SQL_BIGINT:			break;
 
 		// Boolean types.
-		case SQL_BIT:				break;
+		case SQL_BIT:				return MDCT_BOOL;
 
 		// Date/Time types.
 		case SQL_DATE:				break;
@@ -397,7 +397,7 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 		case MDCT_CHAR:			return SQL_CHAR;
 		case MDCT_FXDSTR:		return SQL_CHAR;
 		case MDCT_VARSTR:		return SQL_CHAR;
-		case MDCT_BOOL:			break;
+		case MDCT_BOOL:			return SQL_BIT;
 		case MDCT_IDENTITY:		return SQL_INTEGER;
 		case MDCT_DATETIME:		return SQL_TYPE_TIMESTAMP;
 		case MDCT_DATE:			return SQL_TYPE_TIMESTAMP;
@@ -435,7 +435,7 @@ int CODBCSource::BufferSize(COLTYPE eColType, int nColSize)
 		case MDCT_CHAR:			nSize = sizeof(char) + 1;		break;
 		case MDCT_FXDSTR:		nSize = nColSize + 1;			break;
 		case MDCT_VARSTR:		nSize = nColSize + 1;			break;
-		case MDCT_BOOL:			ASSERT(false);					break;
+		case MDCT_BOOL:			nSize = sizeof(bool);			break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
 		case MDCT_DATE:			nSize = sizeof(CTimeStamp);		break;
@@ -473,7 +473,7 @@ int CODBCSource::ColumnSize(COLTYPE eColType, int nColSize)
 		case MDCT_CHAR:			return 1;
 		case MDCT_FXDSTR:		return nColSize;
 		case MDCT_VARSTR:		return nColSize;
-//		case MDCT_BOOL:			
+		case MDCT_BOOL:			return 0;
 		case MDCT_IDENTITY:		return 0;
 		case MDCT_DATETIME:		return 23;
 		case MDCT_DATE:			return 23;
