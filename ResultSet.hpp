@@ -1,7 +1,6 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
-** MODULE:		RESULTSET.HPP
+** MODULE:		RESULTSET.H
 ** COMPONENT:	Memory Database Library.
 ** DESCRIPTION:	The CResultSet class declaration.
 **
@@ -19,20 +18,22 @@
 *******************************************************************************
 */
 
-class CResultSet : public CPtrArray
+class CResultSet : protected CPtrArray
 {
 public:
 	//
 	// Constructors/Destructor.
 	//
 	CResultSet();
-//	CResultSet(const CResultSet& oResultSet);
+	CResultSet(CRow* pRow);
+	CResultSet(const CResultSet& oResultSet);
 	CResultSet(const CRowSet& oRowSet);
 	~CResultSet();
 	
 	//
 	// Methods.
 	//
+	int   Count() const;
 	CRow& Row(int n) const;
 	CRow& operator[](int n) const;
 
@@ -40,7 +41,7 @@ public:
 
 private:
 	//
-	// Disallow copies/assignment for now.
+	// Disallow assignment.
 	//
 	void operator=(const CResultSet&);
 };
@@ -52,14 +53,23 @@ private:
 *******************************************************************************
 */
 
+inline int CResultSet::Count() const
+{
+	return Size();
+}
+
 inline CRow& CResultSet::Row(int n) const
 {
-	return *((CRow*) CPtrArray::Item(n));
+	ASSERT((n >= 0) && (n < Count()));
+
+	return *((CRow*)CPtrArray::Item(n));
 }
 
 inline CRow& CResultSet::operator[](int n) const
 {
-	return *((CRow*) CPtrArray::Item(n));
+	ASSERT((n >= 0) && (n < Count()));
+
+	return *((CRow*)CPtrArray::Item(n));
 }
 
 inline int CResultSet::Add(CRow& oRow)
