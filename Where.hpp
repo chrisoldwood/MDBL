@@ -22,22 +22,21 @@
 class CWhere
 {
 public:
+	virtual ~CWhere();
+
 	//
 	// Methods
 	//
 	virtual bool Matches(const CRow& oRow) const = 0;
+
+	virtual CWhere* Clone() const = 0;
 
 protected:
 	//
 	// Make abstract.
 	//
 	CWhere();
-	virtual ~CWhere();
-
-private:
-	//
-	// Disallow assignments.
-	//
+	CWhere(const CWhere&);
 	void operator=(const CWhere& oWhere);
 };
 
