@@ -43,7 +43,7 @@ public:
 *******************************************************************************
 */
 
-class CJoin : protected CPtrArray
+class CJoin : protected TPtrArray<CJoinTable>
 {
 public:
 	//
@@ -81,6 +81,16 @@ protected:
 *******************************************************************************
 */
 
+inline CJoin::CJoin(int nTable)
+{
+	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, -1, -1, -1));
+}
+
+inline CJoin::~CJoin()
+{
+	TPtrArray<CJoinTable>::DeleteAll();
+}
+
 inline int CJoin::Count() const
 {
 	return Size();
@@ -90,19 +100,31 @@ inline CJoinTable& CJoin::Join(int n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
-	return *((CJoinTable*)CPtrArray::Item(n));
+	return *(TPtrArray<CJoinTable>::At(n));
 }
 
 inline CJoinTable& CJoin::operator[](int n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
-	return *((CJoinTable*)CPtrArray::Item(n));
+	return *(TPtrArray<CJoinTable>::At(n));
 }
 
 inline void CJoin::Add(int nTable, int nLHSColumn, Type eType, int nRHSColumn)
 {
-	CPtrArray::Add(new CJoinTable(nTable, nLHSColumn, eType, nRHSColumn));
+	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, nLHSColumn, eType, nRHSColumn));
+}
+
+inline CJoinTable::CJoinTable(int nTable, int nLHSColumn, int nType, int nRHSColumn)
+	: m_nTable(nTable)
+	, m_nLHSColumn(nLHSColumn)
+	, m_nType(nType)
+	, m_nRHSColumn(nRHSColumn)
+{
+}
+
+inline CJoinTable::~CJoinTable()
+{
 }
 
 #endif //JOIN_HPP

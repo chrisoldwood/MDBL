@@ -18,7 +18,7 @@
 *******************************************************************************
 */
 
-class CTableSet : public CPtrArray
+class CTableSet : protected TPtrArray<CTable>
 {
 public:
 	//
@@ -58,28 +58,27 @@ inline int CTableSet::Count() const
 
 inline CTable& CTableSet::Table(int n) const
 {
-	return *((CTable*)CPtrArray::Item(n));
+	return *(TPtrArray<CTable>::At(n));
 }
 
 inline CTable& CTableSet::operator[](int n) const
 {
-	return *((CTable*)CPtrArray::Item(n));
+	return *(TPtrArray<CTable>::At(n));
 }
 
 inline int CTableSet::Add(CTable& oTable)
 {
-	return CPtrArray::Add(&oTable);
+	return TPtrArray<CTable>::Add(&oTable);
 }
 
 inline void CTableSet::Remove(int nTable)
 {
-	CPtrArray::Remove(nTable);
+	TPtrArray<CTable>::Remove(nTable);
 }
 
 inline void CTableSet::Delete(int nTable)
 {
-	delete &Table(nTable);
-	Remove(nTable);
+	TPtrArray<CTable>::Delete(nTable);
 }
 
 #endif //TABLESET_HPP

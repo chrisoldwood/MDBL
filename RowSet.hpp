@@ -18,7 +18,7 @@
 *******************************************************************************
 */
 
-class CRowSet : public TPtrArray<CRow>
+class CRowSet : protected TPtrArray<CRow>
 {
 public:
 	//
@@ -32,12 +32,13 @@ public:
 	//
 	int   Count() const;
 	CRow& Row(int n) const;
-//	CRow& operator[](int n) const;
+	CRow& operator[](int n) const;
 
-//	int   Add(CRow& oRow);
-//	void  Remove(int nRow);
-//	void  Delete(int nRow);
-//	void  DeleteAll();
+	int   Add(CRow& oRow);
+	void  Remove(int nRow);
+
+	void  Delete(int nRow);
+	void  DeleteAll();
 
 	bool  Modified() const;
 
@@ -54,6 +55,15 @@ protected:
 *******************************************************************************
 */
 
+inline CRowSet::CRowSet()
+{
+}
+
+inline CRowSet::~CRowSet()
+{
+	DeleteAll();
+}
+
 inline int CRowSet::Count() const
 {
 	return TPtrArray<CRow>::Size();
@@ -61,28 +71,43 @@ inline int CRowSet::Count() const
 
 inline CRow& CRowSet::Row(int n) const
 {
-	return TPtrArray<CRow>::Item(n);
+	return *(TPtrArray<CRow>::At(n));
 }
-/*
+
 inline CRow& CRowSet::operator[](int n) const
 {
-	return *((CRow*)CPtrArray::Item(n));
+	return *(TPtrArray<CRow>::At(n));
 }
 
 inline int CRowSet::Add(CRow& oRow)
 {
-	return CPtrArray::Add(&oRow);
+	return TPtrArray<CRow>::Add(&oRow);
 }
 
 inline void CRowSet::Remove(int nRow)
 {
-	CPtrArray::Remove(nRow);
+	TPtrArray<CRow>::Remove(nRow);
 }
 
 inline void CRowSet::Delete(int nRow)
 {
-	delete &Row(nRow);
-	TPtrArray<CRow>::Remove(nRow);
+	TPtrArray<CRow>::Delete(nRow);
 }
-*/
+
+inline void CRowSet::DeleteAll()
+{
+	TPtrArray<CRow>::DeleteAll();
+}
+
+inline bool CRowSet::Modified() const
+{
+	for (int i = 0; i < Count(); i++)
+	{
+		if (Row(i).Modified())
+			return true;
+	}
+
+	return false;
+}
+
 #endif //ROWSET_HPP

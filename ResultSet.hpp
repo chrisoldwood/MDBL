@@ -18,7 +18,7 @@
 *******************************************************************************
 */
 
-class CResultSet : protected CPtrArray
+class CResultSet : protected TPtrArray<CRow>
 {
 public:
 	//
@@ -74,26 +74,26 @@ private:
 
 inline int CResultSet::Count() const
 {
-	return Size();
+	return TPtrArray<CRow>::Size();
 }
 
 inline CRow& CResultSet::Row(int n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
-	return *((CRow*)CPtrArray::Item(n));
+	return *(TPtrArray<CRow>::At(n));
 }
 
 inline CRow& CResultSet::operator[](int n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
-	return *((CRow*)CPtrArray::Item(n));
+	return *(TPtrArray<CRow>::At(n));
 }
 
 inline int CResultSet::Add(CRow& oRow)
 {
-	return CPtrArray::Add(&oRow);
+	return TPtrArray<CRow>::Add(&oRow);
 }
 
 #endif //RESULTSET_HPP

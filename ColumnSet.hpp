@@ -18,7 +18,7 @@
 *******************************************************************************
 */
 
-class CColumnSet : protected CPtrArray
+class CColumnSet : protected TPtrArray<CColumn>
 {
 public:
 	//
@@ -56,22 +56,22 @@ protected:
 
 inline int CColumnSet::Count() const
 {
-	return CPtrArray::Size();
+	return TPtrArray<CColumn>::Size();
 }
 
 inline CColumn& CColumnSet::Column(int n) const
 {
-	return *((CColumn*)CPtrArray::Item(n));
+	return *(TPtrArray<CColumn>::At(n));
 }
 
 inline CColumn& CColumnSet::operator[](int n) const
 {
-	return *((CColumn*)CPtrArray::Item(n));
+	return *(TPtrArray<CColumn>::At(n));
 }
 
 inline int CColumnSet::Add(CColumn& oColumn)
 {
-	return CPtrArray::Add(&oColumn);
+	return TPtrArray<CColumn>::Add(&oColumn);
 }
 
 #endif //COLUMNSET_HPP
