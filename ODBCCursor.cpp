@@ -135,8 +135,6 @@ void CODBCCursor::Open(const char* pszStmt, SQLHSTMT hStmt)
 		m_pColumns[i].m_nSQLFetchType = SQL_UNKNOWN_TYPE;
 		m_pColumns[i].m_nSize         = nSize;
 		m_pColumns[i].m_nFlags        = (nNullable == SQL_NULLABLE) ? CColumn::NULLABLE : CColumn::NOT_NULLABLE;
-
-		ASSERT(m_pColumns[i].m_strName != "");
 	}
 
 	// Prepare for bind.
