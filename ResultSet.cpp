@@ -123,8 +123,10 @@ CResultSet::~CResultSet()
 /******************************************************************************
 ** Method:		OrderBy()
 **
-** Description:	Sort the result by the column specified.
-**				NB: Currently uses a bubble sort.
+** Description:	Sort the result by the columns specified.
+**				NB: This uses qsort() which needs a C style callback function.
+**					Consequently we need to use a static member to hold the
+**					sorting definition so this method is not thread safe.
 **
 ** Parameters:	oColumns	The columns and orders to sort by.
 **
@@ -135,54 +137,59 @@ CResultSet::~CResultSet()
 
 void CResultSet::OrderBy(const CSortColumns& oColumns)
 {
-	int nRows = Count();
-	int nExgs = 1;
+	ASSERT(g_pSortOrder == NULL);
 
-	// For all rows OR until no exchanges were done.
-	for (int i = 0; (i < nRows) && (nExgs > 0); i++)
+	// Nothing to sort?
+	if (Count() == 0)
+		return;
+
+	g_pSortOrder = &oColumns;
+
+	// Sort it...
+	qsort(m_pData, Count(), sizeof(CRow*), Compare);
+
+	g_pSortOrder = NULL;
+}
+
+// Used by qsort().
+const CSortColumns* CResultSet::g_pSortOrder = NULL;
+
+/******************************************************************************
+** Methods:		Compare()
+**
+** Description:	The compare function used by qsort().
+**
+** Parameters:	ppRow1/2	Pointers to the rows to compare.
+**
+** Returns:		See qsort().
+**
+*******************************************************************************
+*/
+
+int CResultSet::Compare(const void* ppRow1, const void* ppRow2)
+{
+	ASSERT(g_pSortOrder != NULL);
+
+	CRow* pRow1  = *((CRow**) ppRow1);
+	CRow* pRow2  = *((CRow**) ppRow2);
+
+	// Compare all columns.
+	for (int k = 0; k < g_pSortOrder->Count(); k++)
 	{
-		nExgs = 0;
+		// Get the column and direction.
+		int nColumn = g_pSortOrder->Column(k);
+		int nDir    = g_pSortOrder->Direction(k);
 
-		// For all row comparisions.
-		for (int j = 1; j < nRows; j++)
-		{
-			// Compare the next two rows.
-			CRow* pRow1 = TPtrArray<CRow>::At(j-1);
-			CRow* pRow2 = TPtrArray<CRow>::At(j);
-			bool  bSwap = false;
+		// Compare the column values.
+		int nCmp = pRow1->Field(nColumn).Compare(pRow2->Field(nColumn));
 
-			// Compare all columns.
-			for (int k = 0; k < oColumns.Count(); k++)
-			{
-				// Get the column and direction.
-				int nColumn = oColumns.Column(k);
-				int nDir    = oColumns.Direction(k);
-
-				int nCmp = pRow1->Field(nColumn).Compare(pRow2->Field(nColumn));
-
-				// Wrong order?
-				if ( ((nCmp > 0) && (nDir == CSortColumns::ASC))
-				  || ((nCmp < 0) && (nDir == CSortColumns::DESC)) )
-				{
-					bSwap = true;
-					break;
-				}
-
-				// Not equal?
-				if (nCmp != 0)
-					break;
-			}
-
-			// Swap required?
-			if (bSwap)
-			{
-				TPtrArray<CRow>::Set(j-1, pRow2);
-				TPtrArray<CRow>::Set(j,   pRow1);
-
-				nExgs++;
-			}
-		}
+		// Differ?
+		if (nCmp != 0)
+			return (nDir == CSortColumns::ASC) ? nCmp : -nCmp;
 	}
+
+	// Rows are equal.
+	return 0;
 }
 
 /******************************************************************************

@@ -69,6 +69,12 @@ private:
 	// Friends.
 	//
 	friend class CJoinedSet;
+
+	//
+	// qsort() helpers.
+	//
+	static const CSortColumns* g_pSortOrder;
+	static int Compare(const void* ppRow1, const void* ppRow2);
 };
 
 /******************************************************************************
