@@ -14,7 +14,7 @@
 
 /******************************************************************************
 ** 
-** This class is the base class for composite WHERE clauses.
+** This class is the class for composite WHERE clauses.
 **
 *******************************************************************************
 */
@@ -22,65 +22,37 @@
 class CWhereExp : public CWhere
 {
 public:
-	//
-	// Methods
-	//
-	virtual bool Matches(const CRow& oRow) const = 0;
+	// Comparison ops.
+	enum Op
+	{
+		AND,
+		OR,
+	};
 
-protected:
 	//
 	// Constructors/Destructor.
 	//
-	CWhereExp(const CWhere& oLHSWhere, const CWhere& oRHSWhere);
+	CWhereExp(const CWhere& oLHSWhere, Op eOp, const CWhere& oRHSWhere);
+	CWhereExp(const CWhereExp& oSrc);
 	virtual ~CWhereExp();
 
 	//
-	// Members.
+	// Methods
 	//
-	const CWhere* m_pLHSWhere;	// The left hand side expression.
-	const CWhere* m_pRHSWhere;	// The right hand side expression.
+	virtual bool Matches(const CRow& oRow) const;
+
+	virtual CWhere* Clone() const;
 
 private:
 	//
-	// Disallow copies.
+	// Members.
 	//
-//	CWhereExp(const CWhereExp& oWhere);
+	const CWhere*	m_pLHSWhere;	// The left hand side expression.
+	Op				m_eOp;			// The operator.
+	const CWhere*	m_pRHSWhere;	// The right hand side expression.
+
+	// Disallow assignment.
 	void operator=(const CWhereExp& oWhere);
-};
-
-/******************************************************************************
-** 
-** The CWhereExp derived classes to implement the expression.
-**
-*******************************************************************************
-*/
-
-class CWhereAnd : public CWhereExp
-{
-public:
-	//
-	// Constructors/Destructor.
-	//
-	CWhereAnd(const CWhere& oLHSWhere, const CWhere& oRHSWhere);
-
-	//
-	// Methods
-	//
-	virtual bool Matches(const CRow& oRow) const;
-};
-
-class CWhereOr : public CWhereExp
-{
-public:
-	//
-	// Constructors/Destructor.
-	//
-	CWhereOr(const CWhere& oLHSWhere, const CWhere& oRHSWhere);
-
-	//
-	// Methods
-	//
-	virtual bool Matches(const CRow& oRow) const;
 };
 
 /******************************************************************************
@@ -90,57 +62,21 @@ public:
 *******************************************************************************
 */
 
-inline CWhereExp::CWhereExp(const CWhere& oLHSWhere, const CWhere& oRHSWhere)
-	: m_pLHSWhere(&oLHSWhere)
-	, m_pRHSWhere(&oRHSWhere)
-{
-}
-
-inline CWhereExp::~CWhereExp()
-{
-}
-
-inline CWhereAnd::CWhereAnd(const CWhere& oLHSWhere, const CWhere& oRHSWhere)
-	: CWhereExp(oLHSWhere, oRHSWhere)
-{
-}
-
-inline bool CWhereAnd::Matches(const CRow& oRow) const
-{
-	if (m_pLHSWhere->Matches(oRow) == false)
-		return false;
-	
-	return m_pRHSWhere->Matches(oRow);
-}
-
-inline CWhereOr::CWhereOr(const CWhere& oLHSWhere, const CWhere& oRHSWhere)
-	: CWhereExp(oLHSWhere, oRHSWhere)
-{
-}
-
-inline bool CWhereOr::Matches(const CRow& oRow) const
-{
-	if (m_pLHSWhere->Matches(oRow) == true)
-		return true;
-
-	return m_pRHSWhere->Matches(oRow);
-}
-
 /******************************************************************************
 **
-** Helper fundtions for generating a WHERE caluse.
+** Helper global operators for generating a WHERE caluse.
 **
 *******************************************************************************
 */
 
-inline CWhereAnd operator&(const CWhere& oLHS, const CWhere& oRHS)
+inline CWhereExp operator&&(const CWhere& oLHS, const CWhere& oRHS)
 {
-	return CWhereAnd(oLHS, oRHS);
+	return CWhereExp(oLHS, CWhereExp::AND, oRHS);
 }
 
-inline CWhereOr operator|(const CWhere& oLHS, const CWhere& oRHS)
+inline CWhereExp operator||(const CWhere& oLHS, const CWhere& oRHS)
 {
-	return CWhereOr(oLHS, oRHS);
+	return CWhereExp(oLHS, CWhereExp::OR, oRHS);
 }
 
 #endif //WHEREEXP_HPP
