@@ -49,8 +49,8 @@ protected:
 	//
 	// Members.
 	//
-	CIntArray	m_aiColumns;	// The list of columns.
-	CIntArray	m_aiSortDirs;	// The list of column sort directions.
+	TArray<int>	m_aiColumns;	// The list of columns.
+	TArray<int>	m_aiSortDirs;	// The list of column sort directions.
 };
 
 /******************************************************************************
