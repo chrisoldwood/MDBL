@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ODBCSOURCE.HPP
 ** COMPONENT:	Memory Database Library.
@@ -59,14 +58,6 @@ protected:
 	//
 	SQLHENV		m_hEnv;		// Environment handle.
 	SQLHDBC		m_hDBC;		// Connection handle.
-
-	// Max size of error buffer.
-	enum { MAX_ERR_BUF_LEN = 256 };
-
-	//
-	// Internal methods.
-	//
-	CString LastError(SQLHANDLE hHandle, SQLSMALLINT nType) const;
 
 	//
 	// Friends.

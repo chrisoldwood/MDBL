@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ODBCSOURCE.CPP
 ** COMPONENT:	Memory Database Library.
@@ -54,7 +53,7 @@ CODBCSource::~CODBCSource()
 **
 ** Returns:		Nothing.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -71,19 +70,19 @@ void CODBCSource::Open(const char* pszConnection)
 	rc = ::SQLAllocHandle(SQL_HANDLE_ENV, NULL, &m_hEnv);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_CONNECT_FAILED, LastError(NULL, 0));
+		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, NULL, 0);
 
 	// Say we're ODBC v3.x compliant.
 	rc = ::SQLSetEnvAttr(m_hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_CONNECT_FAILED, LastError(m_hEnv, SQL_HANDLE_ENV));
+		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, m_hEnv, SQL_HANDLE_ENV);
 
 	// Allocate the connection handle.
 	rc = ::SQLAllocHandle(SQL_HANDLE_DBC, m_hEnv, &m_hDBC);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_CONNECT_FAILED, LastError(m_hEnv, SQL_HANDLE_ENV));
+		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, m_hEnv, SQL_HANDLE_ENV);
 
 	// Connect to the database.
 	rc = ::SQLDriverConnect(m_hDBC, NULL, (SQLCHAR*)pszConnection, SQL_NTS,
@@ -91,7 +90,7 @@ void CODBCSource::Open(const char* pszConnection)
 							SQL_DRIVER_NOPROMPT);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_CONNECT_FAILED, LastError(m_hDBC, SQL_HANDLE_DBC));
+		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, m_hDBC, SQL_HANDLE_DBC);
 
 	ASSERT(m_hEnv  != SQL_NULL_HENV);
 	ASSERT(m_hDBC  != SQL_NULL_HDBC);
@@ -155,7 +154,7 @@ bool CODBCSource::IsOpen() const
 **
 ** Returns:		Nothing.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -173,7 +172,7 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 		rc = ::SQLAllocHandle(SQL_HANDLE_STMT, m_hDBC, &hStmt);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-			throw CSQLException(CSQLException::E_EXEC_FAILED, LastError(m_hDBC, SQL_HANDLE_DBC));
+			throw CODBCException(CODBCException::E_EXEC_FAILED, pszStmt, m_hDBC, SQL_HANDLE_DBC);
 
 		ASSERT(hStmt != SQL_NULL_HSTMT);
 
@@ -181,12 +180,12 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 		rc = ::SQLExecDirect(hStmt, (SQLCHAR*)pszStmt, SQL_NTS);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-			throw CSQLException(CSQLException::E_EXEC_FAILED, LastError(hStmt, SQL_HANDLE_STMT));
+			throw CODBCException(CODBCException::E_EXEC_FAILED, pszStmt, hStmt, SQL_HANDLE_STMT);
 
 		// Free statement handle.
 		::SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
 	}
-	catch(CSQLException&)
+	catch(CODBCException&)
 	{
 		// Free statement handle.
 		::SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
@@ -204,7 +203,7 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 **
 ** Returns:		A result set cursor.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -221,7 +220,7 @@ CSQLCursor* CODBCSource::ExecQuery(const char* pszQuery)
 		// Execute it.
 		ExecQuery(pszQuery, *pCursor);
 	}
-	catch(CSQLException&)
+	catch(CODBCException&)
 	{
 		// Free cursor and re-throw exception.
 		delete pCursor;
@@ -242,7 +241,7 @@ CSQLCursor* CODBCSource::ExecQuery(const char* pszQuery)
 **
 ** Returns:		Nothing.
 **
-** Exceptions:	CSQLException on error.
+** Exceptions:	CODBCException on error.
 **
 *******************************************************************************
 */
@@ -258,7 +257,7 @@ void CODBCSource::ExecQuery(const char* pszQuery, CODBCCursor& oCursor)
 	rc = ::SQLAllocHandle(SQL_HANDLE_STMT, m_hDBC, &hStmt);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_EXEC_FAILED, LastError(m_hDBC, SQL_HANDLE_DBC));
+		throw CODBCException(CODBCException::E_EXEC_FAILED, pszQuery, m_hDBC, SQL_HANDLE_DBC);
 
 	ASSERT(hStmt != SQL_NULL_HSTMT);
 
@@ -266,49 +265,9 @@ void CODBCSource::ExecQuery(const char* pszQuery, CODBCCursor& oCursor)
 	rc = ::SQLExecDirect(hStmt, (SQLCHAR*)pszQuery, SQL_NTS);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CSQLException(CSQLException::E_EXEC_FAILED, LastError(hStmt, SQL_HANDLE_STMT));;
+		throw CODBCException(CODBCException::E_EXEC_FAILED, pszQuery, hStmt, SQL_HANDLE_STMT);
 
-	oCursor.Open(hStmt);
-}
-
-/******************************************************************************
-** Method:		LastError()
-**
-** Description:	Gets the last error for a SQL handle.
-**
-** Parameters:	hHandle		The handle to query.
-**				nType		The type of handle being queried.
-**
-** Returns:		The error.
-**
-*******************************************************************************
-*/
-
-CString CODBCSource::LastError(SQLHANDLE hHandle, SQLSMALLINT nType) const
-{
-	if (hHandle == NULL)
-		return "No error details available";
-
-	RETCODE		rc = SQL_SUCCESS;
-	SQLSMALLINT	nRecord = 1;
-	SQLCHAR		szSqlState[MAX_ERR_BUF_LEN] = "";
-	SQLINTEGER	nNativeError = 0;
-	SQLCHAR		szErrorMsg[MAX_ERR_BUF_LEN] = "";
-	SQLSMALLINT	nBufLen = MAX_ERR_BUF_LEN - 1;
-	SQLSMALLINT nTxtLen = 0;
-	CString		strError;
-
-	while ((rc = ::SQLGetDiagRec(nType, hHandle, nRecord, szSqlState, &nNativeError,
-					szErrorMsg, nBufLen, &nTxtLen)) != SQL_NO_DATA_FOUND)
-	{
-		strError += (const char*)szSqlState;
-		strError += " - ";
-		strError += (const char*)szErrorMsg;
-		strError += "\n";
-		nRecord++;
-	}
-
-	return strError;
+	oCursor.Open(pszQuery, hStmt);
 }
 
 /******************************************************************************
@@ -430,9 +389,9 @@ int CODBCSource::BufferSize(const SQLColumn& oColumn)
 	{
 		case MDCT_INT:			nSize = sizeof(int);			break;
 		case MDCT_DOUBLE:		nSize = sizeof(double);			break;
-		case MDCT_CHAR:			nSize = oColumn.m_nSize + 1;	break;
+		case MDCT_CHAR:			nSize = sizeof(char) + 1;		break;
 		case MDCT_FXDSTR:		nSize = oColumn.m_nSize + 1;	break;
-		case MDCT_VARSTR:		ASSERT(false);					break;
+		case MDCT_VARSTR:		nSize = oColumn.m_nSize + 1;	break;
 		case MDCT_BOOL:			ASSERT(false);					break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
