@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		COMPARE.HPP
 ** COMPONENT:	Memory Database Library.
@@ -112,12 +111,12 @@ inline CCompare::~CCompare()
 {
 }
 
-inline bool CWhereTrue::Matches(const CRow& oRow) const
+inline bool CWhereTrue::Matches(const CRow&) const
 {
 	return true;
 }
 
-inline bool CWhereFalse::Matches(const CRow& oRow) const
+inline bool CWhereFalse::Matches(const CRow&) const
 {
 	return false;
 }
