@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		TIMESTAMP.HPP
 ** COMPONENT:	Memory Database Library.
@@ -58,7 +57,14 @@ protected:
 
 inline bool CTimeStamp::operator==(const CTimeStamp& oRHS) const
 {
-	return false;
+	return ( (year     == oRHS.year    )
+		  && (month    == oRHS.month   )
+		  && (day      == oRHS.day     )
+		  && (hour     == oRHS.hour    )
+		  && (minute   == oRHS.minute  )
+		  && (second   == oRHS.second  )
+		  && (fraction == oRHS.fraction)
+		   );
 }
 
 inline bool CTimeStamp::operator!=(const CTimeStamp& oRHS) const
