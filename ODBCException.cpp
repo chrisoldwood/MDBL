@@ -22,8 +22,8 @@
 *******************************************************************************
 */
 
-CODBCException::CODBCException(int eErrCode, const CString& strSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType)
-	: CSQLException(eErrCode, strSQLStmt, LastError(hHandle, nType))
+CODBCException::CODBCException(int eErrCode, const char* pszSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType)
+	: CSQLException(eErrCode, pszSQLStmt, LastError(hHandle, nType))
 {
 
 }

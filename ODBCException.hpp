@@ -29,7 +29,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CODBCException(int eErrCode, const CString& strSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType);
+	CODBCException(int eErrCode, const char* pszSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType);
 	virtual ~CODBCException();
 
 protected:
