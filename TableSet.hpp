@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		TABLESET.HPP
 ** COMPONENT:	Memory Database Library.
@@ -31,6 +30,7 @@ public:
 	//
 	// Methods.
 	//
+	int     Count() const;
 	CTable& Table(int n) const;
 	CTable& operator[](int n) const;
 
@@ -51,14 +51,19 @@ protected:
 *******************************************************************************
 */
 
+inline int CTableSet::Count() const
+{
+	return Size();
+}
+
 inline CTable& CTableSet::Table(int n) const
 {
-	return *((CTable*) CPtrArray::Item(n));
+	return *((CTable*)CPtrArray::Item(n));
 }
 
 inline CTable& CTableSet::operator[](int n) const
 {
-	return *((CTable*) CPtrArray::Item(n));
+	return *((CTable*)CPtrArray::Item(n));
 }
 
 inline int CTableSet::Add(CTable& oTable)

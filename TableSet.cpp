@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		TABLESET.CPP
 ** COMPONENT:	Memory Database Library.
