@@ -32,6 +32,7 @@
 #include "TimeStamp.hpp"
 
 #include "Value.hpp"
+#include "ValueSet.hpp"
 #include "Field.hpp"
 
 #include "Column.hpp"

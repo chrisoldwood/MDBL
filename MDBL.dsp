@@ -277,6 +277,10 @@ SOURCE=.\Value.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\ValueSet.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Where.hpp
 # End Source File
 # Begin Source File
