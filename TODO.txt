@@ -8,7 +8,7 @@
 
 - Aggregates on result sets, e.g. Group By. (CGroupSet - Array of RS).
 
-- Computations on result sets, e.g. distinct, sum, min, max, avg. (CValueSet).
+- Computations on result sets, e.g. distinct (CValueSet - Sort copy of RS then extract dups).
 
 - Special asserts.
 
