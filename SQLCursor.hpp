@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		SQLCURSOR.HPP
 ** COMPONENT:	Memory Database Library.
