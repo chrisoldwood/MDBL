@@ -44,7 +44,7 @@ public:
 	virtual SQLColumn& Column(int n) const;
 
 	virtual bool Fetch();
-	virtual void SetRow(CRow& oRow);
+	virtual void GetRow(CRow& oRow);
 
 protected:
 	// Row fetch size.
