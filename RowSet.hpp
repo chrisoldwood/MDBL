@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ROWSET.HPP
 ** COMPONENT:	Memory Database Library.
@@ -19,7 +18,7 @@
 *******************************************************************************
 */
 
-class CRowSet : public CPtrArray
+class CRowSet : public TPtrArray<CRow>
 {
 public:
 	//
@@ -31,13 +30,14 @@ public:
 	//
 	// Methods.
 	//
+	int   Count() const;
 	CRow& Row(int n) const;
-	CRow& operator[](int n) const;
+//	CRow& operator[](int n) const;
 
-	int   Add(CRow& oRow);
-	void  Remove(int nRow);
-	void  Delete(int nRow);
-	void  DeleteAll();
+//	int   Add(CRow& oRow);
+//	void  Remove(int nRow);
+//	void  Delete(int nRow);
+//	void  DeleteAll();
 
 	bool  Modified() const;
 
@@ -54,14 +54,19 @@ protected:
 *******************************************************************************
 */
 
-inline CRow& CRowSet::Row(int n) const
+inline int CRowSet::Count() const
 {
-	return *((CRow*) CPtrArray::Item(n));
+	return TPtrArray<CRow>::Size();
 }
 
+inline CRow& CRowSet::Row(int n) const
+{
+	return TPtrArray<CRow>::Item(n);
+}
+/*
 inline CRow& CRowSet::operator[](int n) const
 {
-	return *((CRow*) CPtrArray::Item(n));
+	return *((CRow*)CPtrArray::Item(n));
 }
 
 inline int CRowSet::Add(CRow& oRow)
@@ -77,7 +82,7 @@ inline void CRowSet::Remove(int nRow)
 inline void CRowSet::Delete(int nRow)
 {
 	delete &Row(nRow);
-	CPtrArray::Remove(nRow);
+	TPtrArray<CRow>::Remove(nRow);
 }
-
+*/
 #endif //ROWSET_HPP

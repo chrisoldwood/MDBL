@@ -1,5 +1,4 @@
 /******************************************************************************
-** (C) Chris Oldwood
 **
 ** MODULE:		ROWSET.CPP
 ** COMPONENT:	Memory Database Library.
@@ -57,31 +56,11 @@ CRowSet::~CRowSet()
 
 bool CRowSet::Modified() const
 {
-	for (int i = 0; i < Size(); i++)
+	for (int i = 0; i < Count(); i++)
 	{
 		if (Row(i).Modified())
 			return true;
 	}
 
 	return false;
-}
-
-/******************************************************************************
-** Method:		DeleteAll()
-**
-** Description:	Free all rows.
-**
-** Parameters:	None.
-**
-** Returns:		Nothing.
-**
-*******************************************************************************
-*/
-
-void CRowSet::DeleteAll()
-{
-	for (int i = 0; i < Size(); i++)
-		delete &Row(i);
-
-	RemoveAll();
 }
