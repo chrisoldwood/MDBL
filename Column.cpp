@@ -118,13 +118,14 @@ STGTYPE CColumn::ColToStgType(COLTYPE eType)
 		case MDCT_BOOL:			return MDST_BOOL;
 		case MDCT_IDENTITY:		return MDST_INT;
 		case MDCT_DATETIME:		return MDST_TIME_T;
+		case MDCT_DATE:			return MDST_TIME_T;
+		case MDCT_TIME:			return MDST_TIME_T;
 		case MDCT_TIMESTAMP:	return MDST_TIMESTAMP;
 		case MDCT_VOIDPTR:		return MDST_POINTER;
 		case MDCT_ROWPTR:		return MDST_POINTER;
 		case MDCT_ROWSETPTR:	return MDST_POINTER;
+		default:				ASSERT(false);	break;
 	}
-
-	ASSERT(false);
 
 	return MDST_NULL;
 }
@@ -152,28 +153,55 @@ void CColumn::Index(CIndex* pIndex)
 **
 ** Description:	Gets the char width of the column for display.
 **
-** Parameters:	None.
+** Parameters:	bDebug		Get width for debug format strings?
 **
 ** Returns:		The width.
 **
 *******************************************************************************
 */
 
-int CColumn::DisplayWidth() const
+int CColumn::DisplayWidth(bool bDebug) const
 {
-	switch (m_eStgType)
+	// Normal format?
+	if (!bDebug)
 	{
-		case MDST_INT:			return 10;
-		case MDST_DOUBLE:		return 15;
-		case MDST_CHAR:			return 1;
-		case MDST_STRING:		return m_nLength;
-		case MDST_BOOL:			return 1;
-		case MDST_TIME_T:		return 17;
-		case MDST_TIMESTAMP:	return 17;
-		case MDST_POINTER:		return 10;
+		switch (m_eColType)
+		{
+			case MDCT_INT:			return 10;
+			case MDCT_DOUBLE:		return 15;
+			case MDCT_CHAR:			return 1;
+			case MDCT_FXDSTR:		return m_nLength;
+			case MDCT_VARSTR:		return m_nLength;
+			case MDCT_BOOL:			return 1;
+			case MDCT_IDENTITY:		return 10;
+			case MDCT_DATETIME:		return 17;
+			case MDCT_DATE:			return 8;
+			case MDCT_TIME:			return 8;
+			case MDCT_TIMESTAMP:	return 17;
+			case MDCT_VOIDPTR:		return 8;
+			case MDCT_ROWPTR:		return 8;
+			case MDCT_ROWSETPTR:	return 8;
+			default:				ASSERT(false);	break;
+		}
 	}
+	// Debug format?
+	else
+	{
+		int nMin = (Nullable()) ? 5 : 0;
 
-	ASSERT(false);
+		switch (m_eStgType)
+		{
+			case MDST_INT:			return max(nMin, 10);
+			case MDST_DOUBLE:		return max(nMin, 15);
+			case MDST_CHAR:			return max(nMin, 1);
+			case MDST_STRING:		return max(nMin, m_nLength);
+			case MDST_BOOL:			return max(nMin, 1);
+			case MDST_TIME_T:		return max(nMin, 17);
+			case MDST_TIMESTAMP:	return max(nMin, 17);
+			case MDST_POINTER:		return max(nMin, 10);
+			default:				ASSERT(false); break;
+		}
+	}
 
 	return -1;
 }
