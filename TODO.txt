@@ -1,7 +1,5 @@
 - (Non)Unique index support.
 
-- Add foreign key checking code for referes on delete.
-
 - Where clause on joins.
 
 - Multiple joins on same table.
@@ -13,3 +11,5 @@
 - Special asserts.
 
 - Change headers from .hpp to .h
+
+- Query processor.
