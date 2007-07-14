@@ -69,7 +69,7 @@ public:
 	//
 	// Debug methods.
 	//
-	void Dump(CStream& rStream) const;
+	void Dump(WCL::IOutputStream& rStream) const;
 
 protected:
 	//

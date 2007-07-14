@@ -88,7 +88,7 @@ CRow::~CRow()
 *******************************************************************************
 */
 
-void CRow::Read(CStream& rStream)
+void CRow::Read(WCL::IInputStream& rStream)
 {
 	// Get the row data size and start address.
 	int   nSize = m_oTable.m_vColumns.AllocSize();
@@ -123,7 +123,7 @@ void CRow::Read(CStream& rStream)
 	m_eStatus = ORIGINAL;
 }
 
-void CRow::Write(CStream& rStream)
+void CRow::Write(WCL::IOutputStream& rStream)
 {
 	// Get the row data size and start address.
 	int   nSize = m_oTable.m_vColumns.AllocSize();

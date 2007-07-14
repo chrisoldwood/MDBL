@@ -55,8 +55,8 @@ public:
 	//
 	bool Modified() const;
 
-	void Read(CStream& rStream);
-	void Write(CStream& rStream);
+	void Read (WCL::IInputStream&  rStream);
+	void Write(WCL::IOutputStream& rStream);
 
 	//
 	// Row status flags.

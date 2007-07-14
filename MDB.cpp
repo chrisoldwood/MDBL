@@ -311,14 +311,14 @@ bool CMDB::Modified() const
 *******************************************************************************
 */
 
-void CMDB::Read(CStream& rStream)
+void CMDB::Read(WCL::IInputStream& rStream)
 {
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)
 		m_vTables[i].Read(rStream);
 }
 
-void CMDB::Write(CStream& rStream)
+void CMDB::Write(WCL::IOutputStream& rStream)
 {
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)
@@ -408,7 +408,7 @@ void CMDB::ResetRowFlags()
 *******************************************************************************
 */
 
-void CMDB::Dump(CStream& rStream) const
+void CMDB::Dump(WCL::IOutputStream& rStream) const
 {
 	// For all tables.
 	for (int i = 0; i < m_vTables.Count(); i++)

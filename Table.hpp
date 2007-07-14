@@ -100,8 +100,8 @@ public:
 	virtual bool Modified() const;
 	virtual void Modified(bool bModified);
 
-	virtual void Read(CStream& rStream);
-	virtual void Write(CStream& rStream);
+	virtual void Read (WCL::IInputStream&  rStream);
+	virtual void Write(WCL::IOutputStream& rStream);
 
 	virtual void Read(CSQLSource& rSource);
 	virtual void Write(CSQLSource& rSource, RowTypes eRows = ALL);
@@ -125,7 +125,7 @@ public:
 	//
 	// Debug methods.
 	//
-	virtual void Dump(CStream& rStream) const;
+	virtual void Dump(WCL::IOutputStream& rStream) const;
 
 protected:
 	//

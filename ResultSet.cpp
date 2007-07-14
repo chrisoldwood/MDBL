@@ -467,7 +467,7 @@ bool CResultSet::Exists(const CWhere& oQuery) const
 *******************************************************************************
 */
 
-void CResultSet::Dump(CStream& rStream) const
+void CResultSet::Dump(WCL::IOutputStream& rStream) const
 {
 	ASSERT(m_pTable != NULL);
 

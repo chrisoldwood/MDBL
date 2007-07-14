@@ -739,7 +739,7 @@ void CTable::Modified(bool bModified)
 *******************************************************************************
 */
 
-void CTable::Read(CStream& rStream)
+void CTable::Read(WCL::IInputStream& rStream)
 {
 	// Remove all existing rows.
 	m_vRows.DeleteAll();
@@ -807,7 +807,7 @@ void CTable::Read(CStream& rStream)
 	m_nDeletions  = 0;
 }
 
-void CTable::Write(CStream& rStream)
+void CTable::Write(WCL::IOutputStream& rStream)
 {
 	// Ignore if a temporary table.
 	if (Transient())
@@ -1418,7 +1418,7 @@ void CTable::CheckColumn(CRow& /*oRow*/, int /*nColumn*/, const CValue& /*oValue
 *******************************************************************************
 */
 
-void CTable::Dump(CStream& rStream) const
+void CTable::Dump(WCL::IOutputStream& rStream) const
 {
 	TArray<int>	aiColWidths;
 	CString		strColList;
