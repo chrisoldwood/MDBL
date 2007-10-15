@@ -11,6 +11,13 @@
 #ifndef COLUMNSET_HPP
 #define COLUMNSET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Column.hpp"
+#include <Legacy/TArray.hpp>
+
 /******************************************************************************
 ** 
 ** The class used to store the columns which belong to a table.

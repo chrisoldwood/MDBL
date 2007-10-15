@@ -11,6 +11,11 @@
 #ifndef ODBCCURSOR_HPP
 #define ODBCCURSOR_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "SQLCursor.hpp"
 #include <sql.h>
 #include <sqlext.h>
 

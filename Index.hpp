@@ -11,8 +11,16 @@
 #ifndef INDEX_HPP
 #define INDEX_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "ResultSet.hpp"
+
 // Forward declarations.
 class CTable;
+class CRow;
+class CValue;
 
 /******************************************************************************
 ** 

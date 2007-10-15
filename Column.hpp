@@ -11,6 +11,12 @@
 #ifndef COLUMN_HPP
 #define COLUMN_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "MDBLTypes.hpp"
+
 // Forward declarations.
 class CTable;
 class CIndex;

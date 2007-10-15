@@ -12,6 +12,13 @@
 #ifndef GROUPSET_HPP
 #define GROUPSET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <Legacy/TArray.hpp>
+#include "ResultSet.hpp"
+
 /******************************************************************************
 ** 
 ** This is a 2D array based class used to store the results of a GROUP BY.

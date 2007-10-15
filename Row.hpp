@@ -11,6 +11,12 @@
 #ifndef ROW_HPP
 #define ROW_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Field.hpp"
+
 // Forward declarations.
 class CTable;
 

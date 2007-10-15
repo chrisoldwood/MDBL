@@ -11,8 +11,17 @@
 #ifndef ODBCSOURCE_HPP
 #define ODBCSOURCE_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "MDBLTypes.hpp"
+#include "SQLSource.hpp"
 #include <sql.h>
 #include <sqlext.h>
+
+// Forward declarations.
+class CODBCCursor;
 
 /******************************************************************************
 ** 

@@ -11,6 +11,15 @@
 #ifndef JOINEDSET_HPP
 #define JOINEDSET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "ResultSet.hpp"
+
+// Forward declarations.
+class CTable;
+
 /******************************************************************************
 ** 
 ** This is a 2D array based class used to store the results of a join query.

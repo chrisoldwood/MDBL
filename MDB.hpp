@@ -11,6 +11,18 @@
 #ifndef MDB_HPP
 #define MDB_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Table.hpp"
+#include "TableSet.hpp"
+
+// Forward declarations
+class CSQLSource;
+class CJoinedSet;
+class CJoin;
+
 /******************************************************************************
 ** 
 ** This is the class used (possibly as a base class) for all Memory Databases.

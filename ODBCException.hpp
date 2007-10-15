@@ -11,10 +11,13 @@
 #ifndef ODBCEXCEPTION_HPP
 #define ODBCEXCEPTION_HPP
 
-#include <sql.h>
-#include <sqlext.h>
+#if _MSC_VER > 1000
+#pragma once
+#endif
 
 #include "SQLException.hpp"
+#include <sql.h>
+#include <sqlext.h>
 
 /******************************************************************************
 ** 

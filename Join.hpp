@@ -11,6 +11,10 @@
 #ifndef JOIN_HPP
 #define JOIN_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
 /******************************************************************************
 ** 
 ** The class used to hold a table used in a CJoin query.

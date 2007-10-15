@@ -11,8 +11,21 @@
 #ifndef RESULTSET_HPP
 #define RESULTSET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <Legacy/TArray.hpp>
+#include "Value.hpp"
+#include "SortColumns.hpp"
+
 // Forward declarations.
+class CRow;
+class CRowSet;
+class CTable;
+class CValueSet;
 class CGroupSet;
+class CWhere;
 
 /******************************************************************************
 ** 

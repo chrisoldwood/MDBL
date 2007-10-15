@@ -11,6 +11,14 @@
 #ifndef INTMAPINDEX_HPP
 #define INTMAPINDEX_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "UniqIndex.hpp"
+#include <Legacy/IntPtrMap.hpp>
+#include "Row.hpp"
+
 /******************************************************************************
 ** 
 ** This class is used to index int columns using a MAP.

@@ -11,6 +11,11 @@
 #ifndef ODBCPARAMS_HPP
 #define ODBCPARAMS_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "SQLParams.hpp"
 #include <sql.h>
 #include <sqlext.h>
 

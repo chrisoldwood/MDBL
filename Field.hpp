@@ -11,9 +11,16 @@
 #ifndef FIELD_HPP
 #define FIELD_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Value.hpp"
+
 // Forward declarations.
 class CRow;
 class CColumn;
+class CTimeStamp;
 
 /******************************************************************************
 ** 
@@ -162,12 +169,17 @@ private:
 	CField(CRow& oRow, CColumn& oColumn, int nColumn, bool bNull, void* pData);
 	~CField();
 
+#pragma push_macro("new")
+#undef new 
+
 	//
 	// Placement new/delete operators.
 	//
 	void* operator new(size_t n, void* p);
 	void  operator delete(void* p, void* p2);
 	void  operator delete(void* p);
+
+#pragma pop_macro("new")
 
 	//
 	// Disallow copies for now.
@@ -201,6 +213,9 @@ inline CColumn& CField::Column() const
 	return m_oColumn;
 }
 
+#pragma push_macro("new")
+#undef new 
+
 inline void* CField::operator new(size_t, void* p)
 {
 	return p;
@@ -213,6 +228,8 @@ inline void  CField::operator delete(void*, void*)
 inline void  CField::operator delete(void*)
 {
 }
+
+#pragma pop_macro("new")
 
 inline CField::operator int() const
 {

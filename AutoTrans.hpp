@@ -11,6 +11,10 @@
 #ifndef AUTOTRANS_HPP
 #define AUTOTRANS_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
 /******************************************************************************
 ** 
 ** This is a helper class used to manage CSQLSource transactions.
