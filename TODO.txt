@@ -19,3 +19,5 @@
 - Add CField operator= for CValue.
 
 - Fix updating of indexes when field changes.
+
+- Replace bald pointers/catch handlers with SharedPtr.
