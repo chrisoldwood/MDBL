@@ -24,16 +24,16 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				InlineFunctionExpansion="1"
+				InlineFunctionExpansion="0"
 				AdditionalIncludeDirectories="../../Lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="TRUE"
+				EnableFunctionLevelLinking="FALSE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="MBDL.hpp"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="Common.hpp"
 				PrecompiledHeaderFile=".\Release/MDBL.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
@@ -41,6 +41,7 @@
 				WarningLevel="4"
 				WarnAsError="TRUE"
 				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -87,11 +88,11 @@
 				SmallerTypeCheck="TRUE"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
-				EnableFunctionLevelLinking="TRUE"
+				EnableFunctionLevelLinking="FALSE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="MBDL.hpp"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="Common.hpp"
 				PrecompiledHeaderFile=".\Debug/MDBL.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
@@ -99,7 +100,7 @@
 				WarningLevel="4"
 				WarnAsError="TRUE"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -169,6 +170,21 @@
 				RelativePath="ODBCSource.cpp">
 			</File>
 			<File
+				RelativePath=".\pch.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="ResultSet.cpp">
 			</File>
 			<File
@@ -213,6 +229,9 @@
 			</File>
 			<File
 				RelativePath="ColumnSet.hpp">
+			</File>
+			<File
+				RelativePath=".\Common.hpp">
 			</File>
 			<File
 				RelativePath="Field.hpp">
