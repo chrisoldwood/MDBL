@@ -12,6 +12,12 @@
 #ifndef WHEREEXP_HPP
 #define WHEREEXP_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Where.hpp"
+
 /******************************************************************************
 ** 
 ** This class is the class for composite WHERE clauses.

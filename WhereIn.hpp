@@ -12,6 +12,13 @@
 #ifndef WHEREIN_HPP
 #define WHEREIN_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Where.hpp"
+#include "ValueSet.hpp"
+
 /******************************************************************************
 ** 
 ** This class is used for WHERE clause comparisons of multiple value.

@@ -11,6 +11,13 @@
 #ifndef ROWSET_HPP
 #define ROWSET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <Legacy/TArray.hpp>
+#include "Row.hpp"
+
 /******************************************************************************
 ** 
 ** The class used to store the rows which belong to a table.

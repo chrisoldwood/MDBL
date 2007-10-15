@@ -12,6 +12,13 @@
 #ifndef WHERE_HPP
 #define WHERE_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+// Forward declarations.
+class CRow;
+
 /******************************************************************************
 ** 
 ** This class is the base class for all WHERE clause types.

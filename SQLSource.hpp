@@ -11,6 +11,14 @@
 #ifndef SQLSOURCE_HPP
 #define SQLSOURCE_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+// Forward declarations.
+class CSQLParams;
+class CSQLCursor;
+
 /******************************************************************************
 ** 
 ** This is the base class for all Database type Data Sources.

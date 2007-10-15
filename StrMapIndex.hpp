@@ -11,6 +11,14 @@
 #ifndef STRMAPINDEX_HPP
 #define STRMAPINDEX_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "UniqIndex.hpp"
+#include <Legacy/StrPtrMap.hpp>
+#include "Row.hpp"
+
 /******************************************************************************
 ** 
 ** This class is used to index String columns using a MAP.

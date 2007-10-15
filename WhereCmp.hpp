@@ -11,6 +11,13 @@
 #ifndef WHERECMP_HPP
 #define WHERECMP_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Where.hpp"
+#include "Value.hpp"
+
 /******************************************************************************
 ** 
 ** This class is used for WHERE clause comparisons of values.

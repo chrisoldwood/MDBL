@@ -11,6 +11,14 @@
 #ifndef VALUESET_HPP
 #define VALUESET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <Legacy/TArray.hpp>
+#include <WCL/StrArray.hpp>
+#include "Value.hpp"
+
 /******************************************************************************
 ** 
 ** The class used to store a set of CValues.

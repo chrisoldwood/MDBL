@@ -11,6 +11,15 @@
 #ifndef TABLESET_HPP
 #define TABLESET_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <Legacy/TArray.hpp>
+
+// Forward declarations.
+class CTable;
+
 /******************************************************************************
 ** 
 ** The class used to store the tables which belong to a database.

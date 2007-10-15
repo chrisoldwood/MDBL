@@ -11,8 +11,21 @@
 #ifndef TABLE_HPP
 #define TABLE_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "ColumnSet.hpp"
+#include "RowSet.hpp"
+
 // Forward declarations.
 class CMDB;
+class CColumn;
+class CRow;
+class CResultSet;
+class CValue;
+class CWhere;
+class CSQLSource;
 
 /******************************************************************************
 ** 

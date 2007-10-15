@@ -11,6 +11,12 @@
 #ifndef VALUE_HPP
 #define VALUE_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "MDBLTypes.hpp"
+
 /******************************************************************************
 ** 
 ** This class is a VARIANT like class used to hold values of different types.

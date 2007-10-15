@@ -11,6 +11,12 @@
 #ifndef UNIQINDEX_HPP
 #define UNIQINDEX_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include "Index.hpp"
+
 // Forward declarations.
 class CTable;
 

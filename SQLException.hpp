@@ -11,6 +11,10 @@
 #ifndef SQLEXCEPTION_HPP
 #define SQLEXCEPTION_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
 /******************************************************************************
 ** 
 ** This is the exception class thrown by Data Source objects.

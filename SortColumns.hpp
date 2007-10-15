@@ -12,6 +12,12 @@
 #ifndef SORTCOLUMNS_HPP
 #define SORTCOLUMNS_HPP
 
+#if _MSC_VER > 1000
+#pragma once
+#endif
+
+#include <Legacy/TArray.hpp>
+
 /******************************************************************************
 ** 
 ** This class holds the list of columns used to sort a result set.
