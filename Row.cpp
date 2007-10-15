@@ -7,7 +7,11 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "Row.hpp"
+#include "Table.hpp"
+#include <WCL/IInputStream.hpp>
+#include <WCL/IOutputStream.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -46,8 +50,13 @@ CRow::CRow(CTable& oTable, bool bNull)
 	{
 		CColumn& oColumn = m_oTable.m_vColumns[i];
 
+#pragma push_macro("new")
+#undef new 
+
 		// Construct field using 'placement new'.
 		new(&m_aFields[i]) CField(*this, oColumn, i, bNull, pData);
+
+#pragma pop_macro("new")
 
 		pData += oColumn.AllocSize();
 	}
