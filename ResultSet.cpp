@@ -7,7 +7,16 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "ResultSet.hpp"
+#include "Row.hpp"
+#include "RowSet.hpp"
+#include "Table.hpp"
+#include "ValueSet.hpp"
+#include "GroupSet.hpp"
+#include "Where.hpp"
+#include <WCL/IInputStream.hpp>
+#include <WCL/IOutputStream.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.

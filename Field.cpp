@@ -7,7 +7,13 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "Field.hpp"
+#include "Column.hpp"
+#include "Row.hpp"
+#include "Table.hpp"
+#include "TimeStamp.hpp"
+#include <time.h>
 
 // The special null value.
 CNull null;

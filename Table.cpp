@@ -7,7 +7,19 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "Table.hpp"
+#include "TimeStamp.hpp"
+#include "IntMapIndex.hpp"
+#include "StrMapIndex.hpp"
+#include "Where.hpp"
+#include <WCL/IInputStream.hpp>
+#include <WCL/IOutputStream.hpp>
+#include "SQLSource.hpp"
+#include "SQLCursor.hpp"
+#include "SQLException.hpp"
+#include "SQLParams.hpp"
+#include "ODBCException.hpp"
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -975,7 +987,7 @@ void CTable::Read(CSQLSource& rSource)
 		// Cleanup.
 		delete pCursor;
 	}
-	catch(CSQLException&)
+	catch (const CSQLException&)
 	{
 		delete pCursor;
 		throw;
@@ -1107,7 +1119,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 		// Cleanup.
 		delete pParams;
 	}
-	catch(CODBCException&)
+	catch (const CODBCException&)
 	{
 		// Cleanup and rethrow.
 		delete pParams;
@@ -1249,7 +1261,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 			// Cleanup.
 			delete pParams;
 		}
-		catch(CODBCException&)
+		catch (const CODBCException&)
 		{
 			// Cleanup and rethrow.
 			delete pParams;

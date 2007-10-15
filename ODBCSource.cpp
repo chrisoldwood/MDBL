@@ -7,8 +7,14 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "ODBCSource.hpp"
 #include <odbcinst.h>
+#include "ODBCException.hpp"
+#include "ODBCParams.hpp"
+#include "ODBCCursor.hpp"
+#include "TimeStamp.hpp"
+#include <WCL/StrArray.hpp>
 
 /******************************************************************************
 **
@@ -201,7 +207,7 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 		// Free statement handle.
 		::SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
 	}
-	catch(CODBCException&)
+	catch (const CODBCException&)
 	{
 		// Free statement handle.
 		::SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
@@ -270,7 +276,7 @@ CSQLCursor* CODBCSource::ExecQuery(const char* pszQuery)
 		// Execute it.
 		ExecQuery(pszQuery, *pCursor);
 	}
-	catch(CODBCException&)
+	catch (const CODBCException&)
 	{
 		// Free cursor and re-throw exception.
 		delete pCursor;

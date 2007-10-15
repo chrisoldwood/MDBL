@@ -7,7 +7,12 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "ODBCParams.hpp"
+#include "ODBCSource.hpp"
+#include "ODBCException.hpp"
+#include "Row.hpp"
+#include "TimeStamp.hpp"
 
 /******************************************************************************
 ** Method:		Constructor.

@@ -7,7 +7,13 @@
 *******************************************************************************
 */
 
-#include "MDBL.hpp"
+#include "Common.hpp"
+#include "MDB.hpp"
+#include "SQLSource.hpp"
+#include "SQLCursor.hpp"
+#include "SQLException.hpp"
+#include "JoinedSet.hpp"
+#include "Join.hpp"
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -119,7 +125,7 @@ CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const ch
 		// Cleanup.
 		delete pCursor;
 	}
-	catch(CSQLException&)
+	catch (const CSQLException&)
 	{
 		delete pCursor;
 		delete pTable;
