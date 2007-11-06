@@ -21,3 +21,5 @@
 - Fix updating of indexes when field changes.
 
 - Replace bald pointers/catch handlers with SharedPtr.
+
+- Add Forward declarations header.
