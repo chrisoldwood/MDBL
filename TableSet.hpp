@@ -16,9 +16,7 @@
 #endif
 
 #include <Legacy/TArray.hpp>
-
-// Forward declarations.
-class CTable;
+#include "FwdDecls.hpp"
 
 /******************************************************************************
 ** 

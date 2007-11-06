@@ -15,12 +15,8 @@
 #pragma once
 #endif
 
+#include "FwdDecls.hpp"
 #include "Value.hpp"
-
-// Forward declarations.
-class CRow;
-class CColumn;
-class CTimeStamp;
 
 /******************************************************************************
 ** 

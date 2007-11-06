@@ -17,11 +17,6 @@
 
 #include "ResultSet.hpp"
 
-// Forward declarations.
-class CTable;
-class CRow;
-class CValue;
-
 /******************************************************************************
 ** 
 ** This is the base class for all index classes.

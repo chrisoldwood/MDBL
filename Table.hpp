@@ -18,15 +18,6 @@
 #include "ColumnSet.hpp"
 #include "RowSet.hpp"
 
-// Forward declarations.
-class CMDB;
-class CColumn;
-class CRow;
-class CResultSet;
-class CValue;
-class CWhere;
-class CSQLSource;
-
 /******************************************************************************
 ** 
 ** The class used to hold a table in the database.

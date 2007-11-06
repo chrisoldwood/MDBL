@@ -15,9 +15,7 @@
 #pragma once
 #endif
 
-// Forward declarations.
-class CSQLParams;
-class CSQLCursor;
+#include "FwdDecls.hpp"
 
 /******************************************************************************
 ** 

@@ -17,9 +17,6 @@
 
 #include "Field.hpp"
 
-// Forward declarations.
-class CTable;
-
 /******************************************************************************
 ** 
 ** The class used to store a row of data in a table.

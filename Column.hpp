@@ -15,11 +15,8 @@
 #pragma once
 #endif
 
+#include "FwdDecls.hpp"
 #include "MDBLTypes.hpp"
-
-// Forward declarations.
-class CTable;
-class CIndex;
 
 /******************************************************************************
 ** 

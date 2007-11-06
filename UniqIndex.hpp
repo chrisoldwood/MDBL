@@ -17,9 +17,6 @@
 
 #include "Index.hpp"
 
-// Forward declarations.
-class CTable;
-
 /******************************************************************************
 ** 
 ** This is the base class for all unique index classes.

@@ -16,8 +16,7 @@
 #pragma once
 #endif
 
-// Forward declarations.
-class CRow;
+#include "FwdDecls.hpp"
 
 /******************************************************************************
 ** 

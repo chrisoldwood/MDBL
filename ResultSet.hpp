@@ -16,16 +16,9 @@
 #endif
 
 #include <Legacy/TArray.hpp>
+#include "FwdDecls.hpp"
 #include "Value.hpp"
 #include "SortColumns.hpp"
-
-// Forward declarations.
-class CRow;
-class CRowSet;
-class CTable;
-class CValueSet;
-class CGroupSet;
-class CWhere;
 
 /******************************************************************************
 ** 

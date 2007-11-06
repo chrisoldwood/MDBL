@@ -15,10 +15,8 @@
 #pragma once
 #endif
 
+#include "FwdDecls.hpp"
 #include "MDBLTypes.hpp"
-
-// Forward declarations.
-class CRow;
 
 /******************************************************************************
 ** 
