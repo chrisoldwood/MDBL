@@ -16,6 +16,10 @@
 #include "TimeStamp.hpp"
 #include <WCL/StrArray.hpp>
 
+// Linker directives.
+#pragma comment(lib, "odbc32")
+#pragma comment(lib, "odbccp32")
+
 /******************************************************************************
 **
 ** Constants.

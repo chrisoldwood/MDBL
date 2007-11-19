@@ -574,6 +574,21 @@ bool CField::operator==(const CValue& oValue) const
 	return false;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//! Helper function for comparing values larger than an int.
+
+template<typename T>
+int Compare(const T& lhs, const T& rhs)
+{
+	if (lhs < rhs)
+		return -1;
+
+	if (rhs < lhs)
+		return +1;
+
+	return 0;
+}
+
 /******************************************************************************
 ** Methods:		Compare()
 **
@@ -604,11 +619,11 @@ int CField::Compare(const CField& oValue) const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			nCmp = (*m_pInt   - *oValue.m_pInt);			break;
-		case MDST_DOUBLE:		nCmp = (int)(*m_pDouble - *oValue.m_pDouble);	break;
+		case MDST_DOUBLE:		nCmp = ::Compare(*m_pDouble, *oValue.m_pDouble);	break;
 		case MDST_CHAR:			nCmp = (*m_pChar  - *oValue.m_pChar);			break;
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);				break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - *oValue.m_pBool);			break;
-		case MDST_TIME_T:		nCmp = (*m_pTimeT - *oValue.m_pTimeT);			break;
+		case MDST_TIME_T:		nCmp = ::Compare(*m_pTimeT, *oValue.m_pTimeT);	break;
 		case MDST_TIMESTAMP:	ASSERT_FALSE();									break;
 		case MDST_POINTER:		ASSERT_FALSE();									break;
 		default:				ASSERT_FALSE();									break;
@@ -633,11 +648,11 @@ int CField::Compare(const CValue& oValue) const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			nCmp = (*m_pInt   - oValue.m_iValue);			break;
-		case MDST_DOUBLE:		nCmp = (int)(*m_pDouble - oValue.m_dValue);		break;
+		case MDST_DOUBLE:		nCmp = ::Compare(*m_pDouble, oValue.m_dValue);	break;
 		case MDST_CHAR:			nCmp = (*m_pChar  - oValue.m_cValue);			break;
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_sValue);					break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - oValue.m_bValue);			break;
-		case MDST_TIME_T:		nCmp = (*m_pTimeT - oValue.m_tValue);			break;
+		case MDST_TIME_T:		nCmp = ::Compare(*m_pTimeT, oValue.m_tValue);	break;
 		case MDST_TIMESTAMP:	ASSERT_FALSE();									break;
 		case MDST_POINTER:		ASSERT_FALSE();									break;
 		default:				ASSERT_FALSE();									break;
@@ -880,5 +895,5 @@ int CField::StrCmp(const char* pszRHS) const
 {
 	bool bCmpCase = (m_oColumn.Flags() & CColumn::COMPARE_CASE);
 
-	return (bCmpCase) ? strcmp(m_pString, pszRHS) : stricmp(m_pString, pszRHS);
+	return (bCmpCase) ? strcmp(m_pString, pszRHS) : _stricmp(m_pString, pszRHS);
 }
