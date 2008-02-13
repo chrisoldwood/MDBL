@@ -25,3 +25,13 @@
 - Add Forward declarations header.
 
 - Sort out handling of 64-bit time_t (i.e. VC++ 8.0)
+
+- Timestamp string formatting.
+
+- GetRaw() needs buffer size as argument.
+
+- Check ANSI/Unicode string mappings.
+
+- Use strncpy instead of strcpy.
+
+- Move INNER and OUTER join enum to outer scope so its stored as an enum.
