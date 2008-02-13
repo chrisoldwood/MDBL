@@ -39,24 +39,24 @@ public:
 	// Constructors/Destructor.
 	//
 	CSortColumns();
-	CSortColumns(int nColumn, Dir eDir);
+	CSortColumns(size_t nColumn, Dir eDir);
 	~CSortColumns();
 
 	//
 	// Methods.
 	//
-	int  Count() const;
-	int	 Column(int n) const;
-	Dir  Direction(int n) const;
+	size_t Count() const;
+	size_t Column(size_t n) const;
+	Dir  Direction(size_t n) const;
 
-	void Add(int nColumn, Dir eDir);
+	void Add(size_t nColumn, Dir eDir);
 
 protected:
 	//
 	// Members.
 	//
-	TArray<int>	m_aiColumns;	// The list of columns.
-	TArray<int>	m_aiSortDirs;	// The list of column sort directions.
+	TArray<size_t>	m_aiColumns;	// The list of columns.
+	TArray<Dir>		m_aiSortDirs;	// The list of column sort directions.
 };
 
 /******************************************************************************
@@ -70,7 +70,7 @@ inline CSortColumns::CSortColumns()
 {
 }
 
-inline CSortColumns::CSortColumns(int nColumn, Dir eDir)
+inline CSortColumns::CSortColumns(size_t nColumn, Dir eDir)
 {
 	Add(nColumn, eDir);
 }
@@ -79,22 +79,22 @@ inline CSortColumns::~CSortColumns()
 {
 }
 
-inline int CSortColumns::Count() const
+inline size_t CSortColumns::Count() const
 {
 	return m_aiColumns.Size();
 }
 
-inline int CSortColumns::Column(int n) const
+inline size_t CSortColumns::Column(size_t n) const
 {
 	return m_aiColumns[n];
 }
 
-inline CSortColumns::Dir CSortColumns::Direction(int n) const
+inline CSortColumns::Dir CSortColumns::Direction(size_t n) const
 {
 	return static_cast<Dir>(m_aiSortDirs[n]);
 }
 
-inline void CSortColumns::Add(int nColumn, Dir eDir)
+inline void CSortColumns::Add(size_t nColumn, Dir eDir)
 {
 	m_aiColumns.Add(nColumn);
 	m_aiSortDirs.Add(eDir);

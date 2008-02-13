@@ -32,21 +32,21 @@ CRow::CRow(CTable& oTable, bool bNull)
 	, m_nColumns(oTable.m_vColumns.Count())
 	, m_eStatus(ALLOCATED)
 {
-	int i;
-	int	nBufSize = 0;
+	size_t i;
+	size_t nBufSize = 0;
 
 	// Calculate the size of the data values buffer.
 	nBufSize += m_nColumns * sizeof(CField);
 	nBufSize += m_oTable.m_vColumns.AllocSize();
 
 	// Allocate the buffer.
-	m_aFields = (CField*) calloc(1, nBufSize);
+	m_aFields = static_cast<CField*>(calloc(1, nBufSize));
 
 	// Calculate start of data region.
-	byte* pData = (byte*)(m_aFields + m_nColumns);
+	byte* pData = reinterpret_cast<byte*>(m_aFields + m_nColumns);
 
 	// Initialise each field.
-	for (i = 0; i < m_nColumns; i++)
+	for (i = 0; i < m_nColumns; ++i)
 	{
 		CColumn& oColumn = m_oTable.m_vColumns[i];
 
@@ -77,7 +77,7 @@ CRow::CRow(CTable& oTable, bool bNull)
 CRow::~CRow()
 {
 	// Destroy each field.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 		delete &m_aFields[i];
 
 	if (m_aFields != NULL)
@@ -101,30 +101,32 @@ void CRow::Read(WCL::IInputStream& rStream)
 {
 	// Get the row data size and start address.
 	int   nSize = m_oTable.m_vColumns.AllocSize();
-	byte* pData = (byte*)(m_aFields + m_nColumns);
+	byte* pData = reinterpret_cast<byte*>(m_aFields + m_nColumns);
 
 	// Read the null values.
-	for (int i=0; i < m_nColumns; i++)
+	for (size_t i=0; i < m_nColumns; ++i)
 		rStream.Read(&m_aFields[i].m_bNull, sizeof(bool));
 
 	// Read the data values..
 	rStream.Read(pData, nSize);
 
 	// Read any MDCT_VARSTR field values.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 	{
 		if (m_aFields[i].m_oColumn.ColType() == MDCT_VARSTR)
 		{
-			int nLen;
+			size_t nChars;
 
 			// Read the string length.
-			rStream.Read(&nLen, sizeof(int));
+			rStream.Read(&nChars, sizeof(size_t));
+
+			size_t nBytes = Core::NumBytes<tchar>(nChars+1);
 
 			// Allocate the buffer.
-			m_aFields[i].m_pString = (char*) realloc(m_aFields[i].m_pString, nLen+1);
+			m_aFields[i].m_pString = static_cast<tchar*>(realloc(m_aFields[i].m_pString, nBytes));
 
 			// Read the string.
-			rStream.Read(m_aFields[i].m_pString, nLen+1);
+			rStream.Read(m_aFields[i].m_pString, nBytes);
 		}
 	}
 
@@ -136,27 +138,28 @@ void CRow::Write(WCL::IOutputStream& rStream)
 {
 	// Get the row data size and start address.
 	int   nSize = m_oTable.m_vColumns.AllocSize();
-	byte* pData = (byte*)(m_aFields + m_nColumns);
+	byte* pData = reinterpret_cast<byte*>(m_aFields + m_nColumns);
 
 	// Write the null values.
-	for (int i=0; i < m_nColumns; i++)
+	for (size_t i=0; i < m_nColumns; ++i)
 		rStream.Write(&m_aFields[i].m_bNull, sizeof(bool));
 
 	// Write the data values.
 	rStream.Write(pData, nSize);
 
 	// Write any MDCT_VARSTR field values.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 	{
 		if (m_aFields[i].m_oColumn.ColType() == MDCT_VARSTR)
 		{
-			int nLen = strlen(m_aFields[i].m_pString);
+			size_t nChars = tstrlen(m_aFields[i].m_pString);
+			size_t nBytes = Core::NumBytes<tchar>(nChars+1);
 
 			// Read the string length.
-			rStream.Write(&nLen, sizeof(int));
+			rStream.Write(&nChars, sizeof(size_t));
 
 			// Write the string.
-			rStream.Write(m_aFields[i].m_pString, nLen+1);
+			rStream.Write(m_aFields[i].m_pString, nBytes);
 		}
 	}
 

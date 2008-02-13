@@ -32,13 +32,13 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CIntMapIndex(CTable& oTable, int nColumn);
+	CIntMapIndex(CTable& oTable, size_t nColumn);
 	virtual ~CIntMapIndex();
 	
 	//
 	// Methods.
 	//
-	virtual int  RowCount() const;
+	virtual size_t RowCount() const;
 	virtual void AddRow(CRow& oRow);
 	virtual void RemoveRow(CRow& oRow);
 	virtual void Truncate();
@@ -47,7 +47,7 @@ public:
 	virtual CRow* FindRow(const CValue& oValue) const;
 	virtual CResultSet FindRows(const CValue& oValue) const;
 
-	virtual void Capacity(int nRows);
+	virtual void Capacity(size_t nRows);
 
 protected:
 	//
@@ -63,7 +63,7 @@ protected:
 *******************************************************************************
 */
 
-inline int CIntMapIndex::RowCount() const
+inline size_t CIntMapIndex::RowCount() const
 {
 	return m_oMap.Count();
 }
@@ -87,7 +87,7 @@ inline void CIntMapIndex::Truncate()
 
 inline CRow* CIntMapIndex::FindRow(int nKey) const
 {
-	return (CRow*) m_oMap.Find(nKey);
+	return static_cast<CRow*>(m_oMap.Find(nKey));
 }
 
 inline CRow* CIntMapIndex::FindRow(const CValue& oValue) const
@@ -104,7 +104,7 @@ inline CResultSet CIntMapIndex::FindRows(const CValue& oValue) const
 	return CResultSet(m_oTable, FindRow(oValue.m_iValue));
 }
 
-inline void CIntMapIndex::Capacity(int nRows)
+inline void CIntMapIndex::Capacity(size_t nRows)
 {
 	m_oMap.Reserve(nRows);
 }

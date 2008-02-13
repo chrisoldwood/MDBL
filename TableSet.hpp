@@ -37,13 +37,13 @@ public:
 	//
 	// Methods.
 	//
-	int     Count() const;
-	CTable& Table(int n) const;
-	CTable& operator[](int n) const;
+	size_t  Count() const;
+	CTable& Table(size_t n) const;
+	CTable& operator[](size_t n) const;
 
-	int  Add(CTable& oTable);
-	void Remove(int nTable);
-	void Delete(int nTable);
+	size_t Add(CTable& oTable);
+	void Remove(size_t nTable);
+	void Delete(size_t nTable);
 
 protected:
 	//
@@ -65,32 +65,32 @@ private:
 *******************************************************************************
 */
 
-inline int CTableSet::Count() const
+inline size_t CTableSet::Count() const
 {
 	return Size();
 }
 
-inline CTable& CTableSet::Table(int n) const
+inline CTable& CTableSet::Table(size_t n) const
 {
 	return *(TPtrArray<CTable>::At(n));
 }
 
-inline CTable& CTableSet::operator[](int n) const
+inline CTable& CTableSet::operator[](size_t n) const
 {
 	return *(TPtrArray<CTable>::At(n));
 }
 
-inline int CTableSet::Add(CTable& oTable)
+inline size_t CTableSet::Add(CTable& oTable)
 {
 	return TPtrArray<CTable>::Add(&oTable);
 }
 
-inline void CTableSet::Remove(int nTable)
+inline void CTableSet::Remove(size_t nTable)
 {
 	TPtrArray<CTable>::Remove(nTable);
 }
 
-inline void CTableSet::Delete(int nTable)
+inline void CTableSet::Delete(size_t nTable)
 {
 	TPtrArray<CTable>::Delete(nTable);
 }

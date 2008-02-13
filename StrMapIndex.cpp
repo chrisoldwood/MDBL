@@ -23,7 +23,7 @@
 *******************************************************************************
 */
 
-CStrMapIndex::CStrMapIndex(CTable& oTable, int nColumn)
+CStrMapIndex::CStrMapIndex(CTable& oTable, size_t nColumn)
 	: CUniqIndex(oTable, nColumn)
 {
 	ASSERT(m_oTable.Column(m_nColumn).Unique());

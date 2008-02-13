@@ -37,14 +37,14 @@ public:
 	//
 	// Table methods.
 	//
-	virtual int     TableCount() const;
-	virtual CTable& Table(int n) const;
-	virtual CTable& operator[](int n) const;
+	virtual size_t  TableCount() const;
+	virtual CTable& Table(size_t n) const;
+	virtual CTable& operator[](size_t n) const;
 
-	virtual CTable& CreateTable(const char* pszName);
-	virtual CTable& CreateTable(const char* pszName, CSQLSource& oConnection, const char* pszQuery = NULL);
-	virtual int     AddTable(CTable& oTable);
-	virtual int     FindTable(const char* pszName);
+	virtual CTable& CreateTable(const tchar* pszName);
+	virtual CTable& CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery = NULL);
+	virtual size_t  AddTable(CTable& oTable);
+	virtual int     FindTable(const tchar* pszName);
 
 	//
 	// Query methods.
@@ -78,7 +78,7 @@ protected:
 	//
 	// Internal methods.
 	//
-	int DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const;
+	uint DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const;
 };
 
 /******************************************************************************
@@ -88,17 +88,17 @@ protected:
 *******************************************************************************
 */
 
-inline int CMDB::TableCount() const
+inline size_t CMDB::TableCount() const
 {
 	return m_vTables.Count();
 }
 
-inline CTable& CMDB::Table(int n) const
+inline CTable& CMDB::Table(size_t n) const
 {
 	return m_vTables.Table(n);
 }
 
-inline CTable& CMDB::operator[](int n) const
+inline CTable& CMDB::operator[](size_t n) const
 {
 	return m_vTables.Table(n);
 }

@@ -55,11 +55,11 @@ CColumnSet::~CColumnSet()
 *******************************************************************************
 */
 
-int CColumnSet::AllocSize() const
+size_t CColumnSet::AllocSize() const
 {
 	int nSize = 0;
 
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 		nSize += Column(i).AllocSize();
 
 	return nSize;
@@ -77,7 +77,7 @@ int CColumnSet::AllocSize() const
 *******************************************************************************
 */
 
-void CColumnSet::Delete(int n)
+void CColumnSet::Delete(size_t n)
 {
 	delete &Column(n);
 	Remove(n);
@@ -97,7 +97,7 @@ void CColumnSet::Delete(int n)
 
 void CColumnSet::DeleteAll()
 {
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 		delete &Column(i);
 
 	RemoveAll();
@@ -115,11 +115,11 @@ void CColumnSet::DeleteAll()
 *******************************************************************************
 */
 
-int CColumnSet::Find(const char* pszName)
+int CColumnSet::Find(const tchar* pszName)
 {
 	ASSERT(pszName != NULL);
 
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 	{
 		if (Column(i).Name() == pszName)
 			return i;

@@ -24,7 +24,7 @@
 *******************************************************************************
 */
 
-CWhereIn::CWhereIn(int nColumn, const CValueSet& oValueSet)
+CWhereIn::CWhereIn(size_t nColumn, const CValueSet& oValueSet)
 	: m_nColumn(nColumn)
 	, m_oValueSet(oValueSet)
 {
@@ -79,7 +79,7 @@ CWhereIn::~CWhereIn()
 bool CWhereIn::Matches(const CRow& oRow) const
 {
 	// For all values...
-	for (int i = 0; i < m_oValueSet.Count(); ++i)
+	for (size_t i = 0; i < m_oValueSet.Count(); ++i)
 	{
 		if (oRow[m_nColumn] == m_oValueSet[i])
 			return true;

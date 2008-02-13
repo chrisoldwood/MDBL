@@ -59,7 +59,7 @@ CMDB::~CMDB()
 *******************************************************************************
 */
 
-CTable& CMDB::CreateTable(const char* pszName)
+CTable& CMDB::CreateTable(const tchar* pszName)
 {
 	ASSERT(pszName != NULL);
 
@@ -80,7 +80,7 @@ CTable& CMDB::CreateTable(const char* pszName)
 *******************************************************************************
 */
 
-CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const char* pszQuery)
+CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery)
 {
 	ASSERT(pszName != NULL);
 	ASSERT(oConnection.IsOpen());
@@ -90,7 +90,7 @@ CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const ch
 	// Only table name specified?
 	if (pszQuery == NULL)
 	{
-		strQuery.Format("SELECT * FROM %s", pszName);
+		strQuery.Format(TXT("SELECT * FROM %s"), pszName);
 		pszQuery = strQuery;
 	}
 
@@ -102,7 +102,7 @@ CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const ch
 		pCursor = oConnection.ExecQuery(pszQuery);
 
 		// Setup the tables' schema.
-		for (int i = 0; i < pCursor->NumColumns(); i++)
+		for (size_t i = 0; i < pCursor->NumColumns(); ++i)
 		{
 			SQLColumn& oColumn = pCursor->Column(i);
 
@@ -147,7 +147,7 @@ CTable& CMDB::CreateTable(const char* pszName, CSQLSource& oConnection, const ch
 *******************************************************************************
 */
 
-int CMDB::AddTable(CTable& oTable)
+size_t CMDB::AddTable(CTable& oTable)
 {
 	ASSERT(FindTable(oTable.Name()) == -1);
 
@@ -166,10 +166,10 @@ int CMDB::AddTable(CTable& oTable)
 *******************************************************************************
 */
 
-int CMDB::FindTable(const char* pszName)
+int CMDB::FindTable(const tchar* pszName)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 	{
 		if (m_vTables[i].Name() == pszName)
 			return i;
@@ -197,16 +197,16 @@ CJoinedSet CMDB::Select(const CJoin& oQuery) const
 	int nJoins = oQuery.Count();
 
 	// Create the table list.
-	CTable** apTables = (CTable**) _alloca(sizeof(CTable*) * nJoins);
+	CTable** apTables = static_cast<CTable**>(_alloca(sizeof(CTable*) * nJoins));
 
-	for (int i = 0; i < nJoins; i++)
+	for (int i = 0; i < nJoins; ++i)
 		apTables[i] = &Table(oQuery[i].m_nTable);;
 
 	// Create the joined result set.
 	CJoinedSet oJS(nJoins, apTables);
 
 	// Run the query.
-	DoJoin(oQuery, 0, *((CRow*)(NULL)), oJS);
+	DoJoin(oQuery, 0, *(static_cast<CRow*>(nullptr)), oJS);
 
 	return oJS;
 }
@@ -225,19 +225,19 @@ CJoinedSet CMDB::Select(const CJoin& oQuery) const
 *******************************************************************************
 */
 
-int CMDB::DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const
+uint CMDB::DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const
 {
 	// Get the table to join on.
 	CTable& oRHSTable = Table(oQuery[nJoin].m_nTable);
 
 	// Get the columns to join on.
-	int nLHSColumn = oQuery[nJoin].m_nLHSColumn;
-	int nRHSColumn = oQuery[nJoin].m_nRHSColumn;
+	size_t nLHSColumn = oQuery[nJoin].m_nLHSColumn;
+	size_t nRHSColumn = oQuery[nJoin].m_nRHSColumn;
 
-	int nMatches = 0;
+	uint nMatches = 0;
 
 	// For all rows in the table.
-	for (int r = 0; r < oRHSTable.RowCount(); r++)
+	for (size_t r = 0; r < oRHSTable.RowCount(); ++r)
 	{
 		// Get the row.
 		CRow& oRHSRow = oRHSTable[r];
@@ -245,7 +245,7 @@ int CMDB::DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet
 		// Scanning first table OR this row matches?
 		if ( (nJoin == 0) || (oRHSRow[nRHSColumn] == oLHSRow[nLHSColumn]) )
 		{
-			int nRows = 1;
+			size_t nRows = 1;
 
 			// More joins to process?
 			if (nJoin < (oQuery.Count()-1))
@@ -257,7 +257,7 @@ int CMDB::DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet
 				CResultSet& oRS = oJS[nJoin];
 
 				// Add this row 'nRows' times.
-				for (int i = 0; i < nRows; i++)
+				for (size_t i = 0; i < nRows; ++i)
 					oRS.Add(oRHSRow);
 
 				nMatches += nRows;
@@ -269,10 +269,10 @@ int CMDB::DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet
 				oJS[nJoin].Add(oRHSRow);
 
 				// Add NULL row to all joins from here down.
-				for (int i = nJoin+1; i < oQuery.Count(); i++)
+				for (size_t i = nJoin+1; i < oQuery.Count(); ++i)
 					oJS[i].Add(Table(oQuery[i].m_nTable).NullRow());
 
-				nMatches++;
+				++nMatches;
 			}
 		}
 	}
@@ -295,7 +295,7 @@ int CMDB::DoJoin(const CJoin& oQuery, int nJoin, const CRow& oLHSRow, CJoinedSet
 bool CMDB::Modified() const
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 	{
 		if (m_vTables[i].Modified())
 			return true;
@@ -320,14 +320,14 @@ bool CMDB::Modified() const
 void CMDB::Read(WCL::IInputStream& rStream)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 		m_vTables[i].Read(rStream);
 }
 
 void CMDB::Write(WCL::IOutputStream& rStream)
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 		m_vTables[i].Write(rStream);
 }
 
@@ -350,7 +350,7 @@ void CMDB::Read(CSQLSource& rSource)
 	ASSERT(rSource.IsOpen());
 
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 		m_vTables[i].Read(rSource);
 }
 
@@ -362,7 +362,7 @@ void CMDB::Write(CSQLSource& rSource, CTable::RowTypes eRows)
 	if (eRows & CTable::INSERTED)
 	{
 		// Process insertions from table 1 to n.
-		for (int i = 0; i < m_vTables.Count(); i++)
+		for (size_t i = 0; i < m_vTables.Count(); ++i)
 			m_vTables[i].Write(rSource, CTable::INSERTED);
 	}
 
@@ -370,7 +370,7 @@ void CMDB::Write(CSQLSource& rSource, CTable::RowTypes eRows)
 	if (eRows & CTable::UPDATED)
 	{
 		// Process updates from table 1 to n.
-		for (int i = 0; i < m_vTables.Count(); i++)
+		for (size_t i = 0; i < m_vTables.Count(); ++i)
 			m_vTables[i].Write(rSource, CTable::UPDATED);
 	}
 
@@ -398,7 +398,7 @@ void CMDB::Write(CSQLSource& rSource, CTable::RowTypes eRows)
 void CMDB::ResetRowFlags()
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 		m_vTables[i].ResetRowFlags();
 }
 
@@ -417,6 +417,6 @@ void CMDB::ResetRowFlags()
 void CMDB::Dump(WCL::IOutputStream& rStream) const
 {
 	// For all tables.
-	for (int i = 0; i < m_vTables.Count(); i++)
+	for (size_t i = 0; i < m_vTables.Count(); ++i)
 		m_vTables[i].Dump(rStream);
 }

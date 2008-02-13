@@ -30,22 +30,22 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CJoinedSet(int nTables, CTable* apTables[]);
+	CJoinedSet(size_t nTables, CTable* apTables[]);
 	CJoinedSet(const CJoinedSet& oJoinedSet);
 	~CJoinedSet();
 	
 	//
 	// Methods.
 	//
-	int         Count() const;
-	CResultSet& ResultSet(int n) const;
-	CResultSet& operator[](int n) const;
+	size_t      Count() const;
+	CResultSet& ResultSet(size_t n) const;
+	CResultSet& operator[](size_t n) const;
 
 protected:
 	//
 	// Members.
 	//
-	int			m_nTables;		// Number of joined tables.
+	size_t		m_nTables;		// Number of joined tables.
 	CResultSet*	m_pResSets;		// Array of result sets.
 
 private:
@@ -62,14 +62,14 @@ private:
 *******************************************************************************
 */
 
-inline int CJoinedSet::Count() const
+inline size_t CJoinedSet::Count() const
 {
 	ASSERT(m_pResSets != NULL);
 
 	return m_pResSets[0].Count();
 }
 
-inline CResultSet& CJoinedSet::ResultSet(int n) const
+inline CResultSet& CJoinedSet::ResultSet(size_t n) const
 {
 	ASSERT(m_pResSets != NULL);
 	ASSERT((n >= 0) && (n < m_nTables));
@@ -77,7 +77,7 @@ inline CResultSet& CJoinedSet::ResultSet(int n) const
 	return m_pResSets[n];
 }
 
-inline CResultSet& CJoinedSet::operator[](int n) const
+inline CResultSet& CJoinedSet::operator[](size_t n) const
 {
 	ASSERT(m_pResSets != NULL);
 	ASSERT((n >= 0) && (n < m_nTables));

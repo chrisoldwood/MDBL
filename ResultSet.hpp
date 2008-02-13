@@ -44,27 +44,27 @@ public:
 	//
 	// Accessors/Mutators.
 	//
-	int   Count() const;
-	CRow& Row(int n) const;
-	CRow& operator[](int n) const;
+	size_t Count() const;
+	CRow& Row(size_t n) const;
+	CRow& operator[](size_t n) const;
 
-	int   Add(CRow& oRow);
+	size_t Add(CRow& oRow);
 	void  Truncate();
 
 	//
 	// Sorting methods.
 	//
 	void  OrderBy(const CSortColumns& oColumns);
-	void  OrderBy(int nColumn, CSortColumns::Dir eDir);
+	void  OrderBy(size_t nColumn, CSortColumns::Dir eDir);
 
 	//
 	// Aggregation methods.
 	//
-	CValue    Sum(int nColumn) const;
-	CValue    Min(int nColumn) const;
-	CValue    Max(int nColumn) const;
-	CValueSet Distinct(int nColumn) const;
-	CGroupSet GroupBy(int nColumn) const;
+	CValue    Sum(size_t nColumn) const;
+	CValue    Min(size_t nColumn) const;
+	CValue    Max(size_t nColumn) const;
+	CValueSet Distinct(size_t nColumn) const;
+	CGroupSet GroupBy(size_t nColumn) const;
 
 	//
 	// Query methods.
@@ -108,26 +108,26 @@ private:
 *******************************************************************************
 */
 
-inline int CResultSet::Count() const
+inline size_t CResultSet::Count() const
 {
 	return TPtrArray<CRow>::Size();
 }
 
-inline CRow& CResultSet::Row(int n) const
+inline CRow& CResultSet::Row(size_t n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
 	return *(TPtrArray<CRow>::At(n));
 }
 
-inline CRow& CResultSet::operator[](int n) const
+inline CRow& CResultSet::operator[](size_t n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
 	return *(TPtrArray<CRow>::At(n));
 }
 
-inline int CResultSet::Add(CRow& oRow)
+inline size_t CResultSet::Add(CRow& oRow)
 {
 	return TPtrArray<CRow>::Add(&oRow);
 }
@@ -137,7 +137,7 @@ inline void CResultSet::Truncate()
 	TPtrArray<CRow>::RemoveAll();
 }
 
-inline void CResultSet::OrderBy(int nColumn, CSortColumns::Dir eDir)
+inline void CResultSet::OrderBy(size_t nColumn, CSortColumns::Dir eDir)
 {
 	OrderBy(CSortColumns(nColumn, eDir));
 }

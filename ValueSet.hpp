@@ -40,12 +40,12 @@ public:
 	//
 	// Methods.
 	//
-	int     Count() const;
-	CValue& Value(int n) const;
-	CValue& operator[](int n) const;
+	size_t  Count() const;
+	CValue& Value(size_t n) const;
+	CValue& operator[](size_t n) const;
 
-	int   Add(const CValue& oValue);
-	void  Delete(int nValue);
+	size_t Add(const CValue& oValue);
+	void  Delete(size_t nValue);
 	void  DeleteAll();
 
 protected:
@@ -73,7 +73,7 @@ inline CValueSet::CValueSet()
 
 inline CValueSet::CValueSet(const CStrArray& astrStrings)
 {
-	for (int i = 0; i < astrStrings.Size(); ++i)
+	for (size_t i = 0; i < astrStrings.Size(); ++i)
 		TPtrArray<CValue>::Add(new CValue(astrStrings[i]));
 }
 
@@ -87,27 +87,27 @@ inline CValueSet::~CValueSet()
 	DeleteAll();
 }
 
-inline int CValueSet::Count() const
+inline size_t CValueSet::Count() const
 {
 	return TPtrArray<CValue>::Size();
 }
 
-inline CValue& CValueSet::Value(int n) const
+inline CValue& CValueSet::Value(size_t n) const
 {
 	return *(TPtrArray<CValue>::At(n));
 }
 
-inline CValue& CValueSet::operator[](int n) const
+inline CValue& CValueSet::operator[](size_t n) const
 {
 	return *(TPtrArray<CValue>::At(n));
 }
 
-inline int CValueSet::Add(const CValue& oValue)
+inline size_t CValueSet::Add(const CValue& oValue)
 {
 	return TPtrArray<CValue>::Add(new CValue(oValue));
 }
 
-inline void CValueSet::Delete(int nValue)
+inline void CValueSet::Delete(size_t nValue)
 {
 	TPtrArray<CValue>::Delete(nValue);
 }

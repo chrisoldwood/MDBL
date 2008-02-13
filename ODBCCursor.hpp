@@ -38,15 +38,15 @@ public:
 	CODBCCursor(CODBCSource& oSource);
 	virtual ~CODBCCursor();
 
-	virtual void Open(const char* pszStmt, SQLHSTMT hStmt);
+	virtual void Open(const tchar* pszStmt, SQLHSTMT hStmt);
 	virtual void Close();
 	
 	//
 	// Accessors.
 	//
 	virtual bool IsOpen() const;
-	virtual int NumColumns() const;
-	virtual SQLColumn& Column(int n) const;
+	virtual size_t NumColumns() const;
+	virtual SQLColumn& Column(size_t n) const;
 
 	virtual bool Fetch();
 	virtual void GetRow(CRow& oRow);
@@ -61,11 +61,11 @@ protected:
 	CODBCSource&	m_oSource;		// The data source.
 	CString			m_strStmt;		// The statment executed.
 	SQLHSTMT		m_hStmt;		// The statement handle.
-	SQLSMALLINT		m_nColumns;		// Number of columns returned.
+	size_t			m_nColumns;		// Number of columns returned.
 	SQLColumn*		m_pColumns;		// The array of column definitions.
-	int				m_nRowLen;		// Size of a row.
-	int				m_nTotalLen;	// Total size of the buffer.
-	int*			m_pOffsets;		// The array of value offsets.
+	size_t			m_nRowLen;		// Size of a row.
+	size_t			m_nTotalLen;	// Total size of the buffer.
+	size_t*			m_pOffsets;		// The array of value offsets.
 	byte*			m_pRowData;		// The row data.
 	SQLUSMALLINT*	m_pRowStatus;	// The array of status values.
 	bool			m_bDoneBind;	// Bind output buffers flag.

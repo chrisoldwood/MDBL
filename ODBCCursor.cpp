@@ -76,7 +76,7 @@ CODBCCursor::~CODBCCursor()
 *******************************************************************************
 */
 
-void CODBCCursor::Open(const char* pszStmt, SQLHSTMT hStmt)
+void CODBCCursor::Open(const tchar* pszStmt, SQLHSTMT hStmt)
 {
 	ASSERT(IsOpen() == false);
 	ASSERT(hStmt    != SQL_NULL_HSTMT);
@@ -89,11 +89,15 @@ void CODBCCursor::Open(const char* pszStmt, SQLHSTMT hStmt)
 	// NB: Can't assume first result set if a stored procedure has been called.
 	while (m_nColumns == 0)
 	{
+		SQLSMALLINT nColumns = 0;
+
 		// Get the number of columns in the result set.
-		SQLRETURN rc = ::SQLNumResultCols(m_hStmt, &m_nColumns);
+		SQLRETURN rc = ::SQLNumResultCols(m_hStmt, &nColumns);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
+
+		m_nColumns = nColumns;
 
 		// Result set contains rows?
 		if (m_nColumns != 0)
@@ -112,11 +116,13 @@ void CODBCCursor::Open(const char* pszStmt, SQLHSTMT hStmt)
 	m_pColumns = new SQLColumn[m_nColumns];
 
 	// Retrieve column definitions.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 	{
-		SQLCHAR		szName[256] = "";
+		const size_t MAX_NAME_LEN = 256;
+
+		SQLTCHAR	szName[MAX_NAME_LEN+1] = { 0 };
 		SQLSMALLINT	nColumn = (SQLSMALLINT) (i+1);
-		SQLSMALLINT	nNameLen = 256;
+		SQLSMALLINT	nNameLen = MAX_NAME_LEN;
 		SQLSMALLINT	nType;
 		SQLUINTEGER	nSize;
 		SQLSMALLINT	nScale;
@@ -135,7 +141,7 @@ void CODBCCursor::Open(const char* pszStmt, SQLHSTMT hStmt)
 
 		// Convert definition to MDB types.
 		m_pColumns[i].m_nDstColumn    = i;
-		m_pColumns[i].m_strName       = (const char*)szName;
+		m_pColumns[i].m_strName       = reinterpret_cast<tchar*>(szName);
 		m_pColumns[i].m_nSQLColType   = nType;
 		m_pColumns[i].m_eMDBColType   = CODBCSource::MDBType(nType);
 		m_pColumns[i].m_nSQLFetchType = SQL_UNKNOWN_TYPE;
@@ -214,7 +220,7 @@ bool CODBCCursor::IsOpen() const
 *******************************************************************************
 */
 
-int CODBCCursor::NumColumns() const
+size_t CODBCCursor::NumColumns() const
 {
 	return m_nColumns;
 }
@@ -231,9 +237,9 @@ int CODBCCursor::NumColumns() const
 *******************************************************************************
 */
 
-SQLColumn& CODBCCursor::Column(int n) const
+SQLColumn& CODBCCursor::Column(size_t n) const
 {
-	ASSERT( (n >= 0) && (n < m_nColumns) );
+	ASSERT(n < m_nColumns);
 
 	return m_pColumns[n];
 }
@@ -255,7 +261,7 @@ SQLColumn& CODBCCursor::Column(int n) const
 void CODBCCursor::Bind()
 {
 	// Set column fetch types and sizes.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 	{
 		m_pColumns[i].m_nSQLFetchType = CODBCSource::ODBCType(m_pColumns[i].m_eMDBColType);
 		m_pColumns[i].m_nSize         = CODBCSource::BufferSize(m_pColumns[i].m_eMDBColType, m_pColumns[i].m_nSize);
@@ -264,7 +270,7 @@ void CODBCCursor::Bind()
 	m_nRowLen = 0;
 
 	// Calculate the row buffer size.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 	{
 		m_nRowLen += sizeof(SQLINTEGER);
 		m_nRowLen += m_pColumns[i].m_nSize;
@@ -274,7 +280,7 @@ void CODBCCursor::Bind()
 	m_nTotalLen = m_nRowLen * FETCH_SIZE;
 
 	// Allocate row buffers.
-	m_pOffsets   = new int[m_nColumns];
+	m_pOffsets   = new size_t[m_nColumns];
 	m_pRowData   = new byte[m_nTotalLen];
 	m_pRowStatus = new SQLUSMALLINT[FETCH_SIZE];
 
@@ -287,7 +293,7 @@ void CODBCCursor::Bind()
 	int nOffset = 0;
 
 	// Bind row buffers.
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 	{
 		// Save buffer offset to value.
 		m_pOffsets[i] = nOffset;
@@ -303,7 +309,7 @@ void CODBCCursor::Bind()
 		ASSERT(nSize > 0);
 
 		// Bind the buffer to the column.
-		SQLRETURN rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, (SQLINTEGER*) pLenInd);
+		SQLRETURN rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, reinterpret_cast<SQLINTEGER*>(pLenInd));
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
@@ -383,15 +389,15 @@ void CODBCCursor::GetRow(CRow& oRow)
 	byte* pRowData = m_pRowData + (m_nCurRow * m_nRowLen);
 
 	// For all SQL columns.
-	for (int iSQLCol = 0; iSQLCol < m_nColumns; iSQLCol++)
+	for (size_t iSQLCol = 0; iSQLCol < m_nColumns; ++iSQLCol)
 	{
 		int iRowCol = m_pColumns[iSQLCol].m_nDstColumn;
 
 		// Calculate pointer to value.
-		byte* pValue = pRowData + m_pOffsets[iSQLCol];
+		const byte* pValue = pRowData + m_pOffsets[iSQLCol];
 
 		// Get null/len indicator pointer.
-		SQLINTEGER* pLenInd = (SQLINTEGER*) pValue;
+		const SQLINTEGER* pLenInd = reinterpret_cast<const SQLINTEGER*>(pValue);
 
 		// Is value null?
 		if (*pLenInd == SQL_NULL_DATA)
@@ -403,15 +409,15 @@ void CODBCCursor::GetRow(CRow& oRow)
 			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATE)
 			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_TIME) )
 		{
-			CTimeStamp* pTimeStamp = (CTimeStamp*)(pValue + sizeof(SQLINTEGER));
-			time_t		tTime      = *pTimeStamp;
+			const CTimeStamp* pTimeStamp = reinterpret_cast<const CTimeStamp*>(pValue + sizeof(SQLINTEGER));
+			time_t		      tTime      = *pTimeStamp;
 
 			oRow[iRowCol].SetRaw(&tTime);
 		}
 		// Requires conversion to MDCT_CHAR?
 		else if (m_pColumns[iSQLCol].m_eMDBColType == MDCT_CHAR)
 		{
-			char cChar = *((char*)(pValue + sizeof(SQLINTEGER)));
+			tchar cChar = *(reinterpret_cast<const tchar*>(pValue + sizeof(SQLINTEGER)));
 
 			oRow[iRowCol].SetRaw(&cChar);
 		}

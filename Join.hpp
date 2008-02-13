@@ -28,16 +28,16 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CJoinTable(int nTable, int nLHSColumn, int nType, int nRHSColumn);
+	CJoinTable(size_t nTable, size_t nLHSColumn, int nType, size_t nRHSColumn);
 	~CJoinTable();
 
 	//
 	// Members.
 	//
-	int		m_nTable;		// The table to join onto.
-	int		m_nLHSColumn;	// The left hand tables' column.
+	size_t	m_nTable;		// The table to join onto.
+	size_t	m_nLHSColumn;	// The left hand tables' column.
 	int		m_nType;		// The join type (INNER or OUTER).
-	int		m_nRHSColumn;	// The right hand tables' column.
+	size_t	m_nRHSColumn;	// The right hand tables' column.
 };
 
 /******************************************************************************
@@ -53,7 +53,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CJoin(int nTable);
+	CJoin(size_t nTable);
 	~CJoin();
 
 	// Join types
@@ -66,11 +66,11 @@ public:
 	//
 	// Methods.
 	//
-	int         Count() const;
-	CJoinTable& Join(int n) const;
-	CJoinTable& operator[](int n) const;
+	size_t      Count() const;
+	CJoinTable& Join(size_t n) const;
+	CJoinTable& operator[](size_t n) const;
 
-	void Add(int nTable, int nLHSColumn, Type eType, int nRHSColumn);
+	void Add(size_t nTable, size_t nLHSColumn, Type eType, size_t nRHSColumn);
 
 protected:
 	//
@@ -85,9 +85,9 @@ protected:
 *******************************************************************************
 */
 
-inline CJoin::CJoin(int nTable)
+inline CJoin::CJoin(size_t nTable)
 {
-	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, -1, -1, -1));
+	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, 0, -1, 0));
 }
 
 inline CJoin::~CJoin()
@@ -95,31 +95,31 @@ inline CJoin::~CJoin()
 	TPtrArray<CJoinTable>::DeleteAll();
 }
 
-inline int CJoin::Count() const
+inline size_t CJoin::Count() const
 {
 	return Size();
 }
 
-inline CJoinTable& CJoin::Join(int n) const
+inline CJoinTable& CJoin::Join(size_t n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
 	return *(TPtrArray<CJoinTable>::At(n));
 }
 
-inline CJoinTable& CJoin::operator[](int n) const
+inline CJoinTable& CJoin::operator[](size_t n) const
 {
 	ASSERT((n >= 0) && (n < Count()));
 
 	return *(TPtrArray<CJoinTable>::At(n));
 }
 
-inline void CJoin::Add(int nTable, int nLHSColumn, Type eType, int nRHSColumn)
+inline void CJoin::Add(size_t nTable, size_t nLHSColumn, Type eType, size_t nRHSColumn)
 {
 	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, nLHSColumn, eType, nRHSColumn));
 }
 
-inline CJoinTable::CJoinTable(int nTable, int nLHSColumn, int nType, int nRHSColumn)
+inline CJoinTable::CJoinTable(size_t nTable, size_t nLHSColumn, int nType, size_t nRHSColumn)
 	: m_nTable(nTable)
 	, m_nLHSColumn(nLHSColumn)
 	, m_nType(nType)

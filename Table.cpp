@@ -33,7 +33,7 @@
 *******************************************************************************
 */
 
-CTable::CTable(CMDB& oDB, const char* pszName, int nFlags)
+CTable::CTable(CMDB& oDB, const tchar* pszName, uint nFlags)
 	: m_oDB(oDB)
 	, m_strName(pszName)
 	, m_nFlags(nFlags)
@@ -79,7 +79,7 @@ CTable::~CTable()
 *******************************************************************************
 */
 
-int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlags)
+size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, uint nFlags)
 {
 	ASSERT(m_vRows.Count() == 0);
 	ASSERT(FindColumn(pszName) == -1);
@@ -102,11 +102,11 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 			break;
 
 		case MDCT_CHAR:
-			pColumn = new CColumn(*this, pszName, MDCT_CHAR,      1,       sizeof(char),       nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_CHAR,      1,       Core::NumBytes<tchar>(1),	nFlags);
 			break;
 
 		case MDCT_FXDSTR:
-			pColumn = new CColumn(*this, pszName, MDCT_FXDSTR,    nLength, nLength+1,          nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_FXDSTR,    nLength, Core::NumBytes<tchar>(nLength+1),	nFlags);
 			break;
 
 		case MDCT_VARSTR:
@@ -186,7 +186,7 @@ int CTable::AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlag
 *******************************************************************************
 */
 
-int CTable::AddColumn(const char* pszName, CTable& oTable, int nColumn, int nFlags)
+size_t CTable::AddColumn(const tchar* pszName, CTable& oTable, size_t nColumn, uint nFlags)
 {
 	ASSERT(m_vRows.Count() == 0);
 	ASSERT(FindColumn(pszName) == -1);
@@ -219,7 +219,7 @@ int CTable::AddColumn(const char* pszName, CTable& oTable, int nColumn, int nFla
 *******************************************************************************
 */
 
-void CTable::DropColumn(int nColumn)
+void CTable::DropColumn(size_t nColumn)
 {
 	ASSERT(m_vRows.Count() == 0);
 
@@ -263,7 +263,7 @@ void CTable::DropAllColumns()
 *******************************************************************************
 */
 
-void CTable::AddIndex(int nColumn)
+void CTable::AddIndex(size_t nColumn)
 {
 	ASSERT(m_vRows.Count() == 0);
 	ASSERT(m_vColumns[nColumn].Index() == NULL);
@@ -320,7 +320,7 @@ void CTable::AddIndex(int nColumn)
 *******************************************************************************
 */
 
-void CTable::DropIndex(int nColumn)
+void CTable::DropIndex(size_t nColumn)
 {
 	ASSERT(m_vColumns[nColumn].ColType() != MDCT_IDENTITY);
 
@@ -358,7 +358,7 @@ CRow& CTable::CreateRow()
 *******************************************************************************
 */
 
-int CTable::InsertRow(CRow& oRow, bool bNew)
+size_t CTable::InsertRow(CRow& oRow, bool bNew)
 {
 	ASSERT(&oRow.Table()   == this);
 	ASSERT(oRow.InTable() == false);
@@ -379,7 +379,7 @@ int CTable::InsertRow(CRow& oRow, bool bNew)
 #endif //_DEBUG
 
 	// Update any indexes.
-	for (int i=0; i < m_vColumns.Count(); i++)
+	for (size_t i=0; i < m_vColumns.Count(); ++i)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
@@ -391,7 +391,7 @@ int CTable::InsertRow(CRow& oRow, bool bNew)
 	if (bNew)
 	{
 		oRow.MarkInserted();
-		m_nInsertions++;
+		++m_nInsertions;
 	}
 	// Serialised row.
 	else
@@ -420,7 +420,7 @@ int CTable::InsertRow(CRow& oRow, bool bNew)
 *******************************************************************************
 */
 
-void CTable::DeleteRow(int nRow)
+void CTable::DeleteRow(size_t nRow)
 {
 	CRow& oRow = m_vRows[nRow];
 
@@ -428,7 +428,7 @@ void CTable::DeleteRow(int nRow)
 	OnBeforeDelete(oRow);
 
 	// Update any indexes.
-	for (int i=0; i < m_vColumns.Count(); i++)
+	for (size_t i=0; i < m_vColumns.Count(); ++i)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
@@ -438,7 +438,7 @@ void CTable::DeleteRow(int nRow)
 
 	// Remove it.
 	m_vRows.Remove(nRow);
-	m_nDeletions++;
+	++m_nDeletions;
 
 	// Call "trigger".
 	OnAfterDelete(oRow);
@@ -461,7 +461,7 @@ void CTable::DeleteRow(int nRow)
 
 void CTable::DeleteRow(CRow& oRow)
 {
-	for (int i=0; i < m_vRows.Count(); i++)
+	for (size_t i=0; i < m_vRows.Count(); ++i)
 	{
 		if (&m_vRows[i] == &oRow)
 		{
@@ -485,7 +485,7 @@ void CTable::DeleteRow(CRow& oRow)
 
 void CTable::DeleteRows(const CResultSet& oRS)
 {
-	for (int i =0; i < oRS.Count(); i++)
+	for (size_t i =0; i < oRS.Count(); ++i)
 		DeleteRow(oRS[i]);
 }
 
@@ -529,13 +529,13 @@ void CTable::CopyTable(const CTable& oTable)
 	ASSERT(ColumnCount() == oTable.ColumnCount());
 
 	// For all rows...
-	for (int r = 0; r < oTable.RowCount(); ++r)
+	for (size_t r = 0; r < oTable.RowCount(); ++r)
 	{
 		CRow& oSrcRow = oTable[r];
 		CRow& oDstRow = CreateRow();
 
 		// For all columns...
-		for (int c = 0; c < oTable.ColumnCount(); ++c)
+		for (size_t c = 0; c < oTable.ColumnCount(); ++c)
 			oDstRow[c] = oSrcRow[c];
 
 		InsertRow(oDstRow);
@@ -579,7 +579,7 @@ CRow& CTable::NullRow()
 void CTable::TruncateIndexes()
 {
 	// For all indexes.
-	for (int i=0; i < m_vColumns.Count(); i++)
+	for (size_t i=0; i < m_vColumns.Count(); ++i)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
@@ -618,7 +618,7 @@ CResultSet CTable::SelectAll() const
 *******************************************************************************
 */
 
-CRow* CTable::SelectRow(int nColumn, const CValue& oValue) const
+CRow* CTable::SelectRow(size_t nColumn, const CValue& oValue) const
 {
 	ASSERT(oValue.m_bNull == false);
 	ASSERT(m_vColumns[nColumn].Unique());
@@ -647,7 +647,7 @@ CResultSet CTable::Select(const CWhere& oWhere) const
 	CResultSet oRS(*this);
 
 	// For all rows, apply the clause,
-	for (int i = 0; i < m_vRows.Count(); i++)
+	for (size_t i = 0; i < m_vRows.Count(); ++i)
 	{
 		CRow& oRow = m_vRows[i];
 
@@ -673,7 +673,7 @@ CResultSet CTable::Select(const CWhere& oWhere) const
 bool CTable::Exists(const CWhere& oWhere) const
 {
 	// For all rows, apply the clause,
-	for (int i = 0; i < m_vRows.Count(); i++)
+	for (size_t i = 0; i < m_vRows.Count(); ++i)
 	{
 		CRow& oRow = m_vRows[i];
 
@@ -727,9 +727,9 @@ void CTable::Modified(bool bModified)
 	if (bModified)
 	{
 		// Set modified flags.
-		m_nInsertions++;
-		m_nUpdates++;
-		m_nDeletions++;
+		++m_nInsertions;
+		++m_nUpdates;
+		++m_nDeletions;
 	}
 	else
 	{
@@ -761,8 +761,8 @@ void CTable::Read(WCL::IInputStream& rStream)
 	if (Transient())
 		return;
 
-	int32 nColumns;
-	int32 nRows;
+	uint32 nColumns;
+	uint32 nRows;
 
 	// Verify the column count.
 	rStream >> nColumns;
@@ -773,7 +773,7 @@ void CTable::Read(WCL::IInputStream& rStream)
 	rStream >> nRows;
 
 	// Prepare any indexes.
-	for (int n = 0; n < m_vColumns.Count(); n++)
+	for (size_t n = 0; n < m_vColumns.Count(); ++n)
 	{
 		CIndex* pIndex = m_vColumns[n].Index();
 
@@ -782,7 +782,7 @@ void CTable::Read(WCL::IInputStream& rStream)
 	}
 
 	// Read the actual rows.
-	for (int i = 0; i < nRows; i++)
+	for (size_t i = 0; i < nRows; ++i)
 	{
 		CRow& oRow = CTable::CreateRow();
 
@@ -796,7 +796,7 @@ void CTable::Read(WCL::IInputStream& rStream)
 		m_vRows.Add(oRow);
 
 		// Update any indexes.
-		for (int n = 0; n < m_vColumns.Count(); n++)
+		for (size_t n = 0; n < m_vColumns.Count(); ++n)
 		{
 			CIndex* pIndex = m_vColumns[n].Index();
 
@@ -836,7 +836,7 @@ void CTable::Write(WCL::IOutputStream& rStream)
 	rStream << nRows;
 
 	// Write the actual rows.
-	for (int i = 0; i < nRows; i++)
+	for (int i = 0; i < nRows; ++i)
 		m_vRows[i].Write(rStream);
 
 	// Write the identity value.
@@ -865,13 +865,13 @@ CString CTable::SQLColumnList() const
 	CString strColumns;
 
 	// Get column list.
-	for (int i = 0; i < m_vColumns.Count(); i++)
+	for (size_t i = 0; i < m_vColumns.Count(); ++i)
 	{
 		// Ignore TRANSIENT columns.
 		if (!m_vColumns[i].Transient())
 		{
 			if (!strColumns.Empty())
-				strColumns += ',';
+				strColumns += TXT(',');
 
 			strColumns += m_vColumns[i].Name();
 		}
@@ -901,19 +901,19 @@ CString CTable::SQLQuery() const
 	CString strTable = (m_strSQLTable.Empty()) ? m_strName : m_strSQLTable;
 
 	// Build basic SELECT query.
-	CString strQuery = "SELECT " + SQLColumnList() + " FROM " + strTable;
+	CString strQuery = TXT("SELECT ") + SQLColumnList() + TXT(" FROM ") + strTable;
 
 	// Append WHERE, if set.
 	if (m_strSQLWhere.Empty() == false)
-		strQuery += " WHERE " + m_strSQLWhere;
+		strQuery += TXT(" WHERE ") + m_strSQLWhere;
 
 	// Append GROUP BY, if set.
 	if (m_strSQLGroup.Empty() == false)
-		strQuery += " GROUP BY " + m_strSQLGroup;
+		strQuery += TXT(" GROUP BY ") + m_strSQLGroup;
 
 	// Append ORDER BY, if set.
 	if (m_strSQLOrder.Empty() == false)
-		strQuery += " ORDER BY " + m_strSQLOrder;
+		strQuery += TXT(" ORDER BY ") + m_strSQLOrder;
 
 	return strQuery;
 }
@@ -951,7 +951,7 @@ void CTable::Read(CSQLSource& rSource)
 		pCursor = rSource.ExecQuery(SQLQuery());
 
 		// Set the output column types.
-		for (int iTabCol = 0, iSQLCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+		for (size_t iTabCol = 0, iSQLCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 		{
 			CColumn& oTabColumn = m_vColumns[iTabCol];
 
@@ -967,7 +967,7 @@ void CTable::Read(CSQLSource& rSource)
 				oSQLColumn.m_eMDBColType = oTabColumn.ColType();
 				oSQLColumn.m_nSize       = oTabColumn.Length();
 
-				iSQLCol++;
+				++iSQLCol;
 			}
 		}
 
@@ -1034,7 +1034,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 
 	// Perform a quick check to see if
 	// there is actually anything to write.
-	for (int i = 0; (i < RowCount()) && (!bAnyDirty); i++)
+	for (size_t i = 0; (i < RowCount()) && (!bAnyDirty); ++i)
 	{
 		CRow& oRow = m_vRows[i];
 
@@ -1052,7 +1052,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 	int		nParams = 0;
 
 	// Create column and parameter list.
-	for (int i = 0; i < m_vColumns.Count(); i++)
+	for (size_t i = 0; i < m_vColumns.Count(); ++i)
 	{
 		// Ignore TRANSIENT columns.
 		if (m_vColumns[i].Transient())
@@ -1061,18 +1061,18 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 		// Not first column?
 		if (!strColumns.Empty())
 		{
-			strColumns += ", ";
-			strParams  += ", ";
+			strColumns += TXT(", ");
+			strParams  += TXT(", ");
 		}
 
 		strColumns += m_vColumns[i].Name();
-		strParams  += '?';
+		strParams  += TXT('?');
 
-		nParams++;
+		++nParams;
 	}
 
 	// Create the full statement.
-	strQuery.Format("INSERT INTO %s (%s) VALUES (%s)", Name(), strColumns, strParams);
+	strQuery.Format(TXT("INSERT INTO %s (%s) VALUES (%s)"), Name(), strColumns, strParams);
 
 	ASSERT(nParams > 0);
 
@@ -1084,7 +1084,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 		pParams = rSource.CreateParams(strQuery, nParams);
 
 		// Create parameter definitions.
-		for (int iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+		for (size_t iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 		{
 			const CColumn& oColumn = m_vColumns[iTabCol];
 
@@ -1099,11 +1099,11 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 			oParam.m_eMDBColType = oColumn.ColType();
 			oParam.m_nMDBColSize = oColumn.Length();
 
-			iSQLParam++;
+			++iSQLParam;
 		}
 
 		// For all rows.
-		for (int i = 0; i < RowCount(); i++)
+		for (size_t i = 0; i < RowCount(); ++i)
 		{
 			CRow& oRow = m_vRows[i];
 
@@ -1134,7 +1134,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 
 	// Perform a quick check to see if
 	// there is actually anything to write.
-	for (int i = 0; (i < RowCount()) && (!bAnyDirty); i++)
+	for (size_t i = 0; (i < RowCount()) && (!bAnyDirty); ++i)
 	{
 		CRow& oRow = m_vRows[i];
 
@@ -1147,7 +1147,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 		return;
 
 	// For all rows.
-	for (int r = 0; r < RowCount(); r++)
+	for (size_t r = 0; r < RowCount(); ++r)
 	{
 		CRow& oRow = m_vRows[r];
 
@@ -1161,7 +1161,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 		int		nParams = 0;
 
 		// Create column and where clause list.
-		for (int i = 0; i < m_vColumns.Count(); i++)
+		for (size_t i = 0; i < m_vColumns.Count(); ++i)
 		{
 			const CColumn& oColumn = m_vColumns[i];
 
@@ -1173,12 +1173,12 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 			if (oRow[i].Modified())
 			{
 				if (!strModColumns.Empty())
-					strModColumns += ", ";
+					strModColumns += TXT(", ");
 
 				strModColumns += m_vColumns[i].Name();
-				strModColumns += " = ?";
+				strModColumns += TXT(" = ?");
 
-				nParams++;
+				++nParams;
 			}
 
 			// Part of primary key?
@@ -1187,17 +1187,17 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 				ASSERT(oRow[i].Modified() == false);
 
 				if (!strPKColumns.Empty())
-					strPKColumns += " AND ";
+					strPKColumns += TXT(" AND ");
 
 				strPKColumns += m_vColumns[i].Name();
-				strPKColumns += " = ?";
+				strPKColumns += TXT(" = ?");
 
-				nParams++;
+				++nParams;
 			}
 		}
 
 		// Create the full statement.
-		strQuery.Format("UPDATE %s SET %s WHERE %s", Name(), strModColumns, strPKColumns);
+		strQuery.Format(TXT("UPDATE %s SET %s WHERE %s"), Name(), strModColumns, strPKColumns);
 
 		ASSERT(nParams > 0);
 
@@ -1211,7 +1211,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 			int iSQLParam = 0;
 
 			// Create modified column parameter definitions.
-			for (int iTabCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+			for (size_t iTabCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 			{
 				const CColumn& oColumn = m_vColumns[iTabCol];
 
@@ -1228,12 +1228,12 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 					oParam.m_eMDBColType = oColumn.ColType();
 					oParam.m_nMDBColSize = oColumn.Length();
 
-					iSQLParam++;
+					++iSQLParam;
 				}
 			}
 
 			// Create primary key column parameter definitions.
-			for (int iTabCol = 0; iTabCol < m_vColumns.Count(); iTabCol++)
+			for (size_t iTabCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 			{
 				const CColumn& oColumn = m_vColumns[iTabCol];
 
@@ -1250,7 +1250,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 					oParam.m_eMDBColType = oColumn.ColType();
 					oParam.m_nMDBColSize = oColumn.Length();
 
-					iSQLParam++;
+					++iSQLParam;
 				}
 			}
 
@@ -1291,7 +1291,7 @@ void CTable::WriteDeletions(CSQLSource& /*rSource*/)
 void CTable::ResetRowFlags()
 {
 	// Update all rows.
-	for (int i = 0; i < RowCount(); i++)
+	for (size_t i = 0; i < RowCount(); ++i)
 		m_vRows[i].ResetStatus();
 
 	// Update table counters.
@@ -1345,7 +1345,7 @@ void CTable::CheckIndexes() const
 {
 #ifdef _DEBUG
 	// For all indexes.
-	for (int i=0; i < m_vColumns.Count(); i++)
+	for (size_t i=0; i < m_vColumns.Count(); ++i)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
@@ -1376,7 +1376,7 @@ void CTable::CheckIndexes() const
 void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 {
 #ifdef _DEBUG
-	for (int k = 0; k < m_vColumns.Count(); k++)
+	for (size_t k = 0; k < m_vColumns.Count(); ++k)
 	{
 		bool bCanBeNull = m_vColumns[k].Nullable();
 		bool bIsNull    = (oRow[k] == null);
@@ -1414,7 +1414,7 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 *******************************************************************************
 */
 
-void CTable::CheckColumn(CRow& /*oRow*/, int /*nColumn*/, const CValue& /*oValue*/, bool /*bUpdate*/) const
+void CTable::CheckColumn(CRow& /*oRow*/, size_t /*nColumn*/, const CValue& /*oValue*/, bool /*bUpdate*/) const
 {
 }
 
@@ -1437,7 +1437,7 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 	int			nRowWidth = 0;
 
 	// Get the column widths and name list.
-	for (int i = 0; i < m_vColumns.Count(); i++)
+	for (size_t i = 0; i < m_vColumns.Count(); ++i)
 	{
 		CColumn& oColumn = m_vColumns[i];
 
@@ -1459,12 +1459,13 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 		// Value longer than name?
 		else if (nWidth > nNameLen)
 		{
-			int nPadChars = (nWidth - nNameLen);
+			size_t nPadChars = (nWidth - nNameLen);
+			size_t nBytes    = Core::NumBytes<tchar>(nPadChars+1);
 
 			// Create padding with spaces.
-			char* pszPad = (char*) _alloca(nPadChars+1);
-			memset(pszPad, ' ', nPadChars);
-			pszPad[nPadChars] = '\0';
+			tchar* pszPad = static_cast<tchar*>(_alloca(nBytes));
+			std::fill(pszPad, pszPad+nPadChars, TXT(' '));
+			pszPad[nPadChars] = TXT('\0');
 
 			// Pad out name.
 			strName += pszPad;
@@ -1483,13 +1484,13 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 	rStream.Write("\r\n", 2);
 
 	// Create the heading underline.
-	char* psUnderline = (char*) _alloca(nRowWidth);
-	memset(psUnderline, '=', nRowWidth);
+	tchar* psUnderline = static_cast<tchar*>(_alloca(nRowWidth));
+	std::fill(psUnderline, psUnderline+nRowWidth, TXT('='));
 
-	for (int j = 0, pos = 0; j < aiColWidths.Size(); j++)
+	for (size_t j = 0, pos = 0; j < aiColWidths.Size(); ++j)
 	{
 		pos += aiColWidths[j];
-		psUnderline[pos++] = ' ';
+		psUnderline[pos++] = TXT(' ');
 	}
 
 	// Write heading underline.
@@ -1497,16 +1498,16 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 	rStream.Write("\r\n", 2);
 
 	// Reuse underline for padding.
-	char* psPad = psUnderline;
-	memset(psPad, ' ', nRowWidth);
+	tchar* psPad = psUnderline;
+	std::fill(psPad, psPad+nRowWidth, TXT(' '));
 
 	// For all rows.
-	for (int r = 0; r < RowCount(); r++)
+	for (size_t r = 0; r < RowCount(); ++r)
 	{
 		CRow& oRow = m_vRows[r];
 
 		// For all columns in the row.
-		for (int c = 0; c < m_vColumns.Count(); c++)
+		for (size_t c = 0; c < m_vColumns.Count(); c++)
 		{
 			CString strValue  = oRow[c].DbgFormat();
 			int     nValueLen = strValue.Length();

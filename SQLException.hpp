@@ -28,7 +28,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CSQLException(int eErrCode, const char* pszSQLStmt, const CString& strSQLErr);
+	CSQLException(int eErrCode, const tchar* pszSQLStmt, const CString& strSQLErr);
 	virtual ~CSQLException();
 	
 	//

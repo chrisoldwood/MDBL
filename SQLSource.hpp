@@ -36,7 +36,7 @@ public:
 	//
 	// Connection methods.
 	//
-	virtual void Open(const char* pszConnection) = 0;
+	virtual void Open(const tchar* pszConnection) = 0;
 	virtual void Close() = 0;
 
 	virtual bool IsOpen() const = 0;
@@ -44,10 +44,10 @@ public:
 	//
 	// Statement methods.
 	//
-	virtual CSQLParams* CreateParams(const char* pszStmt, int nParams) = 0;
-	virtual void        ExecStmt(const char* pszStmt) = 0;
-	virtual void        ExecStmt(const char* pszStmt, CSQLParams& oParams) = 0;
-	virtual CSQLCursor* ExecQuery(const char* pszQuery) = 0;
+	virtual CSQLParams* CreateParams(const tchar* pszStmt, size_t nParams) = 0;
+	virtual void        ExecStmt(const tchar* pszStmt) = 0;
+	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams) = 0;
+	virtual CSQLCursor* ExecQuery(const tchar* pszQuery) = 0;
 
 	//
 	// Transaction methods.

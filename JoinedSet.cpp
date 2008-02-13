@@ -22,14 +22,14 @@
 *******************************************************************************
 */
 
-CJoinedSet::CJoinedSet(int nTables, CTable* apTables[])
+CJoinedSet::CJoinedSet(size_t nTables, CTable* apTables[])
 	: m_nTables(nTables)
 	, m_pResSets(new CResultSet[nTables])
 {
 	ASSERT(m_nTables > 0);
 
 	// Setup table pointers in the result sets.
-	for (int i = 0; i < m_nTables; i++)
+	for (size_t i = 0; i < m_nTables; ++i)
 		m_pResSets[i].m_pTable = apTables[i];
 }
 

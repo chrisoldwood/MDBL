@@ -31,7 +31,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CTable(CMDB& oDB, const char* pszName, int nFlags = DEFAULTS);
+	CTable(CMDB& oDB, const tchar* pszName, uint nFlags = DEFAULTS);
 	virtual ~CTable();
 
 	//
@@ -46,30 +46,30 @@ public:
 	//
 	// Column methods.
 	//
-	virtual int  ColumnCount() const;
-	virtual const CColumn& Column(int n) const;
-	virtual int AddColumn(const char* pszName, COLTYPE eType, int nLength, int nFlags = CColumn::DEFAULTS);
-	virtual int AddColumn(const char* pszName, CTable& oTable, int nColumn, int nFlags = CColumn::FOREIGNKEY);
-	virtual void DropColumn(int nColumn);
+	virtual size_t ColumnCount() const;
+	virtual const CColumn& Column(size_t n) const;
+	virtual size_t AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, uint nFlags = CColumn::DEFAULTS);
+	virtual size_t AddColumn(const tchar* pszName, CTable& oTable, size_t nColumn, uint nFlags = CColumn::FOREIGNKEY);
+	virtual void DropColumn(size_t nColumn);
 	virtual void DropAllColumns();
-	virtual int FindColumn(const char* pszName);
+	virtual int FindColumn(const tchar* pszName);
 
 	//
 	// Index methods.
 	//
-	virtual void AddIndex(int nColumn);
-	virtual void DropIndex(int nColumn);
+	virtual void AddIndex(size_t nColumn);
+	virtual void DropIndex(size_t nColumn);
 
 	//
 	// Row methods.
 	//
-	virtual int   RowCount() const;
-	virtual CRow& Row(int n) const;
-	virtual CRow& operator[](int n) const;
+	virtual size_t RowCount() const;
+	virtual CRow& Row(size_t n) const;
+	virtual CRow& operator[](size_t n) const;
 
 	virtual CRow& CreateRow();
-	virtual int   InsertRow(CRow& oRow, bool bNew = true);
-	virtual void  DeleteRow(int nRow);
+	virtual size_t InsertRow(CRow& oRow, bool bNew = true);
+	virtual void  DeleteRow(size_t nRow);
 	virtual void  DeleteRow(CRow& oRow);
 	virtual void  DeleteRows(const CResultSet& oRS);
 	virtual void  Truncate();
@@ -82,7 +82,7 @@ public:
 	// Query methods.
 	//
 	virtual CResultSet SelectAll() const;
-	virtual CRow*      SelectRow(int nColumn, const CValue& oValue) const;
+	virtual CRow*      SelectRow(size_t nColumn, const CValue& oValue) const;
 	virtual CResultSet Select(const CWhere& oQuery) const;
 	virtual bool       Exists(const CWhere& oQuery) const;
 
@@ -137,12 +137,12 @@ protected:
 	//
 	CMDB&		m_oDB;			// The parent database.
 	CString		m_strName;		// The name.
-	int			m_nFlags;		// Flags..
+	uint		m_nFlags;		// Flags..
 	CColumnSet	m_vColumns;		// The set of columns.
 	CRowSet		m_vRows;		// The set of rows.
-	int			m_nInsertions;	// Rows inserted.
-	int			m_nUpdates;		// Fields updated.
-	int			m_nDeletions;	// Rows removed.
+	size_t		m_nInsertions;	// Rows inserted.
+	size_t		m_nUpdates;		// Fields updated.
+	size_t		m_nDeletions;	// Rows removed.
 	int			m_nIdentCol;	// Identity column, if one.
 	int			m_nIdentVal;	// Next identity value.
 	CRow*		m_pNullRow;		// The null row, if created.
@@ -180,7 +180,7 @@ protected:
 	//
 	virtual void CheckIndexes() const;
 	virtual void CheckRow(CRow& oRow, bool bUpdate) const;
-	virtual void CheckColumn(CRow& oRow, int nColumn, const CValue& oValue, bool bUpdate) const;
+	virtual void CheckColumn(CRow& oRow, size_t nColumn, const CValue& oValue, bool bUpdate) const;
 };
 
 /******************************************************************************
@@ -210,32 +210,32 @@ inline CMDB& CTable::DB() const
 	return m_oDB;
 }
 
-inline int CTable::ColumnCount() const
+inline size_t CTable::ColumnCount() const
 {
 	return m_vColumns.Count();
 }
 
-inline const CColumn& CTable::Column(int n) const
+inline const CColumn& CTable::Column(size_t n) const
 {
 	return m_vColumns.Column(n);
 }
 
-inline int CTable::FindColumn(const char* pszName)
+inline int CTable::FindColumn(const tchar* pszName)
 {
 	return m_vColumns.Find(pszName);
 }
 
-inline int CTable::RowCount() const
+inline size_t CTable::RowCount() const
 {
 	return m_vRows.Count();
 }
 
-inline CRow& CTable::Row(int n) const
+inline CRow& CTable::Row(size_t n) const
 {
 	return m_vRows.Row(n);
 }
 
-inline CRow& CTable::operator[](int n) const
+inline CRow& CTable::operator[](size_t n) const
 {
 	return m_vRows.Row(n);
 }

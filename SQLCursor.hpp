@@ -27,13 +27,13 @@
 
 struct SQLColumn
 {
-	int		m_nDstColumn;		// The destination column.
+	size_t	m_nDstColumn;		// The destination column.
 	CString	m_strName;			// The name.
 	int		m_nSQLColType;		// The native SQL column type.
 	COLTYPE	m_eMDBColType;		// The nearest MDB column type.
 	int		m_nSQLFetchType;	// The SQL type used to fetch the data.
-	int		m_nSize;			// The length.
-	int		m_nFlags;			// MDB column Flags.
+	size_t	m_nSize;			// The length.
+	uint	m_nFlags;			// MDB column Flags.
 };
 
 /******************************************************************************
@@ -55,8 +55,8 @@ public:
 	//
 	// Accessors.
 	//
-	virtual int NumColumns() const = 0;
-	virtual SQLColumn& Column(int n) const = 0;
+	virtual size_t NumColumns() const = 0;
+	virtual SQLColumn& Column(size_t n) const = 0;
 
 	virtual bool Fetch() = 0;
 	virtual void GetRow(CRow& oRow) = 0;

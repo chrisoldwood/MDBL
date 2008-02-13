@@ -23,7 +23,7 @@
 *******************************************************************************
 */
 
-CColumn::CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength, int nAllocSize, int nFlags)
+CColumn::CColumn(CTable& oTable, const tchar* pszName, COLTYPE eType, size_t nLength, size_t nAllocSize, uint nFlags)
 	: m_oTable(oTable)
 	, m_strName(pszName)
 	, m_eColType(eType)
@@ -32,7 +32,7 @@ CColumn::CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength
 	, m_nAllocSize((nAllocSize + 3) & ~3)
 	, m_nFlags(nFlags)
 	, m_pFKTable(NULL)
-	, m_nFKColumn(-1)
+	, m_nFKColumn(0)
 	, m_pIndex(NULL)
 {
 	ASSERT(pszName      != NULL);
@@ -55,7 +55,7 @@ CColumn::CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength
 *******************************************************************************
 */
 
-CColumn::CColumn(CTable& oTable, const char* pszName, CTable& oFKTable, int nFKColumn, const CColumn& oFKColumn, int nFlags)
+CColumn::CColumn(CTable& oTable, const tchar* pszName, CTable& oFKTable, size_t nFKColumn, const CColumn& oFKColumn, uint nFlags)
 	: m_oTable(oTable)
 	, m_strName(pszName)
 	, m_eColType(oFKColumn.ColType())
@@ -163,7 +163,7 @@ void CColumn::Index(CIndex* pIndex)
 *******************************************************************************
 */
 
-int CColumn::DisplayWidth(bool bDebug) const
+size_t CColumn::DisplayWidth(bool bDebug) const
 {
 	// Normal format?
 	if (!bDebug)
@@ -189,7 +189,7 @@ int CColumn::DisplayWidth(bool bDebug) const
 	// Debug format?
 	else
 	{
-		int nMin = (Nullable()) ? 5 : 0;
+		size_t nMin = (Nullable()) ? 5 : 0;
 
 		switch (m_eStgType)
 		{
@@ -206,5 +206,5 @@ int CColumn::DisplayWidth(bool bDebug) const
 
 	ASSERT_FALSE();
 
-	return -1;
+	return 0;
 }

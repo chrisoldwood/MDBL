@@ -23,7 +23,7 @@
 *******************************************************************************
 */
 
-CWhereCmp::CWhereCmp(int nColumn, Op eOp, const CValue& oValue)
+CWhereCmp::CWhereCmp(size_t nColumn, Op eOp, const CValue& oValue)
 	: m_nColumn(nColumn)
 	, m_eOp(eOp)
 	, m_oValue(oValue)

@@ -32,7 +32,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CWhereIn(int nColumn, const CValueSet& oValueSet);
+	CWhereIn(size_t nColumn, const CValueSet& oValueSet);
 	CWhereIn(const CWhereIn& oSrc);
 	virtual ~CWhereIn();
 	
@@ -47,7 +47,7 @@ private:
 	//
 	// Members.
 	//
-	int			m_nColumn;		// The column to check.
+	size_t		m_nColumn;		// The column to check.
 	CValueSet	m_oValueSet;	// The values to match.
 };
 

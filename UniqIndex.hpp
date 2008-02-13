@@ -36,7 +36,7 @@ protected:
 	//
 	// Constructors/Destructor.
 	//
-	CUniqIndex(CTable& oTable, int nColumn);
+	CUniqIndex(CTable& oTable, size_t nColumn);
 	virtual ~CUniqIndex();
 };
 
@@ -47,7 +47,7 @@ protected:
 *******************************************************************************
 */
 
-inline CUniqIndex::CUniqIndex(CTable& oTable, int nColumn)
+inline CUniqIndex::CUniqIndex(CTable& oTable, size_t nColumn)
 	: CIndex(oTable, nColumn)
 {
 }

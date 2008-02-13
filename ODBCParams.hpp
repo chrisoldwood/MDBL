@@ -35,14 +35,14 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CODBCParams(CODBCSource& oSource, const char* pszStmt, SQLHSTMT hStmt, int nParams);
+	CODBCParams(CODBCSource& oSource, const tchar* pszStmt, SQLHSTMT hStmt, size_t nParams);
 	virtual ~CODBCParams();
 
 	//
 	// Accessors.
 	//
-	virtual int NumParams() const;
-	virtual SQLParam& Param(int n) const;
+	virtual size_t NumParams() const;
+	virtual SQLParam& Param(size_t n) const;
 
 	virtual void SetRow(CRow& oRow);
 
@@ -55,10 +55,10 @@ protected:
 	CODBCSource&	m_oSource;		// The data source.
 	CString			m_strStmt;		// The statment to be executed.
 	SQLHSTMT		m_hStmt;		// The statement handle.
-	SQLSMALLINT		m_nParams;		// Number of parameters.
+	size_t			m_nParams;		// Number of parameters.
 	SQLParam*		m_pParams;		// The array of parameter definitions.
-	int				m_nRowLen;		// Size of a row.
-	int*			m_pOffsets;		// The array of value offsets.
+	size_t			m_nRowLen;		// Size of a row.
+	size_t*			m_pOffsets;		// The array of value offsets.
 	byte*			m_pRowData;		// The row data.
 	bool			m_bDoneBind;	// Bind input buffers flag.
 

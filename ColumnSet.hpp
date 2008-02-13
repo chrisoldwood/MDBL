@@ -37,16 +37,16 @@ public:
 	//
 	// Methods.
 	//
-	int      Count() const;
-	CColumn& Column(int n) const;
-	CColumn& operator[](int n) const;
+	size_t   Count() const;
+	CColumn& Column(size_t n) const;
+	CColumn& operator[](size_t n) const;
 
-	int  Add(CColumn& oColumn);
-	void Delete(int n);
+	size_t Add(CColumn& oColumn);
+	void Delete(size_t n);
 	void DeleteAll();
-	int  Find(const char* pszName);
+	int  Find(const tchar* pszName);
 
-	int AllocSize() const;
+	size_t AllocSize() const;
 
 protected:
 	//
@@ -68,22 +68,22 @@ private:
 *******************************************************************************
 */
 
-inline int CColumnSet::Count() const
+inline size_t CColumnSet::Count() const
 {
 	return TPtrArray<CColumn>::Size();
 }
 
-inline CColumn& CColumnSet::Column(int n) const
+inline CColumn& CColumnSet::Column(size_t n) const
 {
 	return *(TPtrArray<CColumn>::At(n));
 }
 
-inline CColumn& CColumnSet::operator[](int n) const
+inline CColumn& CColumnSet::operator[](size_t n) const
 {
 	return *(TPtrArray<CColumn>::At(n));
 }
 
-inline int CColumnSet::Add(CColumn& oColumn)
+inline size_t CColumnSet::Add(CColumn& oColumn)
 {
 	return TPtrArray<CColumn>::Add(&oColumn);
 }

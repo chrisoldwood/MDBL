@@ -27,8 +27,8 @@
 *******************************************************************************
 */
 
-// Minimum length for connection string.
-const int MIN_CONN_STR_LEN = 1024;
+// Maximum length for connection string.
+const int MAX_CONN_STR_LEN = 1024;
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -80,13 +80,13 @@ CODBCSource::~CODBCSource()
 *******************************************************************************
 */
 
-void CODBCSource::Open(const char* pszConnection)
+void CODBCSource::Open(const tchar* pszConnection)
 {
 	ASSERT(IsOpen()  == false);
 	ASSERT(InTrans() == false);
 
 	SQLRETURN	rc;
-	SQLCHAR		szConnection[MIN_CONN_STR_LEN];
+	SQLTCHAR	szConnection[MAX_CONN_STR_LEN+1] = { 0 };
 	SQLSMALLINT	nLength = 0;
 
 	// Allocate the environment handle.
@@ -107,9 +107,11 @@ void CODBCSource::Open(const char* pszConnection)
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, m_hEnv, SQL_HANDLE_ENV);
 
+	SQLTCHAR* pszPartialConnStr = reinterpret_cast<SQLTCHAR*>(const_cast<tchar*>(pszConnection));
+
 	// Connect to the database.
-	rc = ::SQLDriverConnect(m_hDBC, NULL, (SQLCHAR*)pszConnection, SQL_NTS,
-							(SQLCHAR*)&szConnection, sizeof(szConnection), &nLength,
+	rc = ::SQLDriverConnect(m_hDBC, NULL, pszPartialConnStr, SQL_NTS,
+							szConnection, MAX_CONN_STR_LEN, &nLength,
 							SQL_DRIVER_NOPROMPT);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
@@ -185,7 +187,7 @@ bool CODBCSource::IsOpen() const
 *******************************************************************************
 */
 
-void CODBCSource::ExecStmt(const char* pszStmt)
+void CODBCSource::ExecStmt(const tchar* pszStmt)
 {
 	ASSERT(IsOpen() == true);
 
@@ -202,8 +204,10 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 
 		ASSERT(hStmt != SQL_NULL_HSTMT);
 
+		SQLTCHAR* ptszStmt = reinterpret_cast<SQLTCHAR*>(const_cast<tchar*>(pszStmt));
+
 		// Execute the query.
-		rc = ::SQLExecDirect(hStmt, (SQLCHAR*)pszStmt, SQL_NTS);
+		rc = ::SQLExecDirect(hStmt, ptszStmt, SQL_NTS);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_EXEC_FAILED, pszStmt, hStmt, SQL_HANDLE_STMT);
@@ -234,7 +238,7 @@ void CODBCSource::ExecStmt(const char* pszStmt)
 *******************************************************************************
 */
 
-void CODBCSource::ExecStmt(const char* pszStmt, CSQLParams& oParams)
+void CODBCSource::ExecStmt(const tchar* pszStmt, CSQLParams& oParams)
 {
 	ASSERT(IsOpen() == true);
 
@@ -246,8 +250,10 @@ void CODBCSource::ExecStmt(const char* pszStmt, CSQLParams& oParams)
 
 	ASSERT(hStmt != SQL_NULL_HSTMT);
 
+	SQLTCHAR* ptszStmt = reinterpret_cast<SQLTCHAR*>(const_cast<tchar*>(pszStmt));
+
 	// Execute the query.
-	rc = ::SQLExecDirect(hStmt, (SQLCHAR*)pszStmt, SQL_NTS);
+	rc = ::SQLExecDirect(hStmt, ptszStmt, SQL_NTS);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_EXEC_FAILED, pszStmt, hStmt, SQL_HANDLE_STMT);
@@ -268,7 +274,7 @@ void CODBCSource::ExecStmt(const char* pszStmt, CSQLParams& oParams)
 *******************************************************************************
 */
 
-CSQLCursor* CODBCSource::ExecQuery(const char* pszQuery)
+CSQLCursor* CODBCSource::ExecQuery(const tchar* pszQuery)
 {
 	ASSERT(IsOpen() == true);
 
@@ -306,7 +312,7 @@ CSQLCursor* CODBCSource::ExecQuery(const char* pszQuery)
 *******************************************************************************
 */
 
-void CODBCSource::ExecQuery(const char* pszQuery, CODBCCursor& oCursor)
+void CODBCSource::ExecQuery(const tchar* pszQuery, CODBCCursor& oCursor)
 {
 	ASSERT(IsOpen() == true);
 
@@ -321,8 +327,10 @@ void CODBCSource::ExecQuery(const char* pszQuery, CODBCCursor& oCursor)
 
 	ASSERT(hStmt != SQL_NULL_HSTMT);
 
+	SQLTCHAR* ptszQuery = reinterpret_cast<SQLTCHAR*>(const_cast<tchar*>(pszQuery));
+
 	// Execute the query.
-	rc = ::SQLExecDirect(hStmt, (SQLCHAR*)pszQuery, SQL_NTS);
+	rc = ::SQLExecDirect(hStmt, ptszQuery, SQL_NTS);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_EXEC_FAILED, pszQuery, hStmt, SQL_HANDLE_STMT);
@@ -444,17 +452,17 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 *******************************************************************************
 */
 
-int CODBCSource::BufferSize(COLTYPE eColType, int nColSize)
+size_t CODBCSource::BufferSize(COLTYPE eColType, size_t nColSize)
 {
-	int nSize = 0;
+	size_t nSize = 0;
 
 	switch (eColType)
 	{
 		case MDCT_INT:			nSize = sizeof(int);			break;
 		case MDCT_DOUBLE:		nSize = sizeof(double);			break;
-		case MDCT_CHAR:			nSize = sizeof(char) + 1;		break;
-		case MDCT_FXDSTR:		nSize = nColSize + 1;			break;
-		case MDCT_VARSTR:		nSize = nColSize + 1;			break;
+		case MDCT_CHAR:			nSize = Core::NumBytes<char>(1+1);			break;	// ANSI only.
+		case MDCT_FXDSTR:		nSize = Core::NumBytes<char>(nColSize+1);	break;	// ANSI only.
+		case MDCT_VARSTR:		nSize = Core::NumBytes<char>(nColSize+1);	break;	// ANSI only.
 		case MDCT_BOOL:			nSize = sizeof(bool);			break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
@@ -484,7 +492,7 @@ int CODBCSource::BufferSize(COLTYPE eColType, int nColSize)
 *******************************************************************************
 */
 
-int CODBCSource::ColumnSize(COLTYPE eColType, int nColSize)
+size_t CODBCSource::ColumnSize(COLTYPE eColType, size_t nColSize)
 {
 	switch (eColType)
 	{
@@ -521,7 +529,7 @@ int CODBCSource::ColumnSize(COLTYPE eColType, int nColSize)
 *******************************************************************************
 */
 
-CSQLParams* CODBCSource::CreateParams(const char* pszStmt, int nParams)
+CSQLParams* CODBCSource::CreateParams(const tchar* pszStmt, size_t nParams)
 {
 	SQLHSTMT hStmt = SQL_NULL_HSTMT;
 
@@ -577,7 +585,7 @@ void CODBCSource::BeginTrans()
 	SQLRETURN rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_TRANS_FAILED, "Begin Transaction", m_hDBC, SQL_HANDLE_DBC);
+		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("Begin Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	m_bInTrans = true;
 }
@@ -606,13 +614,13 @@ void CODBCSource::CommitTrans()
 	rc = ::SQLEndTran(SQL_HANDLE_DBC, m_hDBC, SQL_COMMIT);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_TRANS_FAILED, "Commit Transaction", m_hDBC, SQL_HANDLE_DBC);
+		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("Commit Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	// End the transaction.
 	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_TRANS_FAILED, "End Transaction", m_hDBC, SQL_HANDLE_DBC);
+		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("End Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	m_bInTrans = false;
 }
@@ -641,13 +649,13 @@ void CODBCSource::RollbackTrans()
 	rc = ::SQLEndTran(SQL_HANDLE_DBC, m_hDBC, SQL_ROLLBACK);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_TRANS_FAILED, "Rollback Transaction", m_hDBC, SQL_HANDLE_DBC);
+		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("Rollback Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	// End the transaction.
 	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_TRANS_FAILED, "End Transaction", m_hDBC, SQL_HANDLE_DBC);
+		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("End Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	m_bInTrans = false;
 }
@@ -668,37 +676,39 @@ void CODBCSource::RollbackTrans()
 
 void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
 {
-	WORD  wBufSize  = 1024;
-	WORD  wRetSize  = 0;
-	char* pszBuffer = NULL;
+	size_t nChars    = 1024;
+	WORD   wRetSize  = 0;
+	tchar* pszBuffer = NULL;
 
 	// Until buffer big enough.
 	for(;;)
 	{
-		pszBuffer = (char*) alloca(wBufSize);
+		size_t nBytes = Core::NumBytes<tchar>(nChars);
+
+		pszBuffer = static_cast<tchar*>(alloca(nBytes));
 
 		// Try query.
-		if (!::SQLGetInstalledDrivers(pszBuffer, wBufSize, &wRetSize))
-			throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLGetInstalledDrivers", NULL, 0);
+		if (!::SQLGetInstalledDrivers(pszBuffer, static_cast<WORD>(nBytes), &wRetSize))
+			throw CODBCException(CODBCException::E_ENUMINFO_FAILED, TXT("SQLGetInstalledDrivers"), NULL, 0);
 
 		// Buffer big enough?
-		if (wRetSize < wBufSize)
+		if (wRetSize < nChars)
 			break;
 
 		// Double buffer size, and try again.
-		wBufSize *= 2;
+		nChars *= 2;
 	}
 
 	ASSERT(pszBuffer != NULL);
 
-	char* pszName = pszBuffer;
+	tchar* pszName = pszBuffer;
 
 	// Extract drivers.
-	while (*pszName != '\0')
+	while (*pszName != TXT('\0'))
 	{
 		astrDrivers.Add(pszName);
 
-		while (*pszName++ != '\0');
+		while (*pszName++ != TXT('\0'));
 	}
 }
 
@@ -718,11 +728,15 @@ void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
 
 void CODBCSource::InstalledSources(CStrArray& astrSources)
 {
+	const size_t MAX_DSN_LEN  = 256;
+	const size_t MAX_DESC_LEN = 256;
+
 	SQLHENV		hEnv = SQL_NULL_HENV;
 	SQLRETURN	rc;
-	SQLCHAR		szDSN[256], szDesc[256];
-	SQLSMALLINT	nDSNSize  = sizeof(szDSN);
-	SQLSMALLINT	nDescSize = sizeof(szDesc);
+	SQLTCHAR	szDSN[MAX_DSN_LEN+1] = { 0 };
+	SQLTCHAR	szDesc[MAX_DESC_LEN+1] = { 0 };
+	SQLSMALLINT	nDSNSize  = MAX_DSN_LEN;
+	SQLSMALLINT	nDescSize = MAX_DESC_LEN;
 	SQLSMALLINT	nDSNRetSize;
 	SQLSMALLINT	nDescRetSize;
 	
@@ -730,13 +744,13 @@ void CODBCSource::InstalledSources(CStrArray& astrSources)
 	rc = ::SQLAllocHandle(SQL_HANDLE_ENV, NULL, &hEnv);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLAllocHandle", NULL, 0);
+		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, TXT("SQLAllocHandle"), NULL, 0);
 
 	// Say we're ODBC v3.x compliant.
 	rc = ::SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
-		throw CODBCException(CODBCException::E_CONNECT_FAILED, "SQLSetEnvAttr", hEnv, SQL_HANDLE_ENV);
+		throw CODBCException(CODBCException::E_CONNECT_FAILED, TXT("SQLSetEnvAttr"), hEnv, SQL_HANDLE_ENV);
 
 	// Fetch the first data source.
 	rc = ::SQLDataSources(hEnv, SQL_FETCH_FIRST, szDSN, nDSNSize, &nDSNRetSize, szDesc, nDescSize, &nDescRetSize);
@@ -744,20 +758,20 @@ void CODBCSource::InstalledSources(CStrArray& astrSources)
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) && (rc != SQL_NO_DATA) )
 	{
 		::SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
-		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLDataSources", hEnv, SQL_HANDLE_ENV);
+		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, TXT("SQLDataSources"), hEnv, SQL_HANDLE_ENV);
 	}
 
 	// For all sources.
 	while (rc != SQL_NO_DATA)
 	{
-		astrSources.Add((char*)szDSN);
+		astrSources.Add(reinterpret_cast<tchar*>(szDSN));
 
 		rc = ::SQLDataSources(hEnv, SQL_FETCH_NEXT, szDSN, nDSNSize, &nDSNRetSize, szDesc, nDescSize, &nDescRetSize);
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) && (rc != SQL_NO_DATA) )
 		{
 			::SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
-			throw CODBCException(CODBCException::E_ENUMINFO_FAILED, "SQLDataSources", hEnv, SQL_HANDLE_ENV);
+			throw CODBCException(CODBCException::E_ENUMINFO_FAILED, TXT("SQLDataSources"), hEnv, SQL_HANDLE_ENV);
 		}
 	}
 

@@ -29,7 +29,7 @@
 *******************************************************************************
 */
 
-CODBCParams::CODBCParams(CODBCSource& oSource, const char* pszStmt, SQLHSTMT hStmt, int nParams)
+CODBCParams::CODBCParams(CODBCSource& oSource, const tchar* pszStmt, SQLHSTMT hStmt, size_t nParams)
 	: m_oSource(oSource)
 	, m_strStmt(pszStmt)
 	, m_hStmt(hStmt)
@@ -80,7 +80,7 @@ CODBCParams::~CODBCParams()
 *******************************************************************************
 */
 
-int CODBCParams::NumParams() const
+size_t CODBCParams::NumParams() const
 {
 	return m_nParams;
 }
@@ -97,9 +97,9 @@ int CODBCParams::NumParams() const
 *******************************************************************************
 */
 
-SQLParam& CODBCParams::Param(int n) const
+SQLParam& CODBCParams::Param(size_t n) const
 {
-	ASSERT( (n >= 0) && (n < m_nParams) );
+	ASSERT(n < m_nParams);
 
 	return m_pParams[n];
 }
@@ -119,7 +119,7 @@ SQLParam& CODBCParams::Param(int n) const
 void CODBCParams::Bind()
 {
 	// Set parameter put types and sizes.
-	for (int i = 0; i < m_nParams; i++)
+	for (size_t i = 0; i < m_nParams; ++i)
 	{
 		COLTYPE eType = m_pParams[i].m_eMDBColType;
 		int     nSize = m_pParams[i].m_nMDBColSize;
@@ -132,20 +132,20 @@ void CODBCParams::Bind()
 	m_nRowLen = 0;
 
 	// Calculate the row buffer size.
-	for (int i = 0; i < m_nParams; i++)
+	for (size_t i = 0; i < m_nParams; ++i)
 	{
 		m_nRowLen += sizeof(SQLINTEGER);
 		m_nRowLen += m_pParams[i].m_nBufSize;
 	}
 
 	// Allocate row buffers.
-	m_pOffsets = new int[m_nParams];
+	m_pOffsets = new size_t[m_nParams];
 	m_pRowData = new byte[m_nRowLen];
 
 	int nOffset = 0;
 
 	// Bind all parameters.
-	for (int i = 0; i < m_nParams; i++)
+	for (size_t i = 0; i < m_nParams; ++i)
 	{
 		// Save buffer offset to value.
 		m_pOffsets[i] = nOffset;
@@ -159,7 +159,7 @@ void CODBCParams::Bind()
 		byte*        pValue   = pLenInd + sizeof(SQLINTEGER);
 
 		SQLRETURN rc = ::SQLBindParameter(m_hStmt, nParam, SQL_PARAM_INPUT, nBufType, nSQLType,
-											nColSize, 0, pValue, nBufSize, (SQLINTEGER*) pLenInd);
+											nColSize, 0, pValue, nBufSize, reinterpret_cast<SQLINTEGER*>(pLenInd));
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_ALLOC_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
@@ -192,7 +192,7 @@ void CODBCParams::SetRow(CRow& oRow)
 		Bind();
 
 	// For all parameters.
-	for (int iParam = 0; iParam < m_nParams; iParam++)
+	for (size_t iParam = 0; iParam < m_nParams; ++iParam)
 	{
 		int iRowCol = m_pParams[iParam].m_nSrcColumn;
 
@@ -200,7 +200,7 @@ void CODBCParams::SetRow(CRow& oRow)
 		byte* pValue = m_pRowData + m_pOffsets[iParam];
 
 		// Get null/len indicator pointer.
-		SQLINTEGER* pLenInd = (SQLINTEGER*) pValue;
+		SQLINTEGER* pLenInd = reinterpret_cast<SQLINTEGER*>(pValue);
 
 		// Is value null?
 		if (oRow[iRowCol] == null)
@@ -212,7 +212,7 @@ void CODBCParams::SetRow(CRow& oRow)
 			   || (m_pParams[iParam].m_eMDBColType == MDCT_DATE)
 			   || (m_pParams[iParam].m_eMDBColType == MDCT_TIME) )
 		{
-			CTimeStamp* pTimeStamp = (CTimeStamp*)(pValue + sizeof(SQLINTEGER));
+			CTimeStamp* pTimeStamp = reinterpret_cast<CTimeStamp*>(pValue + sizeof(SQLINTEGER));
 
 			*pTimeStamp = oRow[iRowCol].GetDateTime();
 			*pLenInd    = m_pParams[iParam].m_nBufSize;
@@ -220,10 +220,10 @@ void CODBCParams::SetRow(CRow& oRow)
 		// Requires conversion from MDCT_CHAR?
 		else if (m_pParams[iParam].m_eMDBColType == MDCT_CHAR)
 		{
-			char* pszChar = (char*)(pValue + sizeof(SQLINTEGER));
+			tchar* pszChar = reinterpret_cast<tchar*>(pValue + sizeof(SQLINTEGER));
 
 			pszChar[0] = oRow[iRowCol];
-			pszChar[1] = '\0';
+			pszChar[1] = TXT('\0');
 			*pLenInd   = SQL_NTS;
 		}
 		// Requires no conversion.

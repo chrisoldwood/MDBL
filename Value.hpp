@@ -33,8 +33,8 @@ public:
 	CValue(const CNull& oNull);
 	CValue(int iValue);
 	CValue(double dValue);
-	CValue(char cValue);
-	CValue(const char* sValue);
+	CValue(tchar cValue);
+	CValue(const tchar* sValue);
 	CValue(const CString& sValue);
 	CValue(bool bValue);
 	CValue(time_t tValue);
@@ -54,8 +54,8 @@ union
 {
 	int		m_iValue;		// Value if type is MDST_INT
 	double	m_dValue;		// Value if type is MDST_DOUBLE.
-	char	m_cValue;		// Value if type is MDST_CHAR.
-	char*	m_sValue;		// Value if type is MDST_STRING
+	tchar	m_cValue;		// Value if type is MDST_CHAR.
+	tchar*	m_sValue;		// Value if type is MDST_STRING
 	bool	m_bValue;		// Value if type is MDST_BOOL.
 	time_t	m_tValue;		// Value if type is MDST_TIME_T.
 	void*	m_pValue;		// Value if type is MDST_POINTER.
@@ -91,27 +91,27 @@ inline CValue::CValue(double dValue)
 {
 }
 
-inline CValue::CValue(char cValue)
+inline CValue::CValue(tchar cValue)
 	: m_eType(MDST_CHAR)
 	, m_bNull(false)
 	, m_cValue(cValue)
 {
 }
 
-inline CValue::CValue(const char* sValue)
+inline CValue::CValue(const tchar* sValue)
 	: m_eType(MDST_STRING)
 	, m_bNull(false)
-	, m_sValue(new char[strlen(sValue)+1])
+	, m_sValue(new tchar[tstrlen(sValue)+1])
 {
-	strcpy(m_sValue, sValue);
+	tstrcpy(m_sValue, sValue);
 }
 
 inline CValue::CValue(const CString& sValue)
 	: m_eType(MDST_STRING)
 	, m_bNull(false)
-	, m_sValue(new char[strlen(sValue)+1])
+	, m_sValue(new tchar[tstrlen(sValue)+1])
 {
-	strcpy(m_sValue, sValue);
+	tstrcpy(m_sValue, sValue);
 }
 
 inline CValue::CValue(bool bValue)
@@ -145,8 +145,8 @@ inline CValue::CValue(const CValue& oValue)
 	}
 	else
 	{
-		m_sValue = new char[strlen(oValue.m_sValue)+1];
-		strcpy(m_sValue, oValue.m_sValue);
+		m_sValue = new tchar[tstrlen(oValue.m_sValue)+1];
+		tstrcpy(m_sValue, oValue.m_sValue);
 	}
 }
 
@@ -161,8 +161,8 @@ inline const CValue& CValue::operator=(const CValue& oValue)
 	}
 	else
 	{
-		m_sValue = new char[strlen(oValue.m_sValue)+1];
-		strcpy(m_sValue, oValue.m_sValue);
+		m_sValue = new tchar[tstrlen(oValue.m_sValue)+1];
+		tstrcpy(m_sValue, oValue.m_sValue);
 	}
 
 	return *this;

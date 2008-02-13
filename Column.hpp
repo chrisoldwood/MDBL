@@ -35,9 +35,9 @@ public:
 	const CString& Name() const;
 	COLTYPE ColType() const;
 	STGTYPE StgType() const;
-	int     Length() const;
-	int     AllocSize() const;
-	int     Flags() const;
+	size_t  Length() const;
+	size_t  AllocSize() const;
+	uint    Flags() const;
 	bool    Nullable() const;
 	bool    Unique() const;
 	bool    ForeignKey() const;
@@ -45,9 +45,9 @@ public:
 	bool    ReadOnly() const;
 	bool	Transient() const;
 	CTable* FKTable() const;
-	int     FKColumn() const;
+	size_t  FKColumn() const;
 	CIndex* Index() const;
-	int     DisplayWidth(bool bDebug = false) const;
+	size_t  DisplayWidth(bool bDebug = false) const;
 
 	//
 	// Mutators.
@@ -97,8 +97,8 @@ protected:
 	//
 	// Constructors/Destructor.
 	//
-	CColumn(CTable& oTable, const char* pszName, COLTYPE eType, int nLength, int nAllocSize, int nFlags);
-	CColumn(CTable& oTable, const char* pszName, CTable& oFKTable, int nFKColumn, const CColumn& oFKColumn, int nFlags);
+	CColumn(CTable& oTable, const tchar* pszName, COLTYPE eType, size_t nLength, size_t nAllocSize, uint nFlags);
+	CColumn(CTable& oTable, const tchar* pszName, CTable& oFKTable, size_t nFKColumn, const CColumn& oFKColumn, uint nFlags);
 	virtual ~CColumn();
 
 	//
@@ -108,11 +108,11 @@ protected:
 	CString	m_strName;		// Name.
 	COLTYPE	m_eColType;		// The column type.
 	STGTYPE	m_eStgType;		// The storage type.
-	int		m_nLength;		// The data types length.
-	int		m_nAllocSize;	// The data types allocation size.
-	int		m_nFlags;		// Additional flags.
+	size_t	m_nLength;		// The data types length.
+	size_t	m_nAllocSize;	// The data types allocation size.
+	uint	m_nFlags;		// Additional flags.
 	CTable*	m_pFKTable;		// Foreign key table, if one.
-	int		m_nFKColumn;	// Foreign key column, if one.
+	size_t	m_nFKColumn;	// Foreign key column, if one.
 	CIndex*	m_pIndex;		// The index, if one.
 
 	//
@@ -149,17 +149,17 @@ inline STGTYPE CColumn::StgType() const
 	return m_eStgType;
 }
 
-inline int CColumn::Length() const
+inline size_t CColumn::Length() const
 {
 	return m_nLength;
 }
 
-inline int CColumn::AllocSize() const
+inline size_t CColumn::AllocSize() const
 {
 	return m_nAllocSize;
 }
 
-inline int CColumn::Flags() const
+inline uint CColumn::Flags() const
 {
 	return m_nFlags;
 }
@@ -199,7 +199,7 @@ inline CTable* CColumn::FKTable() const
 	return m_pFKTable;
 }
 
-inline int CColumn::FKColumn() const
+inline size_t CColumn::FKColumn() const
 {
 	return m_nFKColumn;
 }

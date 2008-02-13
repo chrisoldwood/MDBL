@@ -36,12 +36,12 @@ public:
 	//
 	// Accessors & mutators.
 	//
-	CField& Field(int n) const;
-	CField& operator[](int n) const;
+	CField& Field(size_t n) const;
+	CField& operator[](size_t n) const;
 
 	CTable& Table() const;
 
-	int  Status() const;
+	uint Status() const;
 	bool InTable() const;
 	bool Inserted() const;
 	bool Updated() const;
@@ -79,8 +79,8 @@ protected:
 	//
 	CTable&	m_oTable;		// The parent table.
 	CField*	m_aFields;		// The data fields.
-	int		m_nColumns;		// The number of fields.
-	int		m_eStatus;		// The status.
+	size_t	m_nColumns;		// The number of fields.
+	uint	m_eStatus;		// The status.
 
 	//
 	// Friends.
@@ -101,16 +101,16 @@ private:
 *******************************************************************************
 */
 
-inline CField& CRow::Field(int n) const
+inline CField& CRow::Field(size_t n) const
 {
-	ASSERT( (n >= 0) && (n < m_nColumns));
+	ASSERT(n < m_nColumns);
 
 	return m_aFields[n];
 }
 
-inline CField& CRow::operator[](int n) const
+inline CField& CRow::operator[](size_t n) const
 {
-	ASSERT( (n >= 0) && (n < m_nColumns));
+	ASSERT(n < m_nColumns);
 
 	return m_aFields[n];
 }
@@ -120,7 +120,7 @@ inline CTable& CRow::Table() const
 	return m_oTable;
 }
 
-inline int CRow::Status() const
+inline uint CRow::Status() const
 {
 	return m_eStatus;
 }
@@ -149,7 +149,7 @@ inline void CRow::ResetStatus()
 {
 	m_eStatus = ORIGINAL;
 
-	for (int i = 0; i < m_nColumns; i++)
+	for (size_t i = 0; i < m_nColumns; ++i)
 		m_aFields[i].m_bModified = false;
 }
 

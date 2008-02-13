@@ -207,7 +207,7 @@ int CResultSet::Compare(const void* ppRow1, const void* ppRow2)
 	CRow* pRow2  = *((CRow**) ppRow2);
 
 	// Compare all columns.
-	for (int k = 0; k < g_pSortOrder->Count(); k++)
+	for (size_t k = 0; k < g_pSortOrder->Count(); ++k)
 	{
 		// Get the column and direction.
 		int nColumn = g_pSortOrder->Column(k);
@@ -237,7 +237,7 @@ int CResultSet::Compare(const void* ppRow1, const void* ppRow2)
 *******************************************************************************
 */
 
-CValue CResultSet::Sum(int nColumn) const
+CValue CResultSet::Sum(size_t nColumn) const
 {
 	const CColumn& oColumn = m_pTable->Column(nColumn);
 	STGTYPE eType     = oColumn.StgType();
@@ -251,7 +251,7 @@ CValue CResultSet::Sum(int nColumn) const
 	else if (eType == MDST_DOUBLE)	oSum = CValue(0.0);
 
 	// Sum the rows.
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 	{
 		const CField& oField = (*this)[i][nColumn];
 
@@ -266,14 +266,14 @@ CValue CResultSet::Sum(int nColumn) const
 	return oSum;
 }
 
-CValue CResultSet::Min(int nColumn) const
+CValue CResultSet::Min(size_t nColumn) const
 {
 	const CColumn& oColumn = m_pTable->Column(nColumn);
 	bool    bNullable = oColumn.Nullable();
 	CValue  oSum(null);
 
 	// For all rows.
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 	{
 		const CField& oField = (*this)[i][nColumn];
 
@@ -289,14 +289,14 @@ CValue CResultSet::Min(int nColumn) const
 	return oSum;
 }
 
-CValue CResultSet::Max(int nColumn) const
+CValue CResultSet::Max(size_t nColumn) const
 {
 	const CColumn& oColumn = m_pTable->Column(nColumn);
 	bool    bNullable = oColumn.Nullable();
 	CValue  oSum(null);
 
 	// For all rows.
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 	{
 		const CField& oField = (*this)[i][nColumn];
 
@@ -324,7 +324,7 @@ CValue CResultSet::Max(int nColumn) const
 *******************************************************************************
 */
 
-CValueSet CResultSet::Distinct(int nColumn) const
+CValueSet CResultSet::Distinct(size_t nColumn) const
 {
 	CValueSet oSet;
 
@@ -338,7 +338,7 @@ CValueSet CResultSet::Distinct(int nColumn) const
 		oRS.OrderBy(nColumn, CSortColumns::ASC);
 
 		// For all rows.
-		for (int i = 0; i < oRS.Count(); i++)
+		for (size_t i = 0; i < oRS.Count(); ++i)
 		{
 			CRow& oRow = oRS[i];
 
@@ -366,7 +366,7 @@ CValueSet CResultSet::Distinct(int nColumn) const
 *******************************************************************************
 */
 
-CGroupSet CResultSet::GroupBy(int nColumn) const
+CGroupSet CResultSet::GroupBy(size_t nColumn) const
 {
 	CGroupSet oGS;
 
@@ -391,7 +391,7 @@ CGroupSet CResultSet::GroupBy(int nColumn) const
 	oGroup.Add(oRS[0]);
 
 	// For all subsequent rows
-	for (int i = 1; i < oRS.Count(); ++i)
+	for (size_t i = 1; i < oRS.Count(); ++i)
 	{
 		// Start of new group?
 		if (oRS[i][nColumn] != oGroup[0][nColumn])
@@ -427,7 +427,7 @@ CResultSet CResultSet::Select(const CWhere& oQuery) const
 	CResultSet oRS(*m_pTable);
 
 	// For all rows, apply the clause,
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 	{
 		CRow& oRow = Row(i);
 
@@ -453,7 +453,7 @@ CResultSet CResultSet::Select(const CWhere& oQuery) const
 bool CResultSet::Exists(const CWhere& oQuery) const
 {
 	// For all rows, apply the clause,
-	for (int i = 0; i < Count(); i++)
+	for (size_t i = 0; i < Count(); ++i)
 	{
 		CRow& oRow = Row(i);
 
@@ -485,7 +485,7 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 	int			nRowWidth = 0;
 
 	// Get the column widths and name list.
-	for (int i = 0; i < m_pTable->ColumnCount(); i++)
+	for (size_t i = 0; i < m_pTable->ColumnCount(); ++i)
 	{
 		const CColumn& oColumn = m_pTable->Column(i);
 
@@ -507,12 +507,13 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 		// Value longer than name?
 		else if (nWidth > nNameLen)
 		{
-			int nPadChars = (nWidth - nNameLen);
+			size_t nPadChars = (nWidth - nNameLen);
+			size_t nBytes    = Core::NumBytes<tchar>(nPadChars+1);
 
 			// Create padding with spaces.
-			char* pszPad = (char*) _alloca(nPadChars+1);
-			memset(pszPad, ' ', nPadChars);
-			pszPad[nPadChars] = '\0';
+			tchar* pszPad = static_cast<tchar*>(_alloca(nBytes));
+			std::fill(pszPad, pszPad+nPadChars, TXT(' '));
+			pszPad[nPadChars] = TXT('\0');
 
 			// Pad out name.
 			strName += pszPad;
@@ -531,13 +532,13 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 	rStream.Write("\r\n", 2);
 
 	// Create the heading underline.
-	char* psUnderline = (char*) _alloca(nRowWidth);
-	memset(psUnderline, '=', nRowWidth);
+	tchar* psUnderline = static_cast<tchar*>(_alloca(Core::NumBytes<tchar>(nRowWidth)));
+	std::fill(psUnderline, psUnderline+nRowWidth, TXT('='));
 
-	for (int j = 0, pos = 0; j < aiColWidths.Size(); j++)
+	for (size_t j = 0, pos = 0; j < aiColWidths.Size(); ++j)
 	{
 		pos += aiColWidths[j];
-		psUnderline[pos++] = ' ';
+		psUnderline[pos++] = TXT(' ');
 	}
 
 	// Write heading underline.
@@ -545,16 +546,16 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 	rStream.Write("\r\n", 2);
 
 	// Reuse underline for padding.
-	char* psPad = psUnderline;
-	memset(psPad, ' ', nRowWidth);
+	tchar* psPad = psUnderline;
+	std::fill(psPad, psPad+nRowWidth, TXT(' '));
 
 	// For all rows.
-	for (int r = 0; r < m_pTable->RowCount(); r++)
+	for (size_t r = 0; r < m_pTable->RowCount(); ++r)
 	{
 		CRow& oRow = Row(r);
 
 		// For all columns in the row.
-		for (int c = 0; c < m_pTable->ColumnCount(); c++)
+		for (size_t c = 0; c < m_pTable->ColumnCount(); c++)
 		{
 			CString strValue  = oRow[c].DbgFormat();
 			int     nValueLen = strValue.Length();

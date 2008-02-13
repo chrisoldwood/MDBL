@@ -27,12 +27,12 @@
 
 struct SQLParam
 {
-	int		m_nSrcColumn;	// The source column.
+	size_t	m_nSrcColumn;	// The source column.
 	COLTYPE	m_eMDBColType;	// The MDB column type.
-	int		m_nMDBColSize;	// The MDB column size.
+	size_t	m_nMDBColSize;	// The MDB column size.
 	int		m_nBufType;		// The input buffer type.
-	int		m_nBufSize;		// The input buffer length.
-	int		m_nSQLColSize;	// The SQL column size.
+	size_t	m_nBufSize;		// The input buffer length.
+	size_t	m_nSQLColSize;	// The SQL column size.
 };
 
 /******************************************************************************
@@ -54,8 +54,8 @@ public:
 	//
 	// Accessors.
 	//
-	virtual int NumParams() const = 0;
-	virtual SQLParam& Param(int n) const = 0;
+	virtual size_t NumParams() const = 0;
+	virtual SQLParam& Param(size_t n) const = 0;
 
 	virtual void SetRow(CRow& oRow) = 0;
 

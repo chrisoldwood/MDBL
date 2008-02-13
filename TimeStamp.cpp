@@ -62,10 +62,10 @@ CString CTimeStamp::ToString(bool bDate, bool bTime) const
 
 	// Create strings.
 	if (bDate)
-		strDate.Format("%02d/%02d/%04d", (int)day, (int)month, (int)year);
+		strDate.Format(TXT("%02d/%02d/%04d"), static_cast<int>(day), static_cast<int>(month), static_cast<int>(year));
 
 	if (bTime)
-		strTime.Format("%02d:%02d:%02d", (int)hour, (int)minute, (int)second);
+		strTime.Format(TXT("%02d:%02d:%02d"), static_cast<int>(hour), static_cast<int>(minute), static_cast<int>(second));
 
 	// Return one half only?
 	if (!bTime)		return strDate;
@@ -75,7 +75,7 @@ CString CTimeStamp::ToString(bool bDate, bool bTime) const
 
 	// Create full string.
 	strDateTime  = strDate;
-	strDateTime += " " ;
+	strDateTime += TXT(" ");
 	strDateTime += strTime;
 
 	return strDateTime;

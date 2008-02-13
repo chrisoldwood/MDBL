@@ -40,7 +40,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CWhereCmp(int nColumn, Op eOp, const CValue& oValue);
+	CWhereCmp(size_t nColumn, Op eOp, const CValue& oValue);
 	CWhereCmp(const CWhereCmp& oSrc);
 	virtual ~CWhereCmp();
 
@@ -55,7 +55,7 @@ private:
 	//
 	// Members.
 	//
-	int		m_nColumn;	// The column to check.
+	size_t	m_nColumn;	// The column to check.
 	Op		m_eOp;		// The operator.
 	CValue	m_oValue;	// The value to match.
 };

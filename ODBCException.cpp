@@ -22,7 +22,7 @@
 *******************************************************************************
 */
 
-CODBCException::CODBCException(int eErrCode, const char* pszSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType)
+CODBCException::CODBCException(int eErrCode, const tchar* pszSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType)
 	: CSQLException(eErrCode, pszSQLStmt, LastError(hHandle, nType))
 {
 
@@ -61,25 +61,25 @@ CODBCException::~CODBCException()
 CString CODBCException::LastError(SQLHANDLE hHandle, SQLSMALLINT nType) const
 {
 	if (hHandle == NULL)
-		return "No error details available.";
+		return TXT("No error details available.");
 
 	RETCODE		rc = SQL_SUCCESS;
 	SQLSMALLINT	nRecord = 1;
-	SQLCHAR		szSqlState[MAX_ERR_BUF_LEN] = "";
+	SQLTCHAR	szSqlState[MAX_ERR_BUF_LEN+1] = { 0 };
 	SQLINTEGER	nNativeError = 0;
-	SQLCHAR		szErrorMsg[MAX_ERR_BUF_LEN] = "";
-	SQLSMALLINT	nBufLen = MAX_ERR_BUF_LEN - 1;
+	SQLTCHAR	szErrorMsg[MAX_ERR_BUF_LEN+1] = { 0 };
+	SQLSMALLINT	nBufLen = MAX_ERR_BUF_LEN;
 	SQLSMALLINT nTxtLen = 0;
 	CString		strError;
 
 	while ((rc = ::SQLGetDiagRec(nType, hHandle, nRecord, szSqlState, &nNativeError,
 					szErrorMsg, nBufLen, &nTxtLen)) != SQL_NO_DATA_FOUND)
 	{
-		strError += (const char*)szSqlState;
-		strError += " - ";
-		strError += (const char*)szErrorMsg;
-		strError += "\n";
-		nRecord++;
+		strError += reinterpret_cast<tchar*>(szSqlState);
+		strError += TXT(" - ");
+		strError += reinterpret_cast<tchar*>(szErrorMsg);
+		strError += TXT("\n");
+		++nRecord;
 	}
 
 	return strError;

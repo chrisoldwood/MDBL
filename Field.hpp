@@ -39,8 +39,8 @@ public:
 	//
 	int               GetInt()       const;
 	double            GetDouble()    const;
-	char              GetChar()      const;
-	const char*       GetString()    const;
+	tchar             GetChar()      const;
+	const tchar*      GetString()    const;
 	bool              GetBool()      const;
 	time_t	          GetDateTime()  const;
 	const CTimeStamp& GetTimeStamp() const;
@@ -56,8 +56,8 @@ public:
 	void SetNull();
 	void SetInt(int iValue);
 	void SetDouble(double dValue);
-	void SetChar(char cValue);
-	void SetString(const char* sValue);
+	void SetChar(tchar cValue);
+	void SetString(const tchar* sValue);
 	void SetBool(bool bValue);
 	void SetDateTime(time_t tValue);
 	void SetTimeStamp(const CTimeStamp& tsValue);
@@ -72,8 +72,8 @@ public:
 	//
 	operator int()               const;
 	operator double()            const;
-	operator char()              const;
-	operator const char*()       const;
+	operator tchar()             const;
+	operator const tchar*()      const;
 	operator bool()              const;
 	operator time_t()            const;
 	operator const CTimeStamp&() const;
@@ -86,8 +86,8 @@ public:
 	void operator=(const CNull& oNull);
 	void operator=(int iValue);
 	void operator=(double dValue);
-	void operator=(char cValue);
-	void operator=(const char* sValue);
+	void operator=(tchar cValue);
+	void operator=(const tchar* sValue);
 	void operator=(bool bValue);
 	void operator=(time_t tValue);
 	void operator=(const CTimeStamp& tsValue);
@@ -105,10 +105,10 @@ public:
 	bool operator!=(int  iValue) const;
 	bool operator==(double dValue) const;
 	bool operator!=(double dValue) const;
-	bool operator==(char cValue) const;
-	bool operator!=(char cValue) const;
-	bool operator==(const char* sValue) const;
-	bool operator!=(const char* sValue) const;
+	bool operator==(tchar cValue) const;
+	bool operator!=(tchar cValue) const;
+	bool operator==(const tchar* sValue) const;
+	bool operator!=(const tchar* sValue) const;
 	bool operator==(bool bValue) const;
 	bool operator!=(bool bValue) const;
 	bool operator==(const CValue& oValue) const;
@@ -127,7 +127,7 @@ public:
 	//
 	// String formatting methods.
 	//
-	CString Format(const char* pszFormat = NULL) const;
+	CString Format(const tchar* pszFormat = NULL) const;
 	CString DbgFormat() const;
 
 protected:
@@ -136,15 +136,15 @@ protected:
 	//
 	CRow&		m_oRow;			// The parent row.
 	CColumn&	m_oColumn;		// The parent column.
-	int			m_nColumn;		// The parent column index.
+	size_t		m_nColumn;		// The parent column index.
 	bool		m_bModified;	// Modified flag.
 	bool		m_bNull;		// NULL flag.
 union
 {
 	int*		m_pInt;			// Pointer to value if type is MDCT_INT or MDCT_IDENTITY.
 	double*		m_pDouble;		// Pointer to value if type is MDCT_DOUBLE.
-	char*		m_pChar;		// Pointer to value if type is MDCT_CHAR.
-	char*		m_pString;		// Pointer to value if type is MDCT_FXDSTR or MDCT_VARSTR.
+	tchar*		m_pChar;		// Pointer to value if type is MDCT_CHAR.
+	tchar*		m_pString;		// Pointer to value if type is MDCT_FXDSTR or MDCT_VARSTR.
 	bool*		m_pBool;		// Pointer to value if type is MDCT_BOOL.
 	time_t*		m_pTimeT;		// Pointer to value if type is MDCT_DATETIME or MDCT_DATE or MDCT_TIME.
 	CTimeStamp*	m_pTimeStamp;	// Pointer to value if type is MDCT_TIMESTAMP.
@@ -162,7 +162,7 @@ private:
 	//
 	// Only allow CRow to create and destroy.
 	//
-	CField(CRow& oRow, CColumn& oColumn, int nColumn, bool bNull, void* pData);
+	CField(CRow& oRow, CColumn& oColumn, size_t nColumn, bool bNull, void* pData);
 	~CField();
 
 #pragma push_macro("new")
@@ -186,10 +186,10 @@ private:
 	// Internal methods.
 	//
 	void    Updated();
-	CString FormatTimeT(const char* pszFormat) const;
-	CString FormatTimeStamp(const char* pszFormat) const;
-	CString FormatBool(const char* pszFormat) const;
-	int     StrCmp(const char* pszRHS) const;
+	CString FormatTimeT(const tchar* pszFormat) const;
+	CString FormatTimeStamp(const tchar* pszFormat) const;
+	CString FormatBool(const tchar* pszFormat) const;
+	int     StrCmp(const tchar* pszRHS) const;
 };
 
 /******************************************************************************
@@ -237,12 +237,12 @@ inline CField::operator double() const
 	return GetDouble();
 }
 
-inline CField::operator char() const
+inline CField::operator tchar() const
 {
 	return GetChar();
 }
 
-inline CField::operator const char*() const
+inline CField::operator const tchar*() const
 {
 	return GetString();
 }
@@ -297,12 +297,12 @@ inline void CField::operator=(double dValue)
 	SetDouble(dValue);
 }
 
-inline void CField::operator=(char cValue)
+inline void CField::operator=(tchar cValue)
 {
 	SetChar(cValue);
 }
 
-inline void CField::operator=(const char* sValue)
+inline void CField::operator=(const tchar* sValue)
 {
 	SetString(sValue);
 }
@@ -372,24 +372,24 @@ inline bool CField::operator!=(double dValue) const
 	return (dValue != GetDouble());
 }
 
-inline bool CField::operator==(char cValue) const
+inline bool CField::operator==(tchar cValue) const
 {
 	return (cValue == GetChar());
 }
 
-inline bool CField::operator!=(char cValue) const
+inline bool CField::operator!=(tchar cValue) const
 {
 	return (cValue != GetChar());
 }
 
-inline bool CField::operator==(const char* sValue) const
+inline bool CField::operator==(const tchar* sValue) const
 {
-	return (strcmp(sValue, GetString()) == 0);
+	return (tstrcmp(sValue, GetString()) == 0);
 }
 
-inline bool CField::operator!=(const char* sValue) const
+inline bool CField::operator!=(const tchar* sValue) const
 {
-	return (strcmp(sValue, GetString()) != 0);
+	return (tstrcmp(sValue, GetString()) != 0);
 }
 
 inline bool CField::operator==(bool bValue) const

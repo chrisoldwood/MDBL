@@ -42,7 +42,7 @@ public:
 	//
 	// Connection methods.
 	//
-	virtual void Open(const char* pszConnection);
+	virtual void Open(const tchar* pszConnection);
 	virtual void Close();
 
 	virtual bool IsOpen() const;
@@ -50,11 +50,11 @@ public:
 	//
 	// Statement methods.
 	//
-	virtual CSQLParams* CreateParams(const char* pszStmt, int nParams);
-	virtual void        ExecStmt(const char* pszStmt);
-	virtual void        ExecStmt(const char* pszStmt, CSQLParams& oParams);
-	virtual CSQLCursor* ExecQuery(const char* pszQuery);
-	virtual void        ExecQuery(const char* pszQuery, CODBCCursor& oCursor);
+	virtual CSQLParams* CreateParams(const tchar* pszStmt, size_t nParams);
+	virtual void        ExecStmt(const tchar* pszStmt);
+	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams);
+	virtual CSQLCursor* ExecQuery(const tchar* pszQuery);
+	virtual void        ExecQuery(const tchar* pszQuery, CODBCCursor& oCursor);
 
 	//
 	// Transaction methods.
@@ -69,8 +69,8 @@ public:
 	//
 	static COLTYPE     MDBType(SQLSMALLINT nODBCType);
 	static SQLSMALLINT ODBCType(COLTYPE eMDBType);
-	static int         BufferSize(COLTYPE eColType, int nColSize);
-	static int         ColumnSize(COLTYPE eColType, int nColSize);
+	static size_t      BufferSize(COLTYPE eColType, size_t nColSize);
+	static size_t      ColumnSize(COLTYPE eColType, size_t nColSize);
 
 	//
 	// Installation query methods.

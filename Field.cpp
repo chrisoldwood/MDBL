@@ -14,27 +14,29 @@
 #include "Table.hpp"
 #include "TimeStamp.hpp"
 #include <time.h>
+#include <tchar.h>
+#include <Core/AnsiWide.hpp>
 
 // The special null value.
 CNull null;
 
 // Default format specifiers.
-static const char* pszFormats[] = 
+static const tchar* pszFormats[] = 
 {
-	"%d",					// MDCT_INT
-	"%.2f",					// MDCT_DOUBLE
-	"%c",					// MDCT_CHAR
-	"%s",					// MDCT_FXDSTR
-	"%s",					// MDCT_VARSTR
-	"No|Yes",				// MDCT_BOOL
-	"%d",					// MDCT_IDENTITY
-	"%d/%m/%y %H:%M:%S",	// MDCT_DATETIME
-	"%d/%m/%y",				// MDCT_DATE
-	"%H:%M:%S",				// MDCT_TIME
-	"%d/%m/%y %H:%M:%S",	// MDCT_TIMESTAMP
-	"%p",					// MDCT_VOIDPTR
-	"%p",					// MDCT_ROWPTR
-	"%p"					// MDCT_ROWSETPTR
+	TXT("%d"),					// MDCT_INT
+	TXT("%.2f"),				// MDCT_DOUBLE
+	TXT("%c"),					// MDCT_CHAR
+	TXT("%s"),					// MDCT_FXDSTR
+	TXT("%s"),					// MDCT_VARSTR
+	TXT("No|Yes"),				// MDCT_BOOL
+	TXT("%d"),					// MDCT_IDENTITY
+	TXT("%d/%m/%y %H:%M:%S"),	// MDCT_DATETIME
+	TXT("%d/%m/%y"),			// MDCT_DATE
+	TXT("%H:%M:%S"),			// MDCT_TIME
+	TXT("%d/%m/%y %H:%M:%S"),	// MDCT_TIMESTAMP
+	TXT("%p"),					// MDCT_VOIDPTR
+	TXT("%p"),					// MDCT_ROWPTR
+	TXT("%p")					// MDCT_ROWSETPTR
 };
 
 /******************************************************************************
@@ -49,7 +51,7 @@ static const char* pszFormats[] =
 *******************************************************************************
 */
 
-CField::CField(CRow& oRow, CColumn& oColumn, int nColumn, bool bNull, void* pData)
+CField::CField(CRow& oRow, CColumn& oColumn, size_t nColumn, bool bNull, void* pData)
 	: m_oRow(oRow)
 	, m_oColumn(oColumn)
 	, m_nColumn(nColumn)
@@ -63,7 +65,7 @@ CField::CField(CRow& oRow, CColumn& oColumn, int nColumn, bool bNull, void* pDat
 
 	// VARSTR fields store their values in a separate buffer.
 	if (m_oColumn.ColType() == MDCT_VARSTR)
-		m_pString = (char*) calloc(1, sizeof(char));
+		m_pString = static_cast<tchar*>(calloc(1, sizeof(tchar)));
 }
 
 /******************************************************************************
@@ -113,7 +115,7 @@ double CField::GetDouble() const
 	return *m_pDouble;
 }
 
-char CField::GetChar() const
+tchar CField::GetChar() const
 {
 	ASSERT(m_bNull   != true);
 	ASSERT(m_oColumn.StgType() == MDST_CHAR);
@@ -121,7 +123,7 @@ char CField::GetChar() const
 	return *m_pChar;
 }
 
-const char* CField::GetString() const
+const tchar* CField::GetString() const
 {
 	ASSERT(m_bNull   != true);
 	ASSERT(m_oColumn.StgType() == MDST_STRING);
@@ -218,9 +220,9 @@ void CField::GetRaw(void* pValue) const
 	// Variable buffer string?
 	if (m_oColumn.ColType() == MDCT_VARSTR)
 	{
-		char* pszValue = (char*) pValue;
+		tchar* pszValue = static_cast<tchar*>(pValue);
 
-		strcpy(pszValue, m_pString);
+		tstrcpy(pszValue, m_pString);
 	}
 	// POINTER based type?
 	else if (m_oColumn.StgType() == MDST_POINTER)
@@ -317,7 +319,7 @@ void CField::SetDouble(double dValue)
 	Updated();
 }
 
-void CField::SetChar(char cValue)
+void CField::SetChar(tchar cValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_CHAR);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
@@ -337,14 +339,14 @@ void CField::SetChar(char cValue)
 	Updated();
 }
 
-void CField::SetString(const char* sValue)
+void CField::SetString(const tchar* sValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_STRING);
-	ASSERT(m_oColumn.Length()  >= (int)strlen(sValue));
+	ASSERT(static_cast<size_t>(m_oColumn.Length())  >= tstrlen(sValue));
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
-	if ( (m_bNull == false) && (strcmp(m_pString, sValue) == 0) )
+	if ( (m_bNull == false) && (tstrcmp(m_pString, sValue) == 0) )
 		return;
 
 #ifdef _DEBUG
@@ -354,9 +356,9 @@ void CField::SetString(const char* sValue)
 
 	// Variable buffer string?
 	if (m_oColumn.ColType() == MDCT_VARSTR)
-		m_pString = (char*) realloc(m_pString, strlen(sValue)+1);
+		m_pString = static_cast<tchar*>(realloc(m_pString, Core::NumBytes<tchar>(tstrlen(sValue)+1)));
 
-	strcpy(m_pString, sValue);
+	tstrcpy(m_pString, sValue);
 	m_bNull = false;
 
 	Updated();
@@ -504,13 +506,40 @@ void CField::SetRowSetPtr(CRow** pValue)
 
 void CField::SetRaw(const void* pValue)
 {
-	// Variable buffer string?
-	if (m_oColumn.ColType() == MDCT_VARSTR)
+	// Single char?
+	if (m_oColumn.ColType() == MDCT_CHAR)
 	{
-		const char* pszValue = (const char*) pValue;
+		const char* pszValue = static_cast<const char*>(pValue);
 
-		m_pString = (char*) realloc(m_pString, strlen(pszValue)+1);
+		*m_pChar = *pszValue;
+	}
+	// Fixed buffer string?
+	else if (m_oColumn.ColType() == MDCT_FXDSTR)
+	{
+#ifdef ANSI_BUILD
+		memcpy(m_pVoidPtr, pValue, m_oColumn.AllocSize());
+#else
+		const char* pszValue = static_cast<const char*>(pValue);
+		size_t      nChars   = m_oColumn.Length();
+
+		tchar* pString = static_cast<tchar*>(m_pVoidPtr);
+
+		Core::AnsiToWide(pszValue, pszValue+nChars, pString);
+#endif
+	}
+	// Variable buffer string?
+	else if (m_oColumn.ColType() == MDCT_VARSTR)
+	{
+		const char* pszValue = static_cast<const char*>(pValue);
+		size_t      nChars   = strlen(pszValue);
+
+		m_pString = static_cast<tchar*>(realloc(m_pString, Core::NumBytes<tchar>(nChars+1)));
+
+#ifdef ANSI_BUILD
 		strcpy(m_pString, pszValue);
+#else
+		Core::AnsiToWide(pszValue, pszValue+nChars, m_pString);
+#endif
 	}
 	// POINTER based type?
 	else if (m_oColumn.StgType() == MDST_POINTER)
@@ -680,7 +709,7 @@ void CField::Updated()
 	{
 		m_bModified = true;
 		m_oRow.MarkUpdated();
-		m_oRow.Table().m_nUpdates++;
+		++m_oRow.Table().m_nUpdates;
 	}
 }
 
@@ -697,11 +726,11 @@ void CField::Updated()
 *******************************************************************************
 */
 
-CString CField::Format(const char* pszFormat) const
+CString CField::Format(const tchar* pszFormat) const
 {
 	// Null?
 	if (m_bNull)
-		return "";
+		return TXT("");
 
 	// Use default specifier, if not supplied.
 	if (pszFormat == NULL)
@@ -750,29 +779,29 @@ CString CField::DbgFormat() const
 {
 	// Null?
 	if (m_bNull)
-		return "(null)";
+		return TXT("(null)");
 
 	CString str;
 
 	// Format according to storage type.
 	switch(m_oColumn.StgType())
 	{
-		case MDST_INT:			str.Format("%d", *m_pInt);					break;
-		case MDST_DOUBLE:		str.Format("%f", *m_pDouble);				break;
-		case MDST_CHAR:			str.Format("%c", *m_pChar);					break;
-		case MDST_STRING:		str = m_pString;							break;
-		case MDST_BOOL:			str = FormatBool("N|Y");					break;
-		case MDST_TIME_T:		str = FormatTimeT("%d/%m/%y %H:%M:%S");		break;
-		case MDST_TIMESTAMP:	str = FormatTimeStamp("%d/%m/%y %H:%M:%S");	break;
-		case MDST_POINTER:		str.Format("%p", m_pVoidPtr);				break;
-		default:				ASSERT_FALSE();								break;
+		case MDST_INT:			str.Format(TXT("%d"), *m_pInt);						break;
+		case MDST_DOUBLE:		str.Format(TXT("%f"), *m_pDouble);					break;
+		case MDST_CHAR:			str.Format(TXT("%c"), *m_pChar);					break;
+		case MDST_STRING:		str = m_pString;									break;
+		case MDST_BOOL:			str = FormatBool(TXT("N|Y"));						break;
+		case MDST_TIME_T:		str = FormatTimeT(TXT("%d/%m/%y %H:%M:%S"));		break;
+		case MDST_TIMESTAMP:	str = FormatTimeStamp(TXT("%d/%m/%y %H:%M:%S"));	break;
+		case MDST_POINTER:		str.Format(TXT("%p"), m_pVoidPtr);					break;
+		default:				ASSERT_FALSE();										break;
 	}
 
 	// Replace any CRs or LFs with a '.'.
-	for (char* psz = const_cast<char*>((const char*)str); *psz != '\0'; psz++)
+	for (tchar* psz = str.Buffer(); *psz != TXT('\0'); ++psz)
 	{
 		if (iscntrl(*psz))
-			*psz = '.';
+			*psz = TXT('.');
 	}
 
 	return str;
@@ -790,12 +819,12 @@ CString CField::DbgFormat() const
 *******************************************************************************
 */
 
-CString CField::FormatTimeT(const char* pszFormat) const
+CString CField::FormatTimeT(const tchar* pszFormat) const
 {
 	ASSERT(pszFormat != NULL);
 
-	char szTime[100];
-	tm*  pTM = NULL;
+	tchar szTime[100] = { 0 };
+	tm*   pTM = NULL;
 
 	// Convert the tm struct.
 	if (m_oColumn.Flags() & CColumn::TZ_GMT)
@@ -804,7 +833,7 @@ CString CField::FormatTimeT(const char* pszFormat) const
 		pTM = localtime(m_pTimeT);
 
 	// Format.
-	strftime(szTime, sizeof(szTime), pszFormat, pTM);
+	_tcsftime(szTime, sizeof(szTime), pszFormat, pTM);
 
 	return szTime;
 }
@@ -821,12 +850,12 @@ CString CField::FormatTimeT(const char* pszFormat) const
 *******************************************************************************
 */
 
-CString CField::FormatTimeStamp(const char* pszFormat) const
+CString CField::FormatTimeStamp(const tchar* pszFormat) const
 {
 	ASSERT(pszFormat != NULL);
 
-	char szTime[100];
-	tm	 oTM;
+	tchar szTime[100] = { 0 };
+	tm	  oTM;
 
 	// Initialise the struct.
 	memset(&oTM, 0, sizeof(oTM));
@@ -840,7 +869,7 @@ CString CField::FormatTimeStamp(const char* pszFormat) const
 	oTM.tm_isdst = (m_oColumn.Flags() & CColumn::TZ_GMT) ? 0 : 1;
 
 	// Format.
-	strftime(szTime, sizeof(szTime), pszFormat, &oTM);
+	_tcsftime(szTime, sizeof(szTime), pszFormat, &oTM);
 
 	return szTime;
 }
@@ -858,16 +887,16 @@ CString CField::FormatTimeStamp(const char* pszFormat) const
 *******************************************************************************
 */
 
-CString CField::FormatBool(const char* pszFormat) const
+CString CField::FormatBool(const tchar* pszFormat) const
 {
 	ASSERT(pszFormat != NULL);
-	ASSERT(strchr(pszFormat, '|') != NULL);
+	ASSERT(tstrchr(pszFormat, TXT('|')) != NULL);
 
 	// Copy the whole string and find
 	// the length and pos of the separator.
 	CString str  = pszFormat;
 	int     nLen = str.Length();
-	int     nSep = str.Find('|');
+	int     nSep = str.Find(TXT('|'));
 
 	// Delete either the 1st or 2nd substring.
 	if (*m_pBool == false)
@@ -891,9 +920,9 @@ CString CField::FormatBool(const char* pszFormat) const
 *******************************************************************************
 */
 
-int CField::StrCmp(const char* pszRHS) const
+int CField::StrCmp(const tchar* pszRHS) const
 {
 	bool bCmpCase = (m_oColumn.Flags() & CColumn::COMPARE_CASE);
 
-	return (bCmpCase) ? strcmp(m_pString, pszRHS) : _stricmp(m_pString, pszRHS);
+	return (bCmpCase) ? tstrcmp(m_pString, pszRHS) : tstricmp(m_pString, pszRHS);
 }

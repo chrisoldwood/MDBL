@@ -30,29 +30,29 @@ public:
 	//
 	// Methods.
 	//
-	int Column() const;
+	size_t Column() const;
 
-	virtual int  RowCount() const = 0;
+	virtual size_t RowCount() const = 0;
 	virtual void AddRow(CRow& oRow) = 0;
 	virtual void RemoveRow(CRow& oRow) = 0;
 	virtual void Truncate() = 0;
 
 	virtual CResultSet FindRows(const CValue& oValue) const = 0;
 
-	virtual void Capacity(int nRows) = 0;
+	virtual void Capacity(size_t nRows) = 0;
 
 protected:
 	//
 	// Constructors/Destructor.
 	//
-	CIndex(CTable& oTable, int nColumn);
+	CIndex(CTable& oTable, size_t nColumn);
 	virtual ~CIndex();
 	
 	//
 	// Members.
 	//
 	CTable&	m_oTable;		// The parent table.
-	int		m_nColumn;		// The column to be indexed.
+	size_t	m_nColumn;		// The column to be indexed.
 
 	//
 	// Friends.
@@ -67,7 +67,7 @@ protected:
 *******************************************************************************
 */
 
-inline CIndex::CIndex(CTable& oTable, int nColumn)
+inline CIndex::CIndex(CTable& oTable, size_t nColumn)
 	: m_oTable(oTable)
 	, m_nColumn(nColumn)
 {
@@ -77,7 +77,7 @@ inline CIndex::~CIndex()
 {
 }
 
-inline int CIndex::Column() const
+inline size_t CIndex::Column() const
 {
 	return m_nColumn;
 }

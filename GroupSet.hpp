@@ -39,9 +39,9 @@ public:
 	//
 	// Methods.
 	//
-	int         Count() const;
-	CResultSet& ResultSet(int n) const;
-	CResultSet& operator[](int n) const;
+	size_t      Count() const;
+	CResultSet& ResultSet(size_t n) const;
+	CResultSet& operator[](size_t n) const;
 
 	void Add(const CResultSet& oRS);
 
@@ -68,17 +68,17 @@ private:
 *******************************************************************************
 */
 
-inline int CGroupSet::Count() const
+inline size_t CGroupSet::Count() const
 {
 	return m_oResSets.Size();
 }
 
-inline CResultSet& CGroupSet::ResultSet(int n) const
+inline CResultSet& CGroupSet::ResultSet(size_t n) const
 {
 	return *m_oResSets[n];
 }
 
-inline CResultSet& CGroupSet::operator[](int n) const
+inline CResultSet& CGroupSet::operator[](size_t n) const
 {
 	return *m_oResSets[n];
 }
