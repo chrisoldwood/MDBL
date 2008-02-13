@@ -20,7 +20,7 @@
 			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
@@ -80,7 +80,7 @@
 			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
@@ -262,9 +262,6 @@
 			</File>
 			<File
 				RelativePath="MDB.hpp">
-			</File>
-			<File
-				RelativePath="MDBL.hpp">
 			</File>
 			<File
 				RelativePath="MDBLTypes.hpp">
