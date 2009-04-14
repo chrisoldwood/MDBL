@@ -33,7 +33,7 @@ CODBCParams::CODBCParams(CODBCSource& oSource, const tchar* pszStmt, SQLHSTMT hS
 	: m_oSource(oSource)
 	, m_strStmt(pszStmt)
 	, m_hStmt(hStmt)
-	, m_nParams((SQLSMALLINT)nParams)
+	, m_nParams(static_cast<SQLSMALLINT>(nParams))
 	, m_pParams(new SQLParam[nParams])
 	, m_nRowLen(0)
 	, m_pOffsets(NULL)
@@ -122,7 +122,7 @@ void CODBCParams::Bind()
 	for (size_t i = 0; i < m_nParams; ++i)
 	{
 		COLTYPE eType = m_pParams[i].m_eMDBColType;
-		int     nSize = m_pParams[i].m_nMDBColSize;
+		size_t  nSize = m_pParams[i].m_nMDBColSize;
 
 		m_pParams[i].m_nBufType    = CODBCSource::ODBCType(eType);
 		m_pParams[i].m_nBufSize    = CODBCSource::BufferSize(eType, nSize);
@@ -142,7 +142,7 @@ void CODBCParams::Bind()
 	m_pOffsets = new size_t[m_nParams];
 	m_pRowData = new byte[m_nRowLen];
 
-	int nOffset = 0;
+	size_t nOffset = 0;
 
 	// Bind all parameters.
 	for (size_t i = 0; i < m_nParams; ++i)
@@ -150,16 +150,16 @@ void CODBCParams::Bind()
 		// Save buffer offset to value.
 		m_pOffsets[i] = nOffset;
 
-		SQLUSMALLINT nParam   = (SQLUSMALLINT) (i+1);
-		SQLSMALLINT  nBufType = (SQLSMALLINT) m_pParams[i].m_nBufType;
+		SQLUSMALLINT nParam   = static_cast<SQLUSMALLINT>(i+1);
+		SQLSMALLINT  nBufType = static_cast<SQLSMALLINT>(m_pParams[i].m_nBufType);
 		SQLSMALLINT  nSQLType = nBufType;
-		int          nBufSize = m_pParams[i].m_nBufSize;
-		int          nColSize = m_pParams[i].m_nSQLColSize;
+		size_t       nBufSize = m_pParams[i].m_nBufSize;
+		size_t       nColSize = m_pParams[i].m_nSQLColSize;
 		byte*	     pLenInd  = m_pRowData + m_pOffsets[i];
 		byte*        pValue   = pLenInd + sizeof(SQLINTEGER);
 
 		SQLRETURN rc = ::SQLBindParameter(m_hStmt, nParam, SQL_PARAM_INPUT, nBufType, nSQLType,
-											nColSize, 0, pValue, nBufSize, reinterpret_cast<SQLINTEGER*>(pLenInd));
+											nColSize, 0, pValue, nBufSize, reinterpret_cast<SQLLEN*>(pLenInd));
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_ALLOC_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
@@ -194,13 +194,13 @@ void CODBCParams::SetRow(CRow& oRow)
 	// For all parameters.
 	for (size_t iParam = 0; iParam < m_nParams; ++iParam)
 	{
-		int iRowCol = m_pParams[iParam].m_nSrcColumn;
+		size_t iRowCol = m_pParams[iParam].m_nSrcColumn;
 
 		// Calculate pointer to value.
 		byte* pValue = m_pRowData + m_pOffsets[iParam];
 
 		// Get null/len indicator pointer.
-		SQLINTEGER* pLenInd = reinterpret_cast<SQLINTEGER*>(pValue);
+		SQLLEN* pLenInd = reinterpret_cast<SQLLEN*>(pValue);
 
 		// Is value null?
 		if (oRow[iRowCol] == null)

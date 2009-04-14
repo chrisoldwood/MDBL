@@ -39,7 +39,7 @@ CODBCCursor::CODBCCursor(CODBCSource& oSource)
 	, m_pRowStatus(NULL)
 	, m_bDoneBind(false)
 	, m_nFetched(0)
-	, m_nCurRow((SQLUINTEGER)-1)
+	, m_nCurRow(static_cast<SQLUINTEGER>(-1))
 {
 
 }
@@ -121,10 +121,10 @@ void CODBCCursor::Open(const tchar* pszStmt, SQLHSTMT hStmt)
 		const size_t MAX_NAME_LEN = 256;
 
 		SQLTCHAR	szName[MAX_NAME_LEN+1] = { 0 };
-		SQLSMALLINT	nColumn = (SQLSMALLINT) (i+1);
+		SQLSMALLINT	nColumn = static_cast<SQLSMALLINT>(i+1);
 		SQLSMALLINT	nNameLen = MAX_NAME_LEN;
 		SQLSMALLINT	nType;
-		SQLUINTEGER	nSize;
+		SQLULEN		nSize;
 		SQLSMALLINT	nScale;
 		SQLSMALLINT	nNullable;
 
@@ -188,7 +188,7 @@ void CODBCCursor::Close()
 	m_pRowStatus = NULL;
 	m_bDoneBind  = false;
 	m_nFetched   = 0;
-	m_nCurRow    = (SQLUINTEGER)-1;
+	m_nCurRow    = static_cast<SQLUINTEGER>(-1);
 }
 
 /******************************************************************************
@@ -285,12 +285,12 @@ void CODBCCursor::Bind()
 	m_pRowStatus = new SQLUSMALLINT[FETCH_SIZE];
 
 	// Setup for bulk row fetching.
-	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_BIND_TYPE,    (SQLPOINTER)m_nRowLen,    0);
-	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_ARRAY_SIZE,   (SQLPOINTER)FETCH_SIZE,   0);
-	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_STATUS_PTR,   (SQLPOINTER)m_pRowStatus, 0);
-	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROWS_FETCHED_PTR, (SQLPOINTER)&m_nFetched,  0);
+	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_BIND_TYPE,    reinterpret_cast<SQLPOINTER>(m_nRowLen),    0);
+	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_ARRAY_SIZE,   reinterpret_cast<SQLPOINTER>(FETCH_SIZE),   0);
+	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_STATUS_PTR,   reinterpret_cast<SQLPOINTER>(m_pRowStatus), 0);
+	::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROWS_FETCHED_PTR, reinterpret_cast<SQLPOINTER>(&m_nFetched),  0);
 
-	int nOffset = 0;
+	size_t nOffset = 0;
 
 	// Bind row buffers.
 	for (size_t i = 0; i < m_nColumns; ++i)
@@ -299,9 +299,9 @@ void CODBCCursor::Bind()
 		m_pOffsets[i] = nOffset;
 
 		// Get bind parameters.
-		SQLUSMALLINT nColumn = (SQLUSMALLINT) (i+1);
-		SQLSMALLINT  nType   = (SQLSMALLINT) m_pColumns[i].m_nSQLFetchType;
-		int          nSize   = m_pColumns[i].m_nSize;
+		SQLUSMALLINT nColumn = static_cast<SQLUSMALLINT>(i+1);
+		SQLSMALLINT  nType   = static_cast<SQLSMALLINT>(m_pColumns[i].m_nSQLFetchType);
+		size_t       nSize   = m_pColumns[i].m_nSize;
 		byte*		 pLenInd = m_pRowData + m_pOffsets[i];
 		byte*        pValue  = pLenInd + sizeof(SQLINTEGER);
 
@@ -309,7 +309,7 @@ void CODBCCursor::Bind()
 		ASSERT(nSize > 0);
 
 		// Bind the buffer to the column.
-		SQLRETURN rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, reinterpret_cast<SQLINTEGER*>(pLenInd));
+		SQLRETURN rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, reinterpret_cast<SQLLEN*>(pLenInd));
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
@@ -319,7 +319,7 @@ void CODBCCursor::Bind()
 	}
 
 	// Prepare for fetch.
-	m_nCurRow   = (SQLUINTEGER)-1;
+	m_nCurRow   = static_cast<SQLUINTEGER>(-1);
 	m_bDoneBind = true;
 }
 
@@ -391,7 +391,7 @@ void CODBCCursor::GetRow(CRow& oRow)
 	// For all SQL columns.
 	for (size_t iSQLCol = 0; iSQLCol < m_nColumns; ++iSQLCol)
 	{
-		int iRowCol = m_pColumns[iSQLCol].m_nDstColumn;
+		size_t iRowCol = m_pColumns[iSQLCol].m_nDstColumn;
 
 		// Calculate pointer to value.
 		const byte* pValue = pRowData + m_pOffsets[iSQLCol];
