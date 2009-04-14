@@ -100,7 +100,7 @@ CRow::~CRow()
 void CRow::Read(WCL::IInputStream& rStream)
 {
 	// Get the row data size and start address.
-	int   nSize = m_oTable.m_vColumns.AllocSize();
+	size_t nSize = m_oTable.m_vColumns.AllocSize();
 	byte* pData = reinterpret_cast<byte*>(m_aFields + m_nColumns);
 
 	// Read the null values.
@@ -137,7 +137,7 @@ void CRow::Read(WCL::IInputStream& rStream)
 void CRow::Write(WCL::IOutputStream& rStream)
 {
 	// Get the row data size and start address.
-	int   nSize = m_oTable.m_vColumns.AllocSize();
+	size_t nSize = m_oTable.m_vColumns.AllocSize();
 	byte* pData = reinterpret_cast<byte*>(m_aFields + m_nColumns);
 
 	// Write the null values.

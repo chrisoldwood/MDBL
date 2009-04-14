@@ -127,11 +127,11 @@ void CTimeStamp::operator=(time_t tTime)
 {
 	struct tm* pTime = localtime(&tTime);
 
-	year     = (SQLSMALLINT)  (pTime->tm_year + 1900);
-	month    = (SQLUSMALLINT) (pTime->tm_mon  + 1);
-	day      = (SQLUSMALLINT) pTime->tm_mday;
-	hour     = (SQLUSMALLINT) pTime->tm_hour;
-	minute   = (SQLUSMALLINT) pTime->tm_min;
-	second   = (SQLUSMALLINT) pTime->tm_sec;
+	year     = static_cast<SQLSMALLINT> (pTime->tm_year + 1900);
+	month    = static_cast<SQLUSMALLINT>(pTime->tm_mon  + 1);
+	day      = static_cast<SQLUSMALLINT>(pTime->tm_mday);
+	hour     = static_cast<SQLUSMALLINT>(pTime->tm_hour);
+	minute   = static_cast<SQLUSMALLINT>(pTime->tm_min);
+	second   = static_cast<SQLUSMALLINT>(pTime->tm_sec);
 	fraction = 0;
 }

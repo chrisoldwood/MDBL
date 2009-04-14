@@ -40,7 +40,7 @@ CTable::CTable(CMDB& oDB, const tchar* pszName, uint nFlags)
 	, m_nInsertions(0)
 	, m_nUpdates(0)
 	, m_nDeletions(0)
-	, m_nIdentCol(-1)
+	, m_nIdentCol(Core::npos)
 	, m_nIdentVal(0)
 	, m_pNullRow(NULL)
 {
@@ -158,7 +158,7 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 	ASSERT(pColumn != NULL);
 
 	// Add to the table.
-	int i = m_vColumns.Add(*pColumn);
+	size_t i = m_vColumns.Add(*pColumn);
 
 	// Is identity column?
 	if (pColumn->ColType() == MDCT_IDENTITY)
@@ -198,7 +198,7 @@ size_t CTable::AddColumn(const tchar* pszName, CTable& oTable, size_t nColumn, u
 	CColumn* pColumn = new CColumn(*this, pszName, oTable, nColumn, oTable.m_vColumns[nColumn], nFlags);
 
 	// Add to the table.
-	int i = m_vColumns.Add(*pColumn);
+	size_t i = m_vColumns.Add(*pColumn);
 
 	// If unique add index.
 	if (nFlags & CColumn::UNIQUE)
@@ -400,7 +400,7 @@ size_t CTable::InsertRow(CRow& oRow, bool bNew)
 	}
 
 	// Append it.
-	int nRow = m_vRows.Add(oRow);
+	size_t nRow = m_vRows.Add(oRow);
 
 	// Call "trigger".
 	OnAfterInsert(oRow);
@@ -825,18 +825,18 @@ void CTable::Write(WCL::IOutputStream& rStream)
 	if (Transient())
 		return;
 
-	int32 nColumns = m_vColumns.Count();
+	uint32 nColumns = static_cast<uint32>(m_vColumns.Count());
 
 	// Write the column count.
 	rStream << nColumns;
 
-	int32 nRows = m_vRows.Count();
+	uint32 nRows = static_cast<uint32>(m_vRows.Count());
 
 	// Write the row count.
 	rStream << nRows;
 
 	// Write the actual rows.
-	for (int i = 0; i < nRows; ++i)
+	for (size_t i = 0; i != nRows; ++i)
 		m_vRows[i].Write(rStream);
 
 	// Write the identity value.
@@ -1386,7 +1386,7 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 		CheckColumn(oRow, k, oRow[k], bUpdate);
 
 		CTable* pFKTable  = m_vColumns[k].FKTable();
-		int     nFKColumn = m_vColumns[k].FKColumn();
+		size_t  nFKColumn = m_vColumns[k].FKColumn();
 
 		if ( (pFKTable == NULL) || (bIsNull) )
 			continue;
@@ -1432,9 +1432,9 @@ void CTable::CheckColumn(CRow& /*oRow*/, size_t /*nColumn*/, const CValue& /*oVa
 
 void CTable::Dump(WCL::IOutputStream& rStream) const
 {
-	TArray<int>	aiColWidths;
-	CString		strColList;
-	int			nRowWidth = 0;
+	TArray<size_t>	aiColWidths;
+	CString			strColList;
+	size_t			nRowWidth = 0;
 
 	// Get the column widths and name list.
 	for (size_t i = 0; i < m_vColumns.Count(); ++i)
@@ -1442,9 +1442,9 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 		CColumn& oColumn = m_vColumns[i];
 
 		// Get the column value width and name.
-		int     nWidth   = oColumn.DisplayWidth(true);
+		size_t  nWidth   = oColumn.DisplayWidth(true);
 		CString strName  = oColumn.Name();
-		int     nNameLen = strName.Length();
+		size_t  nNameLen = strName.Length();
 
 		// Truncate long fields to 20 chars.
 		if (nWidth > 20)
@@ -1510,8 +1510,8 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 		for (size_t c = 0; c < m_vColumns.Count(); c++)
 		{
 			CString strValue  = oRow[c].DbgFormat();
-			int     nValueLen = strValue.Length();
-			int     nColWidth = aiColWidths[c];
+			size_t  nValueLen = strValue.Length();
+			size_t  nColWidth = aiColWidths[c];
 
 			// Value longer than field?
 			if (nValueLen > nColWidth)

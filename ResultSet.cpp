@@ -210,8 +210,8 @@ int CResultSet::Compare(const void* ppRow1, const void* ppRow2)
 	for (size_t k = 0; k < g_pSortOrder->Count(); ++k)
 	{
 		// Get the column and direction.
-		int nColumn = g_pSortOrder->Column(k);
-		int nDir    = g_pSortOrder->Direction(k);
+		size_t nColumn = g_pSortOrder->Column(k);
+		int    nDir    = g_pSortOrder->Direction(k);
 
 		// Compare the column values.
 		int nCmp = pRow1->Field(nColumn).Compare(pRow2->Field(nColumn));
@@ -480,9 +480,9 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 {
 	ASSERT(m_pTable != NULL);
 
-	TArray<int>	aiColWidths;
-	CString		strColList;
-	int			nRowWidth = 0;
+	TArray<size_t>	aiColWidths;
+	CString			strColList;
+	size_t			nRowWidth = 0;
 
 	// Get the column widths and name list.
 	for (size_t i = 0; i < m_pTable->ColumnCount(); ++i)
@@ -490,9 +490,9 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 		const CColumn& oColumn = m_pTable->Column(i);
 
 		// Get the column value width and name.
-		int     nWidth   = oColumn.DisplayWidth(true);
+		size_t  nWidth   = oColumn.DisplayWidth(true);
 		CString strName  = oColumn.Name();
-		int     nNameLen = strName.Length();
+		size_t  nNameLen = strName.Length();
 
 		// Truncate long fields to 20 chars.
 		if (nWidth > 20)
@@ -558,8 +558,8 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 		for (size_t c = 0; c < m_pTable->ColumnCount(); c++)
 		{
 			CString strValue  = oRow[c].DbgFormat();
-			int     nValueLen = strValue.Length();
-			int     nColWidth = aiColWidths[c];
+			size_t  nValueLen = strValue.Length();
+			size_t  nColWidth = aiColWidths[c];
 
 			// Value longer than field?
 			if (nValueLen > nColWidth)
