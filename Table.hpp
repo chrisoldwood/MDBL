@@ -52,7 +52,7 @@ public:
 	virtual size_t AddColumn(const tchar* pszName, CTable& oTable, size_t nColumn, uint nFlags = CColumn::FOREIGNKEY);
 	virtual void DropColumn(size_t nColumn);
 	virtual void DropAllColumns();
-	virtual int FindColumn(const tchar* pszName);
+	virtual size_t FindColumn(const tchar* pszName);
 
 	//
 	// Index methods.
@@ -143,7 +143,7 @@ protected:
 	size_t		m_nInsertions;	// Rows inserted.
 	size_t		m_nUpdates;		// Fields updated.
 	size_t		m_nDeletions;	// Rows removed.
-	int			m_nIdentCol;	// Identity column, if one.
+	size_t		m_nIdentCol;	// Identity column, if one.
 	int			m_nIdentVal;	// Next identity value.
 	CRow*		m_pNullRow;		// The null row, if created.
 	CString		m_strSQLTable;	// SQL table name, if different.
@@ -220,7 +220,7 @@ inline const CColumn& CTable::Column(size_t n) const
 	return m_vColumns.Column(n);
 }
 
-inline int CTable::FindColumn(const tchar* pszName)
+inline size_t CTable::FindColumn(const tchar* pszName)
 {
 	return m_vColumns.Find(pszName);
 }

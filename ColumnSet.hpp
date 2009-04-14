@@ -44,7 +44,7 @@ public:
 	size_t Add(CColumn& oColumn);
 	void Delete(size_t n);
 	void DeleteAll();
-	int  Find(const tchar* pszName);
+	size_t Find(const tchar* pszName);
 
 	size_t AllocSize() const;
 

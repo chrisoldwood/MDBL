@@ -44,7 +44,7 @@ public:
 	virtual CTable& CreateTable(const tchar* pszName);
 	virtual CTable& CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery = NULL);
 	virtual size_t  AddTable(CTable& oTable);
-	virtual int     FindTable(const tchar* pszName);
+	virtual size_t  FindTable(const tchar* pszName);
 
 	//
 	// Query methods.
@@ -78,7 +78,7 @@ protected:
 	//
 	// Internal methods.
 	//
-	uint DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const;
+	size_t DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const;
 };
 
 /******************************************************************************

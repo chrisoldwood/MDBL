@@ -57,7 +57,7 @@ CColumnSet::~CColumnSet()
 
 size_t CColumnSet::AllocSize() const
 {
-	int nSize = 0;
+	size_t nSize = 0;
 
 	for (size_t i = 0; i < Count(); ++i)
 		nSize += Column(i).AllocSize();
@@ -115,7 +115,7 @@ void CColumnSet::DeleteAll()
 *******************************************************************************
 */
 
-int CColumnSet::Find(const tchar* pszName)
+size_t CColumnSet::Find(const tchar* pszName)
 {
 	ASSERT(pszName != NULL);
 
@@ -125,5 +125,5 @@ int CColumnSet::Find(const tchar* pszName)
 			return i;
 	}
 
-	return -1;
+	return Core::npos;
 }
