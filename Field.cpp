@@ -170,7 +170,7 @@ CValue CField::GetValue() const
 		case MDST_STRING:		return m_pString;
 		case MDST_BOOL:			return *m_pBool;
 		case MDST_TIME_T:		return *m_pTimeT;
-		case MDST_TIMESTAMP:	return (time_t) *m_pTimeStamp;
+		case MDST_TIMESTAMP:	return static_cast<time_t>(*m_pTimeStamp);
 		case MDST_POINTER:		return m_pVoidPtr;
 	}
 
@@ -276,7 +276,7 @@ void CField::SetInt(int iValue)
 
 #ifdef _DEBUG
 	CTable* pFKTable  = m_oColumn.FKTable();
-	int     nFKColumn = m_oColumn.FKColumn();
+	size_t  nFKColumn = m_oColumn.FKColumn();
 
 	// If foreign key column, check value exists.
 	if (pFKTable != NULL)
@@ -415,7 +415,7 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, (time_t)tsValue, true);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, static_cast<time_t>(tsValue), true);
 #endif //_DEBUG
 
 	*m_pTimeStamp = tsValue;
@@ -895,8 +895,8 @@ CString CField::FormatBool(const tchar* pszFormat) const
 	// Copy the whole string and find
 	// the length and pos of the separator.
 	CString str  = pszFormat;
-	int     nLen = str.Length();
-	int     nSep = str.Find(TXT('|'));
+	size_t  nLen = str.Length();
+	size_t  nSep = str.Find(TXT('|'));
 
 	// Delete either the 1st or 2nd substring.
 	if (*m_pBool == false)
