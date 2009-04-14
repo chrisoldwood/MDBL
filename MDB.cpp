@@ -166,7 +166,7 @@ size_t CMDB::AddTable(CTable& oTable)
 *******************************************************************************
 */
 
-int CMDB::FindTable(const tchar* pszName)
+size_t CMDB::FindTable(const tchar* pszName)
 {
 	// For all tables.
 	for (size_t i = 0; i < m_vTables.Count(); ++i)
@@ -175,7 +175,7 @@ int CMDB::FindTable(const tchar* pszName)
 			return i;
 	}
 
-	return -1;
+	return Core::npos;
 }
 
 /******************************************************************************
@@ -194,12 +194,12 @@ CJoinedSet CMDB::Select(const CJoin& oQuery) const
 {
 	ASSERT(oQuery.Count() > 1);
 
-	int nJoins = oQuery.Count();
+	size_t nJoins = oQuery.Count();
 
 	// Create the table list.
 	CTable** apTables = static_cast<CTable**>(_alloca(sizeof(CTable*) * nJoins));
 
-	for (int i = 0; i < nJoins; ++i)
+	for (size_t i = 0; i != nJoins; ++i)
 		apTables[i] = &Table(oQuery[i].m_nTable);;
 
 	// Create the joined result set.
@@ -225,7 +225,7 @@ CJoinedSet CMDB::Select(const CJoin& oQuery) const
 *******************************************************************************
 */
 
-uint CMDB::DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const
+size_t CMDB::DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoinedSet& oJS) const
 {
 	// Get the table to join on.
 	CTable& oRHSTable = Table(oQuery[nJoin].m_nTable);
@@ -234,7 +234,7 @@ uint CMDB::DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoine
 	size_t nLHSColumn = oQuery[nJoin].m_nLHSColumn;
 	size_t nRHSColumn = oQuery[nJoin].m_nRHSColumn;
 
-	uint nMatches = 0;
+	size_t nMatches = 0;
 
 	// For all rows in the table.
 	for (size_t r = 0; r < oRHSTable.RowCount(); ++r)
@@ -378,8 +378,8 @@ void CMDB::Write(CSQLSource& rSource, CTable::RowTypes eRows)
 	if (eRows & CTable::DELETED)
 	{
 		// Process deletions from table n to 1.
-		for (int i = m_vTables.Count()-1; i >= 0; i--)
-			m_vTables[i].Write(rSource, CTable::DELETED);
+		for (size_t i = m_vTables.Count(); i != 0; --i)
+			m_vTables[i-1].Write(rSource, CTable::DELETED);
 	}
 }
 
