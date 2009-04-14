@@ -96,7 +96,7 @@ void CODBCSource::Open(const tchar* pszConnection)
 		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, NULL, 0);
 
 	// Say we're ODBC v3.x compliant.
-	rc = ::SQLSetEnvAttr(m_hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
+	rc = ::SQLSetEnvAttr(m_hEnv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), SQL_IS_INTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_CONNECT_FAILED, pszConnection, m_hEnv, SQL_HANDLE_ENV);
@@ -582,7 +582,7 @@ void CODBCSource::BeginTrans()
 	ASSERT(m_bInTrans == false);
 
 	// Start the transaction.
-	SQLRETURN rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER);
+	SQLRETURN rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, reinterpret_cast<SQLPOINTER>(SQL_AUTOCOMMIT_OFF), SQL_IS_UINTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("Begin Transaction"), m_hDBC, SQL_HANDLE_DBC);
@@ -617,7 +617,7 @@ void CODBCSource::CommitTrans()
 		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("Commit Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	// End the transaction.
-	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
+	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, reinterpret_cast<SQLPOINTER>(SQL_AUTOCOMMIT_ON), SQL_IS_UINTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("End Transaction"), m_hDBC, SQL_HANDLE_DBC);
@@ -652,7 +652,7 @@ void CODBCSource::RollbackTrans()
 		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("Rollback Transaction"), m_hDBC, SQL_HANDLE_DBC);
 
 	// End the transaction.
-	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
+	rc = ::SQLSetConnectAttr(m_hDBC, SQL_ATTR_AUTOCOMMIT, reinterpret_cast<SQLPOINTER>(SQL_AUTOCOMMIT_ON), SQL_IS_UINTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_TRANS_FAILED, TXT("End Transaction"), m_hDBC, SQL_HANDLE_DBC);
@@ -747,7 +747,7 @@ void CODBCSource::InstalledSources(CStrArray& astrSources)
 		throw CODBCException(CODBCException::E_ENUMINFO_FAILED, TXT("SQLAllocHandle"), NULL, 0);
 
 	// Say we're ODBC v3.x compliant.
-	rc = ::SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
+	rc = ::SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), SQL_IS_INTEGER);
 
 	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 		throw CODBCException(CODBCException::E_CONNECT_FAILED, TXT("SQLSetEnvAttr"), hEnv, SQL_HANDLE_ENV);
