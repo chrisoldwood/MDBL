@@ -193,14 +193,14 @@ size_t CColumn::DisplayWidth(bool bDebug) const
 
 		switch (m_eStgType)
 		{
-			case MDST_INT:			return std::max(nMin, 10u);
-			case MDST_DOUBLE:		return std::max(nMin, 15u);
-			case MDST_CHAR:			return std::max(nMin, 1u);
-			case MDST_STRING:		return std::max(nMin, m_nLength);
-			case MDST_BOOL:			return std::max(nMin, 1u);
-			case MDST_TIME_T:		return std::max(nMin, 17u);
-			case MDST_TIMESTAMP:	return std::max(nMin, 17u);
-			case MDST_POINTER:		return std::max(nMin, 10u);
+			case MDST_INT:			return std::max<size_t>(nMin, 10u);
+			case MDST_DOUBLE:		return std::max<size_t>(nMin, 15u);
+			case MDST_CHAR:			return std::max<size_t>(nMin, 1u);
+			case MDST_STRING:		return std::max<size_t>(nMin, m_nLength);
+			case MDST_BOOL:			return std::max<size_t>(nMin, 1u);
+			case MDST_TIME_T:		return std::max<size_t>(nMin, 17u);
+			case MDST_TIMESTAMP:	return std::max<size_t>(nMin, 17u);
+			case MDST_POINTER:		return std::max<size_t>(nMin, 10u);
 		}
 	}
 
