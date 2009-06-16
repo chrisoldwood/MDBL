@@ -17,6 +17,7 @@
 #include "Where.hpp"
 #include <WCL/IInputStream.hpp>
 #include <WCL/IOutputStream.hpp>
+#include <malloc.h>
 
 /******************************************************************************
 ** Method:		Constructor.

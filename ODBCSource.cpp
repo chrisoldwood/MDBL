@@ -15,6 +15,7 @@
 #include "ODBCCursor.hpp"
 #include "TimeStamp.hpp"
 #include <WCL/StrArray.hpp>
+#include <malloc.h>
 
 // Linker directives.
 #pragma comment(lib, "odbc32")

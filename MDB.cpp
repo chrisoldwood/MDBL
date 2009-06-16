@@ -14,6 +14,7 @@
 #include "SQLException.hpp"
 #include "JoinedSet.hpp"
 #include "Join.hpp"
+#include <malloc.h>
 
 /******************************************************************************
 ** Method:		Constructor.

@@ -20,6 +20,7 @@
 #include "SQLException.hpp"
 #include "SQLParams.hpp"
 #include "ODBCException.hpp"
+#include <malloc.h>
 
 /******************************************************************************
 ** Method:		Constructor.
