@@ -103,11 +103,11 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 			break;
 
 		case MDCT_CHAR:
-			pColumn = new CColumn(*this, pszName, MDCT_CHAR,      1,       Core::NumBytes<tchar>(1),	nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_CHAR,      1,       Core::numBytes<tchar>(1),	nFlags);
 			break;
 
 		case MDCT_FXDSTR:
-			pColumn = new CColumn(*this, pszName, MDCT_FXDSTR,    nLength, Core::NumBytes<tchar>(nLength+1),	nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_FXDSTR,    nLength, Core::numBytes<tchar>(nLength+1),	nFlags);
 			break;
 
 		case MDCT_VARSTR:
@@ -1461,7 +1461,7 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 		else if (nWidth > nNameLen)
 		{
 			size_t nPadChars = (nWidth - nNameLen);
-			size_t nBytes    = Core::NumBytes<tchar>(nPadChars+1);
+			size_t nBytes    = Core::numBytes<tchar>(nPadChars+1);
 
 			// Create padding with spaces.
 			tchar* pszPad = static_cast<tchar*>(_alloca(nBytes));

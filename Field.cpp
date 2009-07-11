@@ -356,7 +356,7 @@ void CField::SetString(const tchar* sValue)
 
 	// Variable buffer string?
 	if (m_oColumn.ColType() == MDCT_VARSTR)
-		m_pString = static_cast<tchar*>(realloc(m_pString, Core::NumBytes<tchar>(tstrlen(sValue)+1)));
+		m_pString = static_cast<tchar*>(realloc(m_pString, Core::numBytes<tchar>(tstrlen(sValue)+1)));
 
 	tstrcpy(m_pString, sValue);
 	m_bNull = false;
@@ -524,7 +524,7 @@ void CField::SetRaw(const void* pValue)
 
 		tchar* pString = static_cast<tchar*>(m_pVoidPtr);
 
-		Core::AnsiToWide(pszValue, pszValue+nChars, pString);
+		Core::ansiToWide(pszValue, pszValue+nChars, pString);
 #endif
 	}
 	// Variable buffer string?
@@ -533,12 +533,12 @@ void CField::SetRaw(const void* pValue)
 		const char* pszValue = static_cast<const char*>(pValue);
 		size_t      nChars   = strlen(pszValue);
 
-		m_pString = static_cast<tchar*>(realloc(m_pString, Core::NumBytes<tchar>(nChars+1)));
+		m_pString = static_cast<tchar*>(realloc(m_pString, Core::numBytes<tchar>(nChars+1)));
 
 #ifdef ANSI_BUILD
 		strcpy(m_pString, pszValue);
 #else
-		Core::AnsiToWide(pszValue, pszValue+nChars, m_pString);
+		Core::ansiToWide(pszValue, pszValue+nChars, m_pString);
 #endif
 	}
 	// POINTER based type?

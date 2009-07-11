@@ -461,9 +461,9 @@ size_t CODBCSource::BufferSize(COLTYPE eColType, size_t nColSize)
 	{
 		case MDCT_INT:			nSize = sizeof(int);			break;
 		case MDCT_DOUBLE:		nSize = sizeof(double);			break;
-		case MDCT_CHAR:			nSize = Core::NumBytes<char>(1+1);			break;	// ANSI only.
-		case MDCT_FXDSTR:		nSize = Core::NumBytes<char>(nColSize+1);	break;	// ANSI only.
-		case MDCT_VARSTR:		nSize = Core::NumBytes<char>(nColSize+1);	break;	// ANSI only.
+		case MDCT_CHAR:			nSize = Core::numBytes<char>(1+1);			break;	// ANSI only.
+		case MDCT_FXDSTR:		nSize = Core::numBytes<char>(nColSize+1);	break;	// ANSI only.
+		case MDCT_VARSTR:		nSize = Core::numBytes<char>(nColSize+1);	break;	// ANSI only.
 		case MDCT_BOOL:			nSize = sizeof(bool);			break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
@@ -684,7 +684,7 @@ void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
 	// Until buffer big enough.
 	for(;;)
 	{
-		size_t nBytes = Core::NumBytes<tchar>(nChars);
+		size_t nBytes = Core::numBytes<tchar>(nChars);
 
 		pszBuffer = static_cast<tchar*>(alloca(nBytes));
 

@@ -120,7 +120,7 @@ void CRow::Read(WCL::IInputStream& rStream)
 			// Read the string length.
 			rStream.Read(&nChars, sizeof(size_t));
 
-			size_t nBytes = Core::NumBytes<tchar>(nChars+1);
+			size_t nBytes = Core::numBytes<tchar>(nChars+1);
 
 			// Allocate the buffer.
 			m_aFields[i].m_pString = static_cast<tchar*>(realloc(m_aFields[i].m_pString, nBytes));
@@ -153,7 +153,7 @@ void CRow::Write(WCL::IOutputStream& rStream)
 		if (m_aFields[i].m_oColumn.ColType() == MDCT_VARSTR)
 		{
 			size_t nChars = tstrlen(m_aFields[i].m_pString);
-			size_t nBytes = Core::NumBytes<tchar>(nChars+1);
+			size_t nBytes = Core::numBytes<tchar>(nChars+1);
 
 			// Read the string length.
 			rStream.Write(&nChars, sizeof(size_t));

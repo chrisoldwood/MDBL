@@ -509,7 +509,7 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 		else if (nWidth > nNameLen)
 		{
 			size_t nPadChars = (nWidth - nNameLen);
-			size_t nBytes    = Core::NumBytes<tchar>(nPadChars+1);
+			size_t nBytes    = Core::numBytes<tchar>(nPadChars+1);
 
 			// Create padding with spaces.
 			tchar* pszPad = static_cast<tchar*>(_alloca(nBytes));
@@ -533,7 +533,7 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 	rStream.Write("\r\n", 2);
 
 	// Create the heading underline.
-	tchar* psUnderline = static_cast<tchar*>(_alloca(Core::NumBytes<tchar>(nRowWidth)));
+	tchar* psUnderline = static_cast<tchar*>(_alloca(Core::numBytes<tchar>(nRowWidth)));
 	std::fill(psUnderline, psUnderline+nRowWidth, TXT('='));
 
 	for (size_t j = 0, pos = 0; j < aiColWidths.Size(); ++j)
