@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="MDBL" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release Win32">
+				<Option output="Release\lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-frtti" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add directory="..\..\Lib" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="..\..\Lib" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Debug Win32">
+				<Option output="Debug\lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-O0" />
+					<Add option="-frtti" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_LIB" />
+					<Add directory="..\..\Lib" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="..\..\Lib" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Unit filename="AutoTrans.hpp" />
+		<Unit filename="Column.cpp" />
+		<Unit filename="Column.hpp" />
+		<Unit filename="ColumnSet.cpp" />
+		<Unit filename="ColumnSet.hpp" />
+		<Unit filename="Common.hpp" />
+		<Unit filename="Field.cpp" />
+		<Unit filename="Field.hpp" />
+		<Unit filename="FwdDecls.hpp" />
+		<Unit filename="GroupSet.cpp" />
+		<Unit filename="GroupSet.hpp" />
+		<Unit filename="Index.hpp" />
+		<Unit filename="IntMapIndex.cpp" />
+		<Unit filename="IntMapIndex.hpp" />
+		<Unit filename="Join.hpp" />
+		<Unit filename="JoinedSet.cpp" />
+		<Unit filename="JoinedSet.hpp" />
+		<Unit filename="MDB.cpp" />
+		<Unit filename="MDB.hpp" />
+		<Unit filename="MDBLTypes.hpp" />
+		<Unit filename="ODBCCursor.cpp" />
+		<Unit filename="ODBCCursor.hpp" />
+		<Unit filename="ODBCException.cpp" />
+		<Unit filename="ODBCException.hpp" />
+		<Unit filename="ODBCParams.cpp" />
+		<Unit filename="ODBCParams.hpp" />
+		<Unit filename="ODBCSource.cpp" />
+		<Unit filename="ODBCSource.hpp" />
+		<Unit filename="ReadMe.txt" />
+		<Unit filename="ResultSet.cpp" />
+		<Unit filename="ResultSet.hpp" />
+		<Unit filename="Row.cpp" />
+		<Unit filename="Row.hpp" />
+		<Unit filename="RowSet.hpp" />
+		<Unit filename="SQLCursor.hpp" />
+		<Unit filename="SQLException.cpp" />
+		<Unit filename="SQLException.hpp" />
+		<Unit filename="SQLParams.hpp" />
+		<Unit filename="SQLSource.hpp" />
+		<Unit filename="SortColumns.hpp" />
+		<Unit filename="StrMapIndex.cpp" />
+		<Unit filename="StrMapIndex.hpp" />
+		<Unit filename="TODO.txt" />
+		<Unit filename="Table.cpp" />
+		<Unit filename="Table.hpp" />
+		<Unit filename="TableSet.cpp" />
+		<Unit filename="TableSet.hpp" />
+		<Unit filename="TimeStamp.cpp" />
+		<Unit filename="TimeStamp.hpp" />
+		<Unit filename="UniqIndex.hpp" />
+		<Unit filename="Value.hpp" />
+		<Unit filename="ValueSet.hpp" />
+		<Unit filename="Where.hpp" />
+		<Unit filename="WhereCmp.cpp" />
+		<Unit filename="WhereCmp.hpp" />
+		<Unit filename="WhereExp.cpp" />
+		<Unit filename="WhereExp.hpp" />
+		<Unit filename="WhereIn.cpp" />
+		<Unit filename="WhereIn.hpp" />
+		<Unit filename="WhereNot.cpp" />
+		<Unit filename="WhereNot.hpp" />
+		<Unit filename="pch.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
