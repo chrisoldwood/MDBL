@@ -102,25 +102,28 @@ CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const t
 	{
 		pCursor = oConnection.ExecQuery(pszQuery);
 
-		// Setup the tables' schema.
-		for (size_t i = 0; i < pCursor->NumColumns(); ++i)
+		if (pCursor->NumColumns() != 0)
 		{
-			SQLColumn& oColumn = pCursor->Column(i);
+			// Setup the tables' schema.
+			for (size_t i = 0; i < pCursor->NumColumns(); ++i)
+			{
+				SQLColumn& oColumn = pCursor->Column(i);
 
-			pTable->AddColumn(oColumn.m_strName, oColumn.m_eMDBColType, oColumn.m_nSize, oColumn.m_nFlags);
-		}
+				pTable->AddColumn(oColumn.m_strName, oColumn.m_eMDBColType, oColumn.m_nSize, oColumn.m_nFlags);
+			}
 
-		// For all rows.
-		while (pCursor->Fetch())
-		{
-			// Allocate the row.
-			CRow& oRow = pTable->CreateRow();
+			// For all rows.
+			while (pCursor->Fetch())
+			{
+				// Allocate the row.
+				CRow& oRow = pTable->CreateRow();
 
-			// Copy the data.
-			pCursor->GetRow(oRow);
+				// Copy the data.
+				pCursor->GetRow(oRow);
 
-			// Append to table.
-			pTable->InsertRow(oRow, false);
+				// Append to table.
+				pTable->InsertRow(oRow, false);
+			}
 		}
 
 		// Cleanup.

@@ -333,10 +333,11 @@ void CODBCSource::ExecQuery(const tchar* pszQuery, CODBCCursor& oCursor)
 	// Execute the query.
 	rc = ::SQLExecDirect(hStmt, ptszQuery, SQL_NTS);
 
-	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
+	if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) && (rc != SQL_NO_DATA) )
 		throw CODBCException(CODBCException::E_EXEC_FAILED, pszQuery, hStmt, SQL_HANDLE_STMT);
 
-	oCursor.Open(pszQuery, hStmt);
+	if (rc != SQL_NO_DATA)
+		oCursor.Open(pszQuery, hStmt);
 }
 
 /******************************************************************************

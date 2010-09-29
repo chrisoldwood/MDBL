@@ -106,11 +106,12 @@ void CODBCCursor::Open(const tchar* pszStmt, SQLHSTMT hStmt)
 		// Move to next result set.
 		rc = ::SQLMoreResults(m_hStmt);
 
+		if (rc == SQL_NO_DATA)
+			break;
+
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 	}
-
-	ASSERT(m_nColumns > 0);
 
 	// Allocate column list.
 	m_pColumns = new SQLColumn[m_nColumns];
