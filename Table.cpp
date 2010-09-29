@@ -69,6 +69,7 @@ CTable::~CTable()
 ** Method:		AddColumn()
 **
 ** Description:	Appends a data column to the table.
+**				NB: Database result sets can have duplicate column names.
 **
 ** Parameters:	pszName		The name.
 **				eType		The data type.
@@ -83,7 +84,6 @@ CTable::~CTable()
 size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, uint nFlags)
 {
 	ASSERT(m_vRows.Count() == 0);
-	ASSERT(FindColumn(pszName) == -1);
 	ASSERT(!((eType == MDCT_IDENTITY) && (m_nIdentCol != -1)));
 
 	// Apply table settings to all columns.
