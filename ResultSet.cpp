@@ -245,10 +245,11 @@ CValue CResultSet::Sum(size_t nColumn) const
 	bool    bNullable = oColumn.Nullable();
 	CValue  oSum(null);
 
-	ASSERT( (eType == MDST_INT) || (eType == MDST_DOUBLE) );
+	ASSERT( (eType == MDST_INT) || (eType == MDST_INT64) || (eType == MDST_DOUBLE) );
 
 	// Initialise the result.
 	if      (eType == MDST_INT)		oSum = CValue(0);
+	else if (eType == MDST_INT64)	oSum = CValue(0i64);
 	else if (eType == MDST_DOUBLE)	oSum = CValue(0.0);
 
 	// Sum the rows.
@@ -261,6 +262,7 @@ CValue CResultSet::Sum(size_t nColumn) const
 			continue;
 
 		if      (eType == MDST_INT)		oSum.m_iValue += oField.GetInt();
+		else if (eType == MDST_INT64)	oSum.m_i64Value += oField.GetInt64();
 		else if (eType == MDST_DOUBLE)	oSum.m_dValue += oField.GetDouble();
 	}
 

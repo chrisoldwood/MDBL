@@ -32,6 +32,7 @@ public:
 	//
 	CValue(const CNull& oNull);
 	CValue(int iValue);
+	CValue(int64 i64Value);
 	CValue(double dValue);
 	CValue(tchar cValue);
 	CValue(const tchar* sValue);
@@ -53,6 +54,7 @@ public:
 union
 {
 	int		m_iValue;		// Value if type is MDST_INT
+	int64	m_i64Value;		// Value if type is MDST_INT64
 	double	m_dValue;		// Value if type is MDST_DOUBLE.
 	tchar	m_cValue;		// Value if type is MDST_CHAR.
 	tchar*	m_sValue;		// Value if type is MDST_STRING
@@ -81,6 +83,13 @@ inline CValue::CValue(int iValue)
 	: m_eType(MDST_INT)
 	, m_bNull(false)
 	, m_iValue(iValue)
+{
+}
+
+inline CValue::CValue(int64 i64Value)
+	: m_eType(MDST_INT64)
+	, m_bNull(false)
+	, m_i64Value(i64Value)
 {
 }
 

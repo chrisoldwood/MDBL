@@ -370,7 +370,7 @@ COLTYPE CODBCSource::MDBType(SQLSMALLINT nODBCType)
 		// Floating point types.
 		case SQL_NUMERIC:			return MDCT_DOUBLE;
 		case SQL_DECIMAL:			return MDCT_DOUBLE;
-		case SQL_REAL:				break;
+		case SQL_REAL:				return MDCT_DOUBLE;
 		case SQL_FLOAT:				return MDCT_DOUBLE;
 		case SQL_DOUBLE:			return MDCT_DOUBLE;
 
@@ -378,18 +378,18 @@ COLTYPE CODBCSource::MDBType(SQLSMALLINT nODBCType)
 		case SQL_INTEGER:			return MDCT_INT;
 		case SQL_SMALLINT:			return MDCT_INT;
 		case SQL_TINYINT:			return MDCT_INT;
-		case SQL_BIGINT:			break;
+		case SQL_BIGINT:			return MDCT_INT64;
 
 		// Boolean types.
 		case SQL_BIT:				return MDCT_BOOL;
 
 		// Date/Time types.
-		case SQL_DATE:				break;
-		case SQL_TIME:				break;
-		case SQL_TIMESTAMP:			break;
-		case SQL_TYPE_DATE:			return MDCT_TIMESTAMP;
-		case SQL_TYPE_TIME:			return MDCT_TIMESTAMP;
-		case SQL_TYPE_TIMESTAMP:	return MDCT_TIMESTAMP;
+		//case SQL_DATE:			break;					/* ODBC 2.x */
+		//case SQL_TIME:			break;					/* ODBC 2.x */
+		//case SQL_TIMESTAMP:		break;					/* ODBC 2.x */
+		case SQL_TYPE_DATE:			return MDCT_TIMESTAMP;	/* ODBC 3.x */
+		case SQL_TYPE_TIME:			return MDCT_TIMESTAMP;	/* ODBC 3.x */
+		case SQL_TYPE_TIMESTAMP:	return MDCT_TIMESTAMP;	/* ODBC 3.x */
 
 		// Blob types.
 		case SQL_BINARY:			break;
@@ -400,6 +400,7 @@ COLTYPE CODBCSource::MDBType(SQLSMALLINT nODBCType)
 		default:					break;
 	}
 
+	TRACE1(TXT("Unsupported SQL type: %d"), nODBCType);
 	ASSERT_FALSE();
 
 	// Unsupported.
@@ -422,17 +423,24 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 {
 	switch (eMDBType)
 	{
-		case MDCT_INT:			return SQL_INTEGER;
-		case MDCT_DOUBLE:		return SQL_DOUBLE;
-		case MDCT_CHAR:			return SQL_CHAR;
-		case MDCT_FXDSTR:		return SQL_CHAR;
-		case MDCT_VARSTR:		return SQL_CHAR;
-		case MDCT_BOOL:			return SQL_BIT;
-		case MDCT_IDENTITY:		return SQL_INTEGER;
-		case MDCT_DATETIME:		return SQL_TYPE_TIMESTAMP;
-		case MDCT_DATE:			return SQL_TYPE_TIMESTAMP;
-		case MDCT_TIME:			return SQL_TYPE_TIMESTAMP;
-		case MDCT_TIMESTAMP:	return SQL_TYPE_TIMESTAMP;
+		case MDCT_INT:			return SQL_C_LONG;
+		case MDCT_INT64:		return SQL_C_SBIGINT;
+		case MDCT_DOUBLE:		return SQL_C_DOUBLE;
+#ifdef ANSI_BUILD
+		case MDCT_CHAR:			return SQL_C_CHAR;
+		case MDCT_FXDSTR:		return SQL_C_CHAR;
+		case MDCT_VARSTR:		return SQL_C_CHAR;
+#else
+		case MDCT_CHAR:			return SQL_C_WCHAR;
+		case MDCT_FXDSTR:		return SQL_C_WCHAR;
+		case MDCT_VARSTR:		return SQL_C_WCHAR;
+#endif
+		case MDCT_BOOL:			return SQL_C_BIT;
+		case MDCT_IDENTITY:		return SQL_C_LONG;
+		case MDCT_DATETIME:		return SQL_C_TYPE_TIMESTAMP;
+		case MDCT_DATE:			return SQL_C_TYPE_TIMESTAMP;
+		case MDCT_TIME:			return SQL_C_TYPE_TIMESTAMP;
+		case MDCT_TIMESTAMP:	return SQL_C_TYPE_TIMESTAMP;
 	}
 
 	ASSERT_FALSE();
@@ -461,10 +469,11 @@ size_t CODBCSource::BufferSize(COLTYPE eColType, size_t nColSize)
 	switch (eColType)
 	{
 		case MDCT_INT:			nSize = sizeof(int);			break;
+		case MDCT_INT64:		nSize = sizeof(int64);			break;
 		case MDCT_DOUBLE:		nSize = sizeof(double);			break;
-		case MDCT_CHAR:			nSize = Core::numBytes<char>(1+1);			break;	// ANSI only.
-		case MDCT_FXDSTR:		nSize = Core::numBytes<char>(nColSize+1);	break;	// ANSI only.
-		case MDCT_VARSTR:		nSize = Core::numBytes<char>(nColSize+1);	break;	// ANSI only.
+		case MDCT_CHAR:			nSize = Core::numBytes<tchar>(1+1);			break;
+		case MDCT_FXDSTR:		nSize = Core::numBytes<tchar>(nColSize+1);	break;
+		case MDCT_VARSTR:		nSize = Core::numBytes<tchar>(nColSize+1);	break;
 		case MDCT_BOOL:			nSize = sizeof(bool);			break;
 		case MDCT_IDENTITY:		nSize = sizeof(int);			break;
 		case MDCT_DATETIME:		nSize = sizeof(CTimeStamp);		break;
@@ -499,6 +508,7 @@ size_t CODBCSource::ColumnSize(COLTYPE eColType, size_t nColSize)
 	switch (eColType)
 	{
 		case MDCT_INT:			return 0;
+		case MDCT_INT64:		return 0;
 		case MDCT_DOUBLE:		return 0;
 		case MDCT_CHAR:			return 1;
 		case MDCT_FXDSTR:		return nColSize;

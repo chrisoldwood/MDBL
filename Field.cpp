@@ -24,7 +24,8 @@ CNull null;
 static const tchar* pszFormats[] = 
 {
 	TXT("%d"),					// MDCT_INT
-	TXT("%.2f"),				// MDCT_DOUBLE
+	TXT("%I64d"),				// MDCT_INT64
+	TXT("%g"),					// MDCT_DOUBLE
 	TXT("%c"),					// MDCT_CHAR
 	TXT("%s"),					// MDCT_FXDSTR
 	TXT("%s"),					// MDCT_VARSTR
@@ -107,6 +108,14 @@ int CField::GetInt() const
 	return *m_pInt;
 }
 
+int64 CField::GetInt64() const
+{
+	ASSERT(m_bNull   != true);
+	ASSERT(m_oColumn.StgType() == MDST_INT64);
+
+	return *m_pInt64;
+}
+
 double CField::GetDouble() const
 {
 	ASSERT(m_bNull   != true);
@@ -165,6 +174,7 @@ CValue CField::GetValue() const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			return *m_pInt;
+		case MDST_INT64:		return *m_pInt64;
 		case MDST_DOUBLE:		return *m_pDouble;
 		case MDST_CHAR:			return *m_pChar;
 		case MDST_STRING:		return m_pString;
@@ -295,6 +305,37 @@ void CField::SetInt(int iValue)
 
 	*m_pInt = iValue;
 	m_bNull = false;
+
+	Updated();
+}
+
+void CField::SetInt64(int64 iValue)
+{
+	ASSERT(m_oColumn.StgType() == MDST_INT64);
+	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+
+#ifdef _DEBUG
+	CTable* pFKTable  = m_oColumn.FKTable();
+	size_t  nFKColumn = m_oColumn.FKColumn();
+
+	// If foreign key column, check value exists.
+	if (pFKTable != NULL)
+	{
+		ASSERT(pFKTable->SelectRow(nFKColumn, iValue) != NULL);
+	}
+#endif //_DEBUG
+
+	if ( (m_bNull == false) && (*m_pInt64 == iValue) )
+		return;
+
+#ifdef _DEBUG
+	if (m_oRow.InTable())
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, iValue, true);
+#endif //_DEBUG
+
+	*m_pInt64 = iValue;
+	m_bNull   = false;
 
 	Updated();
 }
@@ -437,6 +478,7 @@ void CField::SetField(const CField& oValue)
 		switch(oValue.m_oColumn.StgType())
 		{
 			case MDST_INT:		SetInt     (*oValue.m_pInt);	break;
+			case MDST_INT64:	SetInt64   (*oValue.m_pInt64);	break;
 			case MDST_DOUBLE:	SetDouble  (*oValue.m_pDouble);	break;
 			case MDST_CHAR:		SetChar    (*oValue.m_pChar);	break;
 			case MDST_STRING:	SetString  (oValue.m_pString);	break;
@@ -509,37 +551,32 @@ void CField::SetRaw(const void* pValue)
 	// Single char?
 	if (m_oColumn.ColType() == MDCT_CHAR)
 	{
-		const char* pszValue = static_cast<const char*>(pValue);
+		const tchar* pszValue = static_cast<const tchar*>(pValue);
 
 		*m_pChar = *pszValue;
 	}
 	// Fixed buffer string?
 	else if (m_oColumn.ColType() == MDCT_FXDSTR)
 	{
-#ifdef ANSI_BUILD
-		memcpy(m_pVoidPtr, pValue, m_oColumn.AllocSize());
-#else
-		const char* pszValue = static_cast<const char*>(pValue);
-		size_t      nChars   = m_oColumn.Length();
+		const tchar* pszValue = static_cast<const tchar*>(pValue);
+		tchar*       pString = static_cast<tchar*>(m_pVoidPtr);
+		size_t       nChars  = std::min(tstrlen(pszValue), m_oColumn.Length());
 
-		tchar* pString = static_cast<tchar*>(m_pVoidPtr);
+		tstrncpy(pString, pszValue, nChars);
 
-		Core::ansiToWide(pszValue, pszValue+nChars, pString);
-#endif
+		pString[nChars] = '\0';
 	}
 	// Variable buffer string?
 	else if (m_oColumn.ColType() == MDCT_VARSTR)
 	{
-		const char* pszValue = static_cast<const char*>(pValue);
-		size_t      nChars   = strlen(pszValue);
+		const tchar* pszValue = static_cast<const tchar*>(pValue);
+		size_t       nChars   = tstrlen(pszValue);
 
 		m_pString = static_cast<tchar*>(realloc(m_pString, Core::numBytes<tchar>(nChars+1)));
 
-#ifdef ANSI_BUILD
-		strcpy(m_pString, pszValue);
-#else
-		Core::ansiToWide(pszValue, pszValue+nChars, m_pString);
-#endif
+		tstrncpy(m_pString, pszValue, nChars);
+
+		m_pString[nChars] = '\0';
 	}
 	// POINTER based type?
 	else if (m_oColumn.StgType() == MDST_POINTER)
@@ -590,6 +627,7 @@ bool CField::operator==(const CValue& oValue) const
 	switch(oValue.m_eType)
 	{
 		case MDST_INT:		return (*m_pInt     == oValue.m_iValue);
+		case MDST_INT64:	return (*m_pInt64   == oValue.m_i64Value);
 		case MDST_DOUBLE:	return (*m_pDouble  == oValue.m_dValue);
 		case MDST_CHAR:		return (*m_pChar    == oValue.m_cValue);
 		case MDST_STRING:	return (StrCmp(oValue.m_sValue) == 0);
@@ -648,6 +686,7 @@ int CField::Compare(const CField& oValue) const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			nCmp = (*m_pInt   - *oValue.m_pInt);			break;
+		case MDST_INT64:		nCmp = ::Compare(*m_pInt64, *oValue.m_pInt64);	break;
 		case MDST_DOUBLE:		nCmp = ::Compare(*m_pDouble, *oValue.m_pDouble);	break;
 		case MDST_CHAR:			nCmp = (*m_pChar  - *oValue.m_pChar);			break;
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);				break;
@@ -677,6 +716,7 @@ int CField::Compare(const CValue& oValue) const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			nCmp = (*m_pInt   - oValue.m_iValue);			break;
+		case MDST_INT64:		nCmp = ::Compare(*m_pInt64, oValue.m_i64Value);	break;
 		case MDST_DOUBLE:		nCmp = ::Compare(*m_pDouble, oValue.m_dValue);	break;
 		case MDST_CHAR:			nCmp = (*m_pChar  - oValue.m_cValue);			break;
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_sValue);					break;
@@ -744,6 +784,7 @@ CString CField::Format(const tchar* pszFormat) const
 	switch(m_oColumn.ColType())
 	{
 		case MDCT_INT:			str.Format(pszFormat, *m_pInt);		break;
+		case MDCT_INT64:		str.Format(pszFormat, *m_pInt64);	break;
 		case MDCT_DOUBLE:		str.Format(pszFormat, *m_pDouble);	break;
 		case MDCT_CHAR:			str.Format(pszFormat, *m_pChar);	break;
 		case MDCT_FXDSTR:		str = m_pString;					break;
@@ -787,6 +828,7 @@ CString CField::DbgFormat() const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			str.Format(TXT("%d"), *m_pInt);						break;
+		case MDST_INT64:		str.Format(TXT("I64d"), *m_pInt64);					break;
 		case MDST_DOUBLE:		str.Format(TXT("%f"), *m_pDouble);					break;
 		case MDST_CHAR:			str.Format(TXT("%c"), *m_pChar);					break;
 		case MDST_STRING:		str = m_pString;									break;

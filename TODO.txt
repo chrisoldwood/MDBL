@@ -1,5 +1,7 @@
 - Non-Unique index support.
 
+- Switch to Template based indexes.
+
 - Support case insensitive indexes (CStrPtrMap).
 
 - Where clause on joins.

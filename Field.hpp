@@ -38,6 +38,7 @@ public:
 	// Accessors.
 	//
 	int               GetInt()       const;
+	int64             GetInt64()     const;
 	double            GetDouble()    const;
 	tchar             GetChar()      const;
 	const tchar*      GetString()    const;
@@ -55,6 +56,7 @@ public:
 	//
 	void SetNull();
 	void SetInt(int iValue);
+	void SetInt64(int64 iValue);
 	void SetDouble(double dValue);
 	void SetChar(tchar cValue);
 	void SetString(const tchar* sValue);
@@ -142,6 +144,7 @@ protected:
 union
 {
 	int*		m_pInt;			// Pointer to value if type is MDCT_INT or MDCT_IDENTITY.
+	int64*		m_pInt64;		// Pointer to value if type is MDCT_INT64.
 	double*		m_pDouble;		// Pointer to value if type is MDCT_DOUBLE.
 	tchar*		m_pChar;		// Pointer to value if type is MDCT_CHAR.
 	tchar*		m_pString;		// Pointer to value if type is MDCT_FXDSTR or MDCT_VARSTR.

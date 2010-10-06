@@ -26,6 +26,7 @@ enum STGTYPE
 {
 	MDST_NULL,		// No type.
 	MDST_INT,		// 32-bit int.
+	MDST_INT64,		// 64-bit int.
 	MDST_DOUBLE,	// 64-bit floating-point.
 	MDST_CHAR,		// Single character.
 	MDST_STRING,	// String of characters.
@@ -45,6 +46,7 @@ enum STGTYPE
 enum COLTYPE
 {
 	MDCT_INT,		// MDST_INT.
+	MDCT_INT64,		// MDST_INT64.
 	MDCT_DOUBLE,	// MDST_DOUBLE.
 	MDCT_CHAR,		// MDST_CHAR.
 	MDCT_FXDSTR,	// MDST_STRING (using fixed length buffer).

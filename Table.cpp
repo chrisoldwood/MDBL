@@ -98,6 +98,10 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 			pColumn = new CColumn(*this, pszName, MDCT_INT,       0,       sizeof(int),        nFlags);
 			break;
 
+		case MDCT_INT64:
+			pColumn = new CColumn(*this, pszName, MDCT_INT64,     0,       sizeof(int64),      nFlags);
+			break;
+
 		case MDCT_DOUBLE:
 			pColumn = new CColumn(*this, pszName, MDCT_DOUBLE,    0,       sizeof(double),     nFlags);
 			break;

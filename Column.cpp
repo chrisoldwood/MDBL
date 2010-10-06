@@ -113,6 +113,7 @@ STGTYPE CColumn::ColToStgType(COLTYPE eType)
 	switch (eType)
 	{
 		case MDCT_INT:			return MDST_INT;
+		case MDCT_INT64:		return MDST_INT64;
 		case MDCT_DOUBLE:		return MDST_DOUBLE;
 		case MDCT_CHAR:			return MDST_CHAR;
 		case MDCT_FXDSTR:		return MDST_STRING;
@@ -171,6 +172,7 @@ size_t CColumn::DisplayWidth(bool bDebug) const
 		switch (m_eColType)
 		{
 			case MDCT_INT:			return 10;
+			case MDCT_INT64:		return 19;
 			case MDCT_DOUBLE:		return 15;
 			case MDCT_CHAR:			return 1;
 			case MDCT_FXDSTR:		return m_nLength;
@@ -194,6 +196,7 @@ size_t CColumn::DisplayWidth(bool bDebug) const
 		switch (m_eStgType)
 		{
 			case MDST_INT:			return std::max<size_t>(nMin, 10u);
+			case MDST_INT64:		return std::max<size_t>(nMin, 19u);
 			case MDST_DOUBLE:		return std::max<size_t>(nMin, 15u);
 			case MDST_CHAR:			return std::max<size_t>(nMin, 1u);
 			case MDST_STRING:		return std::max<size_t>(nMin, m_nLength);
