@@ -26,6 +26,7 @@
 
 CSQLException::CSQLException(int eErrCode, const tchar* pszSQLStmt, const CString& strSQLErr)
 	: m_eError(eErrCode)
+	, m_strError()
 {
 	// Convert error to string.
 	switch(eErrCode)

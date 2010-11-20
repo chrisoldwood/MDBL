@@ -24,6 +24,7 @@
 */
 
 CGroupSet::CGroupSet()
+	: m_oResSets()
 {
 }
 
@@ -40,6 +41,7 @@ CGroupSet::CGroupSet()
 */
 
 CGroupSet::CGroupSet(const CGroupSet& oSet)
+	: m_oResSets()
 {
 	m_oResSets.DeepCopy(oSet.m_oResSets);
 }

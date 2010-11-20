@@ -16,7 +16,7 @@
 #endif
 
 /******************************************************************************
-** 
+**
 ** The class used to hold a table used in a CJoin query.
 **
 *******************************************************************************
@@ -41,7 +41,7 @@ public:
 };
 
 /******************************************************************************
-** 
+**
 ** This class is used to hold the query when doing a SELECT involving joins.
 **
 *******************************************************************************
@@ -62,7 +62,7 @@ public:
 		INNER,
 		OUTER,
 	};
-	
+
 	//
 	// Methods.
 	//
@@ -102,14 +102,14 @@ inline size_t CJoin::Count() const
 
 inline CJoinTable& CJoin::Join(size_t n) const
 {
-	ASSERT((n >= 0) && (n < Count()));
+	ASSERT(n < Count());
 
 	return *(TPtrArray<CJoinTable>::At(n));
 }
 
 inline CJoinTable& CJoin::operator[](size_t n) const
 {
-	ASSERT((n >= 0) && (n < Count()));
+	ASSERT(n < Count());
 
 	return *(TPtrArray<CJoinTable>::At(n));
 }

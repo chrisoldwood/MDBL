@@ -41,7 +41,8 @@ CWhereNot::CWhereNot(const CWhere& oWhere)
 */
 
 CWhereNot::CWhereNot(const CWhereNot& oSrc)
-	: m_pWhere(oSrc.m_pWhere->Clone())
+	: CWhere()
+	, m_pWhere(oSrc.m_pWhere->Clone())
 {
 }
 

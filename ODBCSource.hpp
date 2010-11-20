@@ -24,7 +24,7 @@
 class CODBCCursor;
 
 /******************************************************************************
-** 
+**
 ** This Data Source is used to access Databases via ODBC.
 **
 *******************************************************************************
@@ -38,7 +38,7 @@ public:
 	//
 	CODBCSource();
 	virtual ~CODBCSource();
-	
+
 	//
 	// Connection methods.
 	//
@@ -90,6 +90,11 @@ protected:
 	// Friends.
 	//
 	friend class CODBCCursor;
+
+private:
+	// NotCopyable.
+	CODBCSource(const CODBCSource&);
+	CODBCSource& operator=(const CODBCSource&);
 };
 
 /******************************************************************************

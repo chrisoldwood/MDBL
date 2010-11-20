@@ -23,7 +23,7 @@
 class CODBCSource;
 
 /******************************************************************************
-** 
+**
 ** This is the SQL parameters type used for ODBC queries.
 **
 *******************************************************************************
@@ -66,6 +66,11 @@ protected:
 	// Internal methods.
 	//
 	virtual void Bind();
+
+private:
+	// NotCopyable.
+	CODBCParams(const CODBCParams&);
+	CODBCParams& operator=(const CODBCParams&);
 };
 
 /******************************************************************************

@@ -29,6 +29,7 @@
 */
 
 CMDB::CMDB()
+	: m_vTables()
 {
 }
 
@@ -153,7 +154,7 @@ CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const t
 
 size_t CMDB::AddTable(CTable& oTable)
 {
-	ASSERT(FindTable(oTable.Name()) == -1);
+	ASSERT(FindTable(oTable.Name()) == Core::npos);
 
 	return m_vTables.Add(oTable);
 }

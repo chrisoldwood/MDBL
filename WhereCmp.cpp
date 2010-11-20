@@ -43,7 +43,8 @@ CWhereCmp::CWhereCmp(size_t nColumn, Op eOp, const CValue& oValue)
 */
 
 CWhereCmp::CWhereCmp(const CWhereCmp& oSrc)
-	: m_nColumn(oSrc.m_nColumn)
+	: CWhere()
+	, m_nColumn(oSrc.m_nColumn)
 	, m_eOp(oSrc.m_eOp)
 	, m_oValue(oSrc.m_oValue)
 {

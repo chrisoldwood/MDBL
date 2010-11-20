@@ -21,7 +21,7 @@
 CNull null;
 
 // Default format specifiers.
-static const tchar* pszFormats[] = 
+static const tchar* pszFormats[] =
 {
 	TXT("%d"),					// MDCT_INT
 	TXT("%I64d"),				// MDCT_INT64
@@ -39,6 +39,11 @@ static const tchar* pszFormats[] =
 	TXT("%p"),					// MDCT_ROWPTR
 	TXT("%p")					// MDCT_ROWSETPTR
 };
+
+#ifdef __GNUG__
+// 'CValue::<anonymous/union>' should be initialized in the member initialization list
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -68,6 +73,11 @@ CField::CField(CRow& oRow, CColumn& oColumn, size_t nColumn, bool bNull, void* p
 	if (m_oColumn.ColType() == MDCT_VARSTR)
 		m_pString = static_cast<tchar*>(calloc(1, sizeof(tchar)));
 }
+
+#ifdef __GNUG__
+// 'CValue::<anonymous/union>' should be initialized in the member initialization list
+#pragma GCC diagnostic warning "-Weffc++"
+#endif
 
 /******************************************************************************
 ** Method:		Destructor.
@@ -173,6 +183,7 @@ CValue CField::GetValue() const
 	// Decode type.
 	switch(m_oColumn.StgType())
 	{
+		case MDST_NULL:			ASSERT_FALSE();	break;
 		case MDST_INT:			return *m_pInt;
 		case MDST_INT64:		return *m_pInt64;
 		case MDST_DOUBLE:		return *m_pDouble;
@@ -182,9 +193,8 @@ CValue CField::GetValue() const
 		case MDST_TIME_T:		return *m_pTimeT;
 		case MDST_TIMESTAMP:	return static_cast<time_t>(*m_pTimeStamp);
 		case MDST_POINTER:		return m_pVoidPtr;
+		default:				ASSERT_FALSE();	break;
 	}
-
-	ASSERT_FALSE();
 
 	return null;
 }
@@ -484,6 +494,10 @@ void CField::SetField(const CField& oValue)
 			case MDST_STRING:	SetString  (oValue.m_pString);	break;
 			case MDST_BOOL:		SetBool    (*oValue.m_pBool);	break;
 			case MDST_TIME_T:	SetDateTime(*oValue.m_pTimeT);	break;
+
+			case MDST_NULL:
+			case MDST_TIMESTAMP:
+			case MDST_POINTER:
 			default:			ASSERT_FALSE();					break;
 		}
 	}
@@ -634,9 +648,11 @@ bool CField::operator==(const CValue& oValue) const
 		case MDST_BOOL:		return (*m_pBool    == oValue.m_bValue);
 		case MDST_TIME_T:	return (*m_pTimeT   == oValue.m_tValue);
 		case MDST_POINTER:	return (m_pVoidPtr  == oValue.m_pValue);
-	}
 
-	ASSERT_FALSE();
+		case MDST_NULL:
+		case MDST_TIMESTAMP:
+		default:			ASSERT_FALSE(); break;
+	}
 
 	return false;
 }
@@ -692,8 +708,10 @@ int CField::Compare(const CField& oValue) const
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);				break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - *oValue.m_pBool);			break;
 		case MDST_TIME_T:		nCmp = ::Compare(*m_pTimeT, *oValue.m_pTimeT);	break;
-		case MDST_TIMESTAMP:	ASSERT_FALSE();									break;
-		case MDST_POINTER:		ASSERT_FALSE();									break;
+
+		case MDST_NULL:
+		case MDST_TIMESTAMP:
+		case MDST_POINTER:
 		default:				ASSERT_FALSE();									break;
 	}
 
@@ -722,8 +740,10 @@ int CField::Compare(const CValue& oValue) const
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_sValue);					break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - oValue.m_bValue);			break;
 		case MDST_TIME_T:		nCmp = ::Compare(*m_pTimeT, oValue.m_tValue);	break;
-		case MDST_TIMESTAMP:	ASSERT_FALSE();									break;
-		case MDST_POINTER:		ASSERT_FALSE();									break;
+
+		case MDST_NULL:
+		case MDST_TIMESTAMP:
+		case MDST_POINTER:
 		default:				ASSERT_FALSE();									break;
 	}
 
@@ -789,7 +809,7 @@ CString CField::Format(const tchar* pszFormat) const
 		case MDCT_CHAR:			str.Format(pszFormat, *m_pChar);	break;
 		case MDCT_FXDSTR:		str = m_pString;					break;
 		case MDCT_VARSTR:		str = m_pString;					break;
-		case MDCT_BOOL:			str = FormatBool(pszFormat);		break;                                  
+		case MDCT_BOOL:			str = FormatBool(pszFormat);		break;
 		case MDCT_IDENTITY:		str.Format(pszFormat, *m_pInt);		break;
 		case MDCT_DATETIME:		str = FormatTimeT(pszFormat);		break;
 		case MDCT_DATE:			str = FormatTimeT(pszFormat);		break;
@@ -836,6 +856,8 @@ CString CField::DbgFormat() const
 		case MDST_TIME_T:		str = FormatTimeT(TXT("%d/%m/%y %H:%M:%S"));		break;
 		case MDST_TIMESTAMP:	str = FormatTimeStamp(TXT("%d/%m/%y %H:%M:%S"));	break;
 		case MDST_POINTER:		str.Format(TXT("%p"), m_pVoidPtr);					break;
+
+		case MDST_NULL:
 		default:				ASSERT_FALSE();										break;
 	}
 

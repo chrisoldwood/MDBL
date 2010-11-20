@@ -19,13 +19,13 @@
 #include "RowSet.hpp"
 
 /******************************************************************************
-** 
+**
 ** The class used to hold a table in the database.
 **
 *******************************************************************************
 */
 
-class CTable
+class CTable /*: private NotCopyable*/
 {
 public:
 	//
@@ -181,6 +181,11 @@ protected:
 	virtual void CheckIndexes() const;
 	virtual void CheckRow(CRow& oRow, bool bUpdate) const;
 	virtual void CheckColumn(CRow& oRow, size_t nColumn, const CValue& oValue, bool bUpdate) const;
+
+private:
+	// NotCopyable.
+	CTable(const CTable&);
+	CTable& operator=(const CTable&);
 };
 
 /******************************************************************************

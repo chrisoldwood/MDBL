@@ -23,7 +23,7 @@
 class CODBCSource;
 
 /******************************************************************************
-** 
+**
 ** This is the SQL cursor type returned for ODBC queries.
 **
 *******************************************************************************
@@ -40,7 +40,7 @@ public:
 
 	virtual void Open(const tchar* pszStmt, SQLHSTMT hStmt);
 	virtual void Close();
-	
+
 	//
 	// Accessors.
 	//
@@ -70,12 +70,17 @@ protected:
 	SQLUSMALLINT*	m_pRowStatus;	// The array of status values.
 	bool			m_bDoneBind;	// Bind output buffers flag.
 	SQLUINTEGER		m_nFetched;		// Number of rows fetched.
-	SQLUINTEGER		m_nCurRow;		// Current row 
+	SQLUINTEGER		m_nCurRow;		// Current row
 
 	//
 	// Internal methods.
 	//
 	virtual void Bind();
+
+private:
+	// NotCopyable.
+	CODBCCursor(const CODBCCursor&);
+	CODBCCursor& operator=(const CODBCCursor&);
 };
 
 /******************************************************************************

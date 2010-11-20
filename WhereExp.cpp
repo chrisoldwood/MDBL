@@ -42,7 +42,8 @@ CWhereExp::CWhereExp(const CWhere& oLHSWhere, Op eOp, const CWhere& oRHSWhere)
 */
 
 CWhereExp::CWhereExp(const CWhereExp& oSrc)
-	: m_pLHSWhere(oSrc.m_pLHSWhere->Clone())
+	: CWhere()
+	, m_pLHSWhere(oSrc.m_pLHSWhere->Clone())
 	, m_eOp(oSrc.m_eOp)
 	, m_pRHSWhere(oSrc.m_pRHSWhere->Clone())
 {

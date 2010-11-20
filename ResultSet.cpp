@@ -85,7 +85,8 @@ CResultSet::CResultSet(const CTable& oTable, CRow* pRow)
 */
 
 CResultSet::CResultSet(const CResultSet& oResultSet)
-	: m_pTable(oResultSet.m_pTable)
+	: TPtrArray<CRow>()
+	, m_pTable(oResultSet.m_pTable)
 {
 	// Copy rows.
 	ShallowCopy(oResultSet);
@@ -249,7 +250,7 @@ CValue CResultSet::Sum(size_t nColumn) const
 
 	// Initialise the result.
 	if      (eType == MDST_INT)		oSum = CValue(0);
-	else if (eType == MDST_INT64)	oSum = CValue(0i64);
+	else if (eType == MDST_INT64)	oSum = CValue(0LL);
 	else if (eType == MDST_DOUBLE)	oSum = CValue(0.0);
 
 	// Sum the rows.

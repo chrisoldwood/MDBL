@@ -20,7 +20,7 @@
 #include "Value.hpp"
 
 /******************************************************************************
-** 
+**
 ** The class used to store a set of CValues.
 **
 *******************************************************************************
@@ -36,7 +36,7 @@ public:
 	CValueSet(const CStrArray& astrStrings);
 	CValueSet(const CValueSet& oRHS);
 	~CValueSet();
-	
+
 	//
 	// Methods.
 	//
@@ -78,6 +78,7 @@ inline CValueSet::CValueSet(const CStrArray& astrStrings)
 }
 
 inline CValueSet::CValueSet(const CValueSet& oRHS)
+	: TPtrArray<CValue>()
 {
 	DeepCopy(oRHS);
 }

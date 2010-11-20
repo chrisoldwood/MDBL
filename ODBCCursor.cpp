@@ -15,6 +15,11 @@
 #include "Row.hpp"
 #include "TimeStamp.hpp"
 
+#ifdef __GNUG__
+// 'X' should be initialized in the member initialization list
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 /******************************************************************************
 ** Method:		Constructor.
 **
@@ -29,6 +34,7 @@
 
 CODBCCursor::CODBCCursor(CODBCSource& oSource)
 	: m_oSource(oSource)
+	, m_strStmt()
 	, m_hStmt(SQL_NULL_HSTMT)
 	, m_nColumns(0)
 	, m_pColumns(NULL)

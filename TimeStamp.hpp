@@ -15,10 +15,14 @@
 #pragma once
 #endif
 
+#ifndef __GNUC__
 #include <sqltypes.h>
+#else
+#include <sql.h>
+#endif
 
 /******************************************************************************
-** 
+**
 ** This is a wrapper class for the TIMESTAMP_STRUCT type.
 **
 *******************************************************************************
@@ -32,7 +36,7 @@ public:
 	//
 	CTimeStamp();
 	~CTimeStamp();
-	
+
 	//
 	// Conversion methods.
 	//
@@ -42,7 +46,7 @@ public:
 	// Operators.
 	//
 	     operator time_t() const;
-	void operator=(time_t tTime);
+	CTimeStamp& operator=(time_t tTime);
 	bool operator==(const CTimeStamp& oRHS) const;
 	bool operator!=(const CTimeStamp& oRHS) const;
 

@@ -18,7 +18,7 @@
 #include "MDBLTypes.hpp"
 
 /******************************************************************************
-** 
+**
 ** This class is a VARIANT like class used to hold values of different types.
 **
 *******************************************************************************
@@ -44,7 +44,7 @@ public:
 
 	CValue(const CValue& oValue);
 	const CValue& operator=(const CValue& oValue);
-	
+
 	//
 	// Members.
 	//
@@ -72,6 +72,11 @@ union
 **
 *******************************************************************************
 */
+
+#ifdef __GNUG__
+// 'CValue::<anonymous/union>' should be initialized in the member initialization list
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
 
 inline CValue::CValue(const CNull&)
 	: m_eType(MDST_NULL)
@@ -158,6 +163,11 @@ inline CValue::CValue(const CValue& oValue)
 		tstrcpy(m_sValue, oValue.m_sValue);
 	}
 }
+
+#ifdef __GNUG__
+// 'CValue::<anonymous/union>' should be initialized in the member initialization list
+#pragma GCC diagnostic warning "-Weffc++"
+#endif
 
 inline const CValue& CValue::operator=(const CValue& oValue)
 {

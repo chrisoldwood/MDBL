@@ -17,9 +17,11 @@
 #include <WCL/StrArray.hpp>
 #include <malloc.h>
 
+#ifdef _MSC_VER
 // Linker directives.
 #pragma comment(lib, "odbc32")
 #pragma comment(lib, "odbccp32")
+#endif
 
 /******************************************************************************
 **
@@ -441,9 +443,12 @@ SQLSMALLINT CODBCSource::ODBCType(COLTYPE eMDBType)
 		case MDCT_DATE:			return SQL_C_TYPE_TIMESTAMP;
 		case MDCT_TIME:			return SQL_C_TYPE_TIMESTAMP;
 		case MDCT_TIMESTAMP:	return SQL_C_TYPE_TIMESTAMP;
-	}
 
-	ASSERT_FALSE();
+		case MDCT_VOIDPTR:
+		case MDCT_ROWPTR:
+		case MDCT_ROWSETPTR:
+		default:				ASSERT_FALSE();	break;
+	}
 
 	// Unsupported.
 	return SQL_UNKNOWN_TYPE;
@@ -480,6 +485,10 @@ size_t CODBCSource::BufferSize(COLTYPE eColType, size_t nColSize)
 		case MDCT_DATE:			nSize = sizeof(CTimeStamp);		break;
 		case MDCT_TIME:			nSize = sizeof(CTimeStamp);		break;
 		case MDCT_TIMESTAMP:	nSize = sizeof(CTimeStamp);		break;
+
+		case MDCT_VOIDPTR:
+		case MDCT_ROWPTR:
+		case MDCT_ROWSETPTR:
 		default:				ASSERT_FALSE();					break;
 	}
 
@@ -519,9 +528,12 @@ size_t CODBCSource::ColumnSize(COLTYPE eColType, size_t nColSize)
 		case MDCT_DATE:			return 23;
 		case MDCT_TIME:			return 23;
 		case MDCT_TIMESTAMP:	return 23;
-	}
 
-	ASSERT_FALSE();
+		case MDCT_VOIDPTR:
+		case MDCT_ROWPTR:
+		case MDCT_ROWSETPTR:
+		default:				ASSERT_FALSE();	break;
+	}
 
 	// Unsupported.
 	return 0;
@@ -751,7 +763,7 @@ void CODBCSource::InstalledSources(CStrArray& astrSources)
 	SQLSMALLINT	nDescSize = MAX_DESC_LEN;
 	SQLSMALLINT	nDSNRetSize;
 	SQLSMALLINT	nDescRetSize;
-	
+
 	// Allocate an environment handle.
 	rc = ::SQLAllocHandle(SQL_HANDLE_ENV, NULL, &hEnv);
 

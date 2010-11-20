@@ -25,6 +25,7 @@
 
 CIntMapIndex::CIntMapIndex(CTable& oTable, size_t nColumn)
 	: CUniqIndex(oTable, nColumn)
+	, m_oMap()
 {
 	ASSERT(m_oTable.Column(m_nColumn).Unique());
 }

@@ -38,12 +38,18 @@ CTable::CTable(CMDB& oDB, const tchar* pszName, uint nFlags)
 	: m_oDB(oDB)
 	, m_strName(pszName)
 	, m_nFlags(nFlags)
+	, m_vColumns()
+	, m_vRows()
 	, m_nInsertions(0)
 	, m_nUpdates(0)
 	, m_nDeletions(0)
 	, m_nIdentCol(Core::npos)
 	, m_nIdentVal(0)
 	, m_pNullRow(NULL)
+	, m_strSQLTable()
+	, m_strSQLWhere()
+	, m_strSQLGroup()
+	, m_strSQLOrder()
 {
 	ASSERT(pszName != NULL);
 }
@@ -84,7 +90,7 @@ CTable::~CTable()
 size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, uint nFlags)
 {
 	ASSERT(m_vRows.Count() == 0);
-	ASSERT(!((eType == MDCT_IDENTITY) && (m_nIdentCol != -1)));
+	ASSERT(!((eType == MDCT_IDENTITY) && (m_nIdentCol != Core::npos)));
 
 	// Apply table settings to all columns.
 	if (ReadOnly())		nFlags |= CColumn::READ_ONLY;
@@ -194,7 +200,7 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 size_t CTable::AddColumn(const tchar* pszName, CTable& oTable, size_t nColumn, uint nFlags)
 {
 	ASSERT(m_vRows.Count() == 0);
-	ASSERT(FindColumn(pszName) == -1);
+	ASSERT(FindColumn(pszName) == Core::npos);
 	ASSERT(oTable.m_vColumns[nColumn].Unique());
 	ASSERT(oTable.m_vColumns[nColumn].Index() != NULL);
 	ASSERT(nFlags & CColumn::FOREIGN_KEY);
@@ -283,7 +289,7 @@ void CTable::AddIndex(size_t nColumn)
 
 	switch (eColType)
 	{
-		case MDCT_INT:	
+		case MDCT_INT:
 			if (bUnique)
 				pIndex = new CIntMapIndex(*this, nColumn);
 			break;
@@ -303,6 +309,17 @@ void CTable::AddIndex(size_t nColumn)
 			pIndex = new CIntMapIndex(*this, nColumn);
 			break;
 
+		case MDCT_INT64:
+		case MDCT_DOUBLE:
+		case MDCT_CHAR:
+		case MDCT_BOOL:
+		case MDCT_DATETIME:
+		case MDCT_DATE:
+		case MDCT_TIME:
+		case MDCT_TIMESTAMP:
+		case MDCT_VOIDPTR:
+		case MDCT_ROWPTR:
+		case MDCT_ROWSETPTR:
 		default:
 			ASSERT_FALSE();
 			break;
@@ -372,7 +389,7 @@ size_t CTable::InsertRow(CRow& oRow, bool bNew)
 	OnBeforeInsert(oRow);
 
 	// Set the identity value, if one.
-	if (m_nIdentCol != -1)
+	if (m_nIdentCol != Core::npos)
 		oRow[m_nIdentCol] = ++m_nIdentVal;
 
 #ifdef _DEBUG
@@ -1077,7 +1094,7 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 	}
 
 	// Create the full statement.
-	strQuery.Format(TXT("INSERT INTO %s (%s) VALUES (%s)"), Name(), strColumns, strParams);
+	strQuery.Format(TXT("INSERT INTO %s (%s) VALUES (%s)"), Name().c_str(), strColumns.c_str(), strParams.c_str());
 
 	ASSERT(nParams > 0);
 
@@ -1202,7 +1219,7 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 		}
 
 		// Create the full statement.
-		strQuery.Format(TXT("UPDATE %s SET %s WHERE %s"), Name(), strModColumns, strPKColumns);
+		strQuery.Format(TXT("UPDATE %s SET %s WHERE %s"), Name().c_str(), strModColumns.c_str(), strPKColumns.c_str());
 
 		ASSERT(nParams > 0);
 
@@ -1362,8 +1379,10 @@ void CTable::CheckIndexes() const
 #endif
 }
 
+#ifdef _MSC_VER
 // Unreferenced formal parameter.
 #pragma warning ( disable : 4100 )
+#endif
 
 /******************************************************************************
 ** Method:		CheckRow()
@@ -1401,8 +1420,10 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 #endif
 }
 
+#ifdef _MSC_VER
 // Unreferenced formal parameter.
 #pragma warning ( default : 4100 )
+#endif
 
 /******************************************************************************
 ** Method:		CheckColumn()

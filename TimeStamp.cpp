@@ -103,7 +103,7 @@ CTimeStamp::operator time_t() const
 	oTime.tm_hour = hour;
 	oTime.tm_min  = minute;
 	oTime.tm_sec  = second;
-	
+
 	oTime.tm_wday  = 0;
 	oTime.tm_yday  = 0;
 	oTime.tm_isdst = -1;
@@ -123,7 +123,7 @@ CTimeStamp::operator time_t() const
 *******************************************************************************
 */
 
-void CTimeStamp::operator=(time_t tTime)
+CTimeStamp& CTimeStamp::operator=(time_t tTime)
 {
 	struct tm* pTime = localtime(&tTime);
 
@@ -134,4 +134,6 @@ void CTimeStamp::operator=(time_t tTime)
 	minute   = static_cast<SQLUSMALLINT>(pTime->tm_min);
 	second   = static_cast<SQLUSMALLINT>(pTime->tm_sec);
 	fraction = 0;
+
+	return *this;
 }

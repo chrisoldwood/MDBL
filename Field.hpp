@@ -19,7 +19,7 @@
 #include "Value.hpp"
 
 /******************************************************************************
-** 
+**
 ** The class that is used to store the value for a rows' column.
 **
 *******************************************************************************
@@ -83,20 +83,20 @@ public:
 	operator void*()             const;
 	operator CRow*()             const;
 	operator CRow**()            const;
-	
 
-	void operator=(const CNull& oNull);
-	void operator=(int iValue);
-	void operator=(double dValue);
-	void operator=(tchar cValue);
-	void operator=(const tchar* sValue);
-	void operator=(bool bValue);
-	void operator=(time_t tValue);
-	void operator=(const CTimeStamp& tsValue);
-	void operator=(const CField& oValue);
-	void operator=(void* pValue);
-	void operator=(CRow* pValue);
-	void operator=(CRow** pValue);
+
+	CField& operator=(const CNull& oNull);
+	CField& operator=(int iValue);
+	CField& operator=(double dValue);
+	CField& operator=(tchar cValue);
+	CField& operator=(const tchar* sValue);
+	CField& operator=(bool bValue);
+	CField& operator=(time_t tValue);
+	CField& operator=(const CTimeStamp& tsValue);
+	CField& operator=(const CField& oValue);
+	CField& operator=(void* pValue);
+	CField& operator=(CRow* pValue);
+	CField& operator=(CRow** pValue);
 
 	//
 	// Comparison operators.
@@ -169,7 +169,7 @@ private:
 	~CField();
 
 #pragma push_macro("new")
-#undef new 
+#undef new
 
 	//
 	// Placement new/delete operators.
@@ -213,7 +213,7 @@ inline CColumn& CField::Column() const
 }
 
 #pragma push_macro("new")
-#undef new 
+#undef new
 
 inline void* CField::operator new(size_t, void* p)
 {
@@ -285,64 +285,88 @@ inline CField::operator CRow**() const
 	return GetRowSetPtr();
 }
 
-inline void CField::operator=(const CNull&)
+inline CField& CField::operator=(const CNull&)
 {
 	SetNull();
+
+	return *this;
 }
 
-inline void CField::operator=(int iValue)
+inline CField& CField::operator=(int iValue)
 {
 	SetInt(iValue);
+
+	return *this;
 }
 
-inline void CField::operator=(double dValue)
+inline CField& CField::operator=(double dValue)
 {
 	SetDouble(dValue);
+
+	return *this;
 }
 
-inline void CField::operator=(tchar cValue)
+inline CField& CField::operator=(tchar cValue)
 {
 	SetChar(cValue);
+
+	return *this;
 }
 
-inline void CField::operator=(const tchar* sValue)
+inline CField& CField::operator=(const tchar* sValue)
 {
 	SetString(sValue);
+
+	return *this;
 }
 
-inline void CField::operator=(bool bValue)
+inline CField& CField::operator=(bool bValue)
 {
 	SetBool(bValue);
+
+	return *this;
 }
 
-inline void CField::operator=(time_t tValue)
+inline CField& CField::operator=(time_t tValue)
 {
 	SetDateTime(tValue);
+
+	return *this;
 }
 
-inline void CField::operator=(const CTimeStamp& tsValue)
+inline CField& CField::operator=(const CTimeStamp& tsValue)
 {
 	SetTimeStamp(tsValue);
+
+	return *this;
 }
 
-inline void CField::operator=(const CField& oValue)
+inline CField& CField::operator=(const CField& oValue)
 {
 	SetField(oValue);
+
+	return *this;
 }
 
-inline void CField::operator=(void* pValue)
+inline CField& CField::operator=(void* pValue)
 {
 	SetPtr(pValue);
+
+	return *this;
 }
 
-inline void CField::operator=(CRow* pValue)
+inline CField& CField::operator=(CRow* pValue)
 {
 	SetRowPtr(pValue);
+
+	return *this;
 }
 
-inline void CField::operator=(CRow** pValue)
+inline CField& CField::operator=(CRow** pValue)
 {
 	SetRowSetPtr(pValue);
+
+	return *this;
 }
 
 inline bool CField::operator==(const CNull&) const

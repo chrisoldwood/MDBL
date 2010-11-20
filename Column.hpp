@@ -19,13 +19,13 @@
 #include "MDBLTypes.hpp"
 
 /******************************************************************************
-** 
+**
 ** The base class used to store the attributes of a column in a table.
 **
 *******************************************************************************
 */
 
-class CColumn
+class CColumn /*: private NotCopyable*/
 {
 public:
 	//
@@ -120,6 +120,11 @@ protected:
 	//
 	friend class CColumnSet;
 	friend class CTable;
+
+private:
+	// NotCopyable.
+	CColumn(const CColumn&);
+	CColumn& operator=(const CColumn&);
 };
 
 /******************************************************************************

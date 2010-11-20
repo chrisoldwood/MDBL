@@ -19,7 +19,7 @@
 #include <Legacy/TArray.hpp>
 
 /******************************************************************************
-** 
+**
 ** This class holds the list of columns used to sort a result set.
 **
 *******************************************************************************
@@ -67,10 +67,14 @@ protected:
 */
 
 inline CSortColumns::CSortColumns()
+	: m_aiColumns()
+	, m_aiSortDirs()
 {
 }
 
 inline CSortColumns::CSortColumns(size_t nColumn, Dir eDir)
+	: m_aiColumns()
+	, m_aiSortDirs()
 {
 	Add(nColumn, eDir);
 }

@@ -21,7 +21,7 @@
 #include "SortColumns.hpp"
 
 /******************************************************************************
-** 
+**
 ** This is an array based class used to store the results of a table query.
 **
 *******************************************************************************
@@ -37,10 +37,10 @@ public:
 	CResultSet(const CTable& oTable, CRow* pRow);
 	CResultSet(const CResultSet& oResultSet);
 	CResultSet(const CTable& oTable, const CRowSet& oRowSet);
-	~CResultSet();
+	virtual ~CResultSet();
 
 	CResultSet& operator=(const CResultSet& oRHS);
-	
+
 	//
 	// Accessors/Mutators.
 	//
@@ -115,14 +115,14 @@ inline size_t CResultSet::Count() const
 
 inline CRow& CResultSet::Row(size_t n) const
 {
-	ASSERT((n >= 0) && (n < Count()));
+	ASSERT(n < Count());
 
 	return *(TPtrArray<CRow>::At(n));
 }
 
 inline CRow& CResultSet::operator[](size_t n) const
 {
-	ASSERT((n >= 0) && (n < Count()));
+	ASSERT(n < Count());
 
 	return *(TPtrArray<CRow>::At(n));
 }

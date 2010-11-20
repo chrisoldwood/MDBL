@@ -43,7 +43,8 @@ CWhereIn::CWhereIn(size_t nColumn, const CValueSet& oValueSet)
 */
 
 CWhereIn::CWhereIn(const CWhereIn& oSrc)
-	: m_nColumn(oSrc.m_nColumn)
+	: CWhere()
+	, m_nColumn(oSrc.m_nColumn)
 	, m_oValueSet(oSrc.m_oValueSet)
 {
 }
