@@ -16,6 +16,10 @@
 //
 //! \namespace MDBL
 //! \brief     The Memory Database Library namespace.
+//!
+//! \mainpage  Memory Database C++ Library
+//! \section   introduction Introduction
+//! This is a library for an in-memory database.
 
 ////////////////////////////////////////////////////////////////////////////////
 // Standard headers.
