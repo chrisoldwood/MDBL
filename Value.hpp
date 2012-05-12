@@ -38,7 +38,9 @@ public:
 	CValue(const tchar* sValue);
 	CValue(const CString& sValue);
 	CValue(bool bValue);
+#ifndef _M_X64
 	CValue(time_t tValue);
+#endif
 	CValue(void* pValue);
 	~CValue();
 
@@ -135,12 +137,15 @@ inline CValue::CValue(bool bValue)
 {
 }
 
+// time_t is a long on x86 and __int64 on x64
+#ifndef _M_X64
 inline CValue::CValue(time_t tValue)
 	: m_eType(MDST_TIME_T)
 	, m_bNull(false)
 	, m_tValue(tValue)
 {
 }
+#endif
 
 inline CValue::CValue(void* pValue)
 	: m_eType(MDST_POINTER)
