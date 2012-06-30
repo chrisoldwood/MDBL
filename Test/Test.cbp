@@ -12,14 +12,15 @@
 				<Option external_deps="..\..\Core\Debug\libCore.a;..\..\WCL\Debug\libWCL.a;..\..\Legacy\Debug\libLegacy.a;..\..\MDBL\Debug\libMDBL.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-D_DEBUG" />
 				</Compiler>
 				<Linker>
-					<Add library="..\..\Core\Debug\libCore.a" />
-					<Add library="..\..\WCL\Debug\libWCL.a" />
-					<Add library="..\..\Legacy\Debug\libLegacy.a" />
 					<Add library="..\..\MDBL\Debug\libMDBL.a" />
+					<Add library="..\..\Legacy\Debug\libLegacy.a" />
+					<Add library="..\..\WCL\Debug\libWCL.a" />
+					<Add library="..\..\Core\Debug\libCore.a" />
 				</Linker>
 			</Target>
 			<Target title="Release Win32">
@@ -28,15 +29,16 @@
 				<Option external_deps="..\..\Core\Release\libCore.a;..\..\WCL\Release\libWCL.a;..\..\Legacy\Release\libLegacy.a;..\..\MDBL\Release\libMDBL.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O" />
 					<Add option="-DNDEBUG" />
 				</Compiler>
 				<Linker>
-					<Add library="..\..\Core\Release\libCore.a" />
-					<Add library="..\..\WCL\Release\libWCL.a" />
-					<Add library="..\..\Legacy\Release\libLegacy.a" />
 					<Add library="..\..\MDBL\Release\libMDBL.a" />
+					<Add library="..\..\Legacy\Release\libLegacy.a" />
+					<Add library="..\..\WCL\Release\libWCL.a" />
+					<Add library="..\..\Core\Release\libCore.a" />
 				</Linker>
 			</Target>
 		</Build>
