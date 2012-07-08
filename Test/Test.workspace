@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
-	<Workspace title="MDBL">
+	<Workspace title="MDBL Tests">
 		<Project filename="../../Core/Core.cbp" />
 		<Project filename="../../WCL/Wcl.cbp" />
+		<Project filename="../../Legacy/Legacy.cbp" />
 		<Project filename="../MDBL.cbp" />
 		<Project filename="Test.cbp" active="1">
 			<Depends filename="../../Core/Core.cbp" />
@@ -10,6 +11,5 @@
 			<Depends filename="../MDBL.cbp" />
 			<Depends filename="../../Legacy/Legacy.cbp" />
 		</Project>
-		<Project filename="../../Legacy/Legacy.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
