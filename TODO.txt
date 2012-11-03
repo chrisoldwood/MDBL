@@ -26,7 +26,7 @@
 
 - Add Forward declarations header.
 
-- Sort out handling of 64-bit time_t (i.e. VC++ 8.0)
+- Sort out handling of 64-bit time_t (i.e. VC++ 8.0 / VS2012)
 
 - Timestamp string formatting.
 
