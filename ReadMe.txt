@@ -1,14 +1,27 @@
-MDBL - Memory DataBase Library
+MDBL (Memory Database) Library
 ==============================
+
+Introduction
+------------
 
 This library provides classes to create an in-memory database which can be
 standalone or act as a cache for data retrieved from a real ODBC data source.
 
+Documentation
+-------------
 
-EMail: gort@cix.co.uk
-Web:   http://www.cix.co.uk/~gort
+See http://www.chrisoldwood.com/win32/dox/mdbl/index.html.
 
+Development
+-----------
 
-Chris Oldwood 
+See DevNotes.txt
 
+Contact Details
+---------------
+
+Email: gort@cix.co.uk
+Web:   http://www.chrisoldwood.com
+
+Chris Oldwood
 21st August 2004
