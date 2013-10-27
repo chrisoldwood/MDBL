@@ -4,10 +4,7 @@
 	Version="7.10"
 	Name="MDBL"
 	ProjectGUID="{9E405156-9B1D-483A-9BBD-B86240FA86BE}"
-	SccProjectName="SAK"
-	SccAuxPath="SAK"
-	SccLocalPath="SAK"
-	SccProvider="SAK">
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
