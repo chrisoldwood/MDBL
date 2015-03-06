@@ -108,40 +108,13 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			Name="Build"
+			Filter="">
 			<File
-				RelativePath="Column.cpp">
+				RelativePath=".\Common.hpp">
 			</File>
 			<File
-				RelativePath="ColumnSet.cpp">
-			</File>
-			<File
-				RelativePath="Field.cpp">
-			</File>
-			<File
-				RelativePath="GroupSet.cpp">
-			</File>
-			<File
-				RelativePath="IntMapIndex.cpp">
-			</File>
-			<File
-				RelativePath="JoinedSet.cpp">
-			</File>
-			<File
-				RelativePath="MDB.cpp">
-			</File>
-			<File
-				RelativePath="ODBCCursor.cpp">
-			</File>
-			<File
-				RelativePath="ODBCException.cpp">
-			</File>
-			<File
-				RelativePath="ODBCParams.cpp">
-			</File>
-			<File
-				RelativePath="ODBCSource.cpp">
+				RelativePath=".\FwdDecls.hpp">
 			</File>
 			<File
 				RelativePath=".\pch.cpp">
@@ -158,96 +131,36 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath="ResultSet.cpp">
-			</File>
-			<File
-				RelativePath="Row.cpp">
-			</File>
-			<File
-				RelativePath="SQLException.cpp">
-			</File>
-			<File
-				RelativePath="StrMapIndex.cpp">
-			</File>
-			<File
-				RelativePath="Table.cpp">
-			</File>
-			<File
-				RelativePath="TableSet.cpp">
-			</File>
-			<File
-				RelativePath="TimeStamp.cpp">
-			</File>
-			<File
-				RelativePath="WhereCmp.cpp">
-			</File>
-			<File
-				RelativePath="WhereExp.cpp">
-			</File>
-			<File
-				RelativePath="WhereIn.cpp">
-			</File>
-			<File
-				RelativePath="WhereNot.cpp">
-			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl">
+			Name="Database"
+			Filter="">
 			<File
-				RelativePath="AutoTrans.hpp">
+				RelativePath="Column.cpp">
 			</File>
 			<File
 				RelativePath="Column.hpp">
 			</File>
 			<File
+				RelativePath="ColumnSet.cpp">
+			</File>
+			<File
 				RelativePath="ColumnSet.hpp">
 			</File>
 			<File
-				RelativePath=".\Common.hpp">
+				RelativePath="Field.cpp">
 			</File>
 			<File
 				RelativePath="Field.hpp">
 			</File>
 			<File
-				RelativePath=".\FwdDecls.hpp">
-			</File>
-			<File
-				RelativePath="GroupSet.hpp">
-			</File>
-			<File
-				RelativePath="Index.hpp">
-			</File>
-			<File
-				RelativePath="IntMapIndex.hpp">
-			</File>
-			<File
-				RelativePath="Join.hpp">
-			</File>
-			<File
-				RelativePath="JoinedSet.hpp">
+				RelativePath="MDB.cpp">
 			</File>
 			<File
 				RelativePath="MDB.hpp">
 			</File>
 			<File
-				RelativePath="MDBLTypes.hpp">
-			</File>
-			<File
-				RelativePath="ODBCCursor.hpp">
-			</File>
-			<File
-				RelativePath="ODBCException.hpp">
-			</File>
-			<File
-				RelativePath="ODBCParams.hpp">
-			</File>
-			<File
-				RelativePath="ODBCSource.hpp">
-			</File>
-			<File
-				RelativePath="ResultSet.hpp">
+				RelativePath="Row.cpp">
 			</File>
 			<File
 				RelativePath="Row.hpp">
@@ -256,10 +169,137 @@
 				RelativePath="RowSet.hpp">
 			</File>
 			<File
+				RelativePath="Table.cpp">
+			</File>
+			<File
+				RelativePath="Table.hpp">
+			</File>
+			<File
+				RelativePath="TableSet.cpp">
+			</File>
+			<File
+				RelativePath="TableSet.hpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="Index"
+			Filter="">
+			<File
+				RelativePath="Index.hpp">
+			</File>
+			<File
+				RelativePath="IntMapIndex.cpp">
+			</File>
+			<File
+				RelativePath="IntMapIndex.hpp">
+			</File>
+			<File
+				RelativePath="StrMapIndex.cpp">
+			</File>
+			<File
+				RelativePath="StrMapIndex.hpp">
+			</File>
+			<File
+				RelativePath="UniqIndex.hpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="ODBC"
+			Filter="">
+			<File
+				RelativePath="ODBCCursor.cpp">
+			</File>
+			<File
+				RelativePath="ODBCCursor.hpp">
+			</File>
+			<File
+				RelativePath="ODBCException.cpp">
+			</File>
+			<File
+				RelativePath="ODBCException.hpp">
+			</File>
+			<File
+				RelativePath="ODBCParams.cpp">
+			</File>
+			<File
+				RelativePath="ODBCParams.hpp">
+			</File>
+			<File
+				RelativePath="ODBCSource.cpp">
+			</File>
+			<File
+				RelativePath="ODBCSource.hpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="Query"
+			Filter="">
+			<File
+				RelativePath="GroupSet.cpp">
+			</File>
+			<File
+				RelativePath="GroupSet.hpp">
+			</File>
+			<File
+				RelativePath="Join.hpp">
+			</File>
+			<File
+				RelativePath="JoinedSet.cpp">
+			</File>
+			<File
+				RelativePath="JoinedSet.hpp">
+			</File>
+			<File
+				RelativePath="ResultSet.cpp">
+			</File>
+			<File
+				RelativePath="ResultSet.hpp">
+			</File>
+			<File
 				RelativePath="SortColumns.hpp">
 			</File>
 			<File
+				RelativePath="ValueSet.hpp">
+			</File>
+			<File
+				RelativePath="Where.hpp">
+			</File>
+			<File
+				RelativePath="WhereCmp.cpp">
+			</File>
+			<File
+				RelativePath="WhereCmp.hpp">
+			</File>
+			<File
+				RelativePath="WhereExp.cpp">
+			</File>
+			<File
+				RelativePath="WhereExp.hpp">
+			</File>
+			<File
+				RelativePath="WhereIn.cpp">
+			</File>
+			<File
+				RelativePath="WhereIn.hpp">
+			</File>
+			<File
+				RelativePath="WhereNot.cpp">
+			</File>
+			<File
+				RelativePath="WhereNot.hpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="Source"
+			Filter="">
+			<File
+				RelativePath="AutoTrans.hpp">
+			</File>
+			<File
 				RelativePath="SQLCursor.hpp">
+			</File>
+			<File
+				RelativePath="SQLException.cpp">
 			</File>
 			<File
 				RelativePath="SQLException.hpp">
@@ -270,43 +310,26 @@
 			<File
 				RelativePath="SQLSource.hpp">
 			</File>
+		</Filter>
+		<Filter
+			Name="Type"
+			Filter="">
 			<File
-				RelativePath="StrMapIndex.hpp">
+				RelativePath="MDBLTypes.hpp">
 			</File>
 			<File
-				RelativePath="Table.hpp">
-			</File>
-			<File
-				RelativePath="TableSet.hpp">
+				RelativePath="TimeStamp.cpp">
 			</File>
 			<File
 				RelativePath="TimeStamp.hpp">
 			</File>
 			<File
-				RelativePath="UniqIndex.hpp">
-			</File>
-			<File
 				RelativePath="Value.hpp">
 			</File>
-			<File
-				RelativePath="ValueSet.hpp">
-			</File>
-			<File
-				RelativePath="Where.hpp">
-			</File>
-			<File
-				RelativePath="WhereCmp.hpp">
-			</File>
-			<File
-				RelativePath="WhereExp.hpp">
-			</File>
-			<File
-				RelativePath="WhereIn.hpp">
-			</File>
-			<File
-				RelativePath="WhereNot.hpp">
-			</File>
 		</Filter>
+		<File
+			RelativePath=".\DevNotes.txt">
+		</File>
 		<File
 			RelativePath=".\Doxygen.cfg">
 		</File>
