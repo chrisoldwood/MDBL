@@ -52,6 +52,8 @@
 		<Unit filename="ColumnSet.cpp" />
 		<Unit filename="ColumnSet.hpp" />
 		<Unit filename="Common.hpp" />
+		<Unit filename="DevNotes.txt" />
+		<Unit filename="Doxygen.cfg" />
 		<Unit filename="Field.cpp" />
 		<Unit filename="Field.hpp" />
 		<Unit filename="FwdDecls.hpp" />
