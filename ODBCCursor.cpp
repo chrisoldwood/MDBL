@@ -15,11 +15,6 @@
 #include "Row.hpp"
 #include "TimeStamp.hpp"
 
-#ifdef __GNUG__
-// 'X' should be initialized in the member initialization list
-#pragma GCC diagnostic ignored "-Weffc++"
-#endif
-
 /******************************************************************************
 ** Method:		Constructor.
 **

@@ -40,11 +40,6 @@ static const tchar* pszFormats[] =
 	TXT("%p")					// MDCT_ROWSETPTR
 };
 
-#ifdef __GNUG__
-// 'CValue::<anonymous/union>' should be initialized in the member initialization list
-#pragma GCC diagnostic ignored "-Weffc++"
-#endif
-
 /******************************************************************************
 ** Method:		Constructor.
 **
@@ -73,11 +68,6 @@ CField::CField(CRow& oRow, CColumn& oColumn, size_t nColumn, bool bNull, void* p
 	if (m_oColumn.ColType() == MDCT_VARSTR)
 		m_pString = static_cast<tchar*>(calloc(1, sizeof(tchar)));
 }
-
-#ifdef __GNUG__
-// 'CValue::<anonymous/union>' should be initialized in the member initialization list
-#pragma GCC diagnostic warning "-Weffc++"
-#endif
 
 /******************************************************************************
 ** Method:		Destructor.

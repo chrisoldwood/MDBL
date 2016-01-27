@@ -21,11 +21,6 @@
 #include <sql.h>
 #endif
 
-#ifdef __GNUG__
-// base class 'X' has a non-virtual destructor
-#pragma GCC diagnostic ignored "-Weffc++"
-#endif
-
 /******************************************************************************
 **
 ** This is a wrapper class for the TIMESTAMP_STRUCT type.
