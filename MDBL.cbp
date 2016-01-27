@@ -42,6 +42,7 @@
 			<Add option="-Wswitch-default" />
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
+			<Add option='-include &quot;Common.hpp&quot;' />
 			<Add option="-DWIN32" />
 			<Add option="-D_LIB" />
 			<Add directory="../../Lib" />
@@ -51,7 +52,10 @@
 		<Unit filename="Column.hpp" />
 		<Unit filename="ColumnSet.cpp" />
 		<Unit filename="ColumnSet.hpp" />
-		<Unit filename="Common.hpp" />
+		<Unit filename="Common.hpp">
+			<Option compile="1" />
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="DevNotes.txt" />
 		<Unit filename="Doxygen.cfg" />
 		<Unit filename="Field.cpp" />
