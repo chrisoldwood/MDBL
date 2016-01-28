@@ -1,107 +1,158 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="9.00"
 	Name="MDBL"
 	ProjectGUID="{9E405156-9B1D-483A-9BBD-B86240FA86BE}"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="4"
-			CharacterSet="1">
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
 				AdditionalIncludeDirectories="../../Lib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				StringPooling="TRUE"
-				ExceptionHandling="FALSE"
+				StringPooling="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="TRUE"
-				ForceConformanceInForLoopScope="TRUE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				ForceConformanceInForLoopScope="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="Common.hpp"
 				WarningLevel="4"
-				WarnAsError="TRUE"
-				DebugInformationFormat="3"/>
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCLibrarianTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCLibrarianTool"
+			/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="4"
-			CharacterSet="1">
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/EHa"
 				Optimization="0"
 				AdditionalIncludeDirectories="../../Lib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
-				MinimalRebuild="TRUE"
-				ExceptionHandling="FALSE"
+				MinimalRebuild="true"
+				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
-				SmallerTypeCheck="TRUE"
+				SmallerTypeCheck="true"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="TRUE"
-				ForceConformanceInForLoopScope="TRUE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				ForceConformanceInForLoopScope="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="Common.hpp"
 				WarningLevel="4"
-				WarnAsError="TRUE"
-				DebugInformationFormat="3"/>
+				WarnAsError="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCLibrarianTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCLibrarianTool"
+			/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -109,235 +160,303 @@
 	<Files>
 		<Filter
 			Name="Build"
-			Filter="">
+			>
 			<File
-				RelativePath=".\Common.hpp">
+				RelativePath=".\Common.hpp"
+				>
 			</File>
 			<File
-				RelativePath=".\FwdDecls.hpp">
+				RelativePath=".\FwdDecls.hpp"
+				>
 			</File>
 			<File
-				RelativePath=".\pch.cpp">
+				RelativePath=".\pch.cpp"
+				>
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
 			Name="Database"
-			Filter="">
+			>
 			<File
-				RelativePath="Column.cpp">
+				RelativePath="Column.cpp"
+				>
 			</File>
 			<File
-				RelativePath="Column.hpp">
+				RelativePath="Column.hpp"
+				>
 			</File>
 			<File
-				RelativePath="ColumnSet.cpp">
+				RelativePath="ColumnSet.cpp"
+				>
 			</File>
 			<File
-				RelativePath="ColumnSet.hpp">
+				RelativePath="ColumnSet.hpp"
+				>
 			</File>
 			<File
-				RelativePath="Field.cpp">
+				RelativePath="Field.cpp"
+				>
 			</File>
 			<File
-				RelativePath="Field.hpp">
+				RelativePath="Field.hpp"
+				>
 			</File>
 			<File
-				RelativePath="MDB.cpp">
+				RelativePath="MDB.cpp"
+				>
 			</File>
 			<File
-				RelativePath="MDB.hpp">
+				RelativePath="MDB.hpp"
+				>
 			</File>
 			<File
-				RelativePath="Row.cpp">
+				RelativePath="Row.cpp"
+				>
 			</File>
 			<File
-				RelativePath="Row.hpp">
+				RelativePath="Row.hpp"
+				>
 			</File>
 			<File
-				RelativePath="RowSet.hpp">
+				RelativePath="RowSet.hpp"
+				>
 			</File>
 			<File
-				RelativePath="Table.cpp">
+				RelativePath="Table.cpp"
+				>
 			</File>
 			<File
-				RelativePath="Table.hpp">
+				RelativePath="Table.hpp"
+				>
 			</File>
 			<File
-				RelativePath="TableSet.cpp">
+				RelativePath="TableSet.cpp"
+				>
 			</File>
 			<File
-				RelativePath="TableSet.hpp">
+				RelativePath="TableSet.hpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Index"
-			Filter="">
+			>
 			<File
-				RelativePath="Index.hpp">
+				RelativePath="Index.hpp"
+				>
 			</File>
 			<File
-				RelativePath="IntMapIndex.cpp">
+				RelativePath="IntMapIndex.cpp"
+				>
 			</File>
 			<File
-				RelativePath="IntMapIndex.hpp">
+				RelativePath="IntMapIndex.hpp"
+				>
 			</File>
 			<File
-				RelativePath="StrMapIndex.cpp">
+				RelativePath="StrMapIndex.cpp"
+				>
 			</File>
 			<File
-				RelativePath="StrMapIndex.hpp">
+				RelativePath="StrMapIndex.hpp"
+				>
 			</File>
 			<File
-				RelativePath="UniqIndex.hpp">
+				RelativePath="UniqIndex.hpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="ODBC"
-			Filter="">
+			>
 			<File
-				RelativePath="ODBCCursor.cpp">
+				RelativePath="ODBCCursor.cpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCCursor.hpp">
+				RelativePath="ODBCCursor.hpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCException.cpp">
+				RelativePath="ODBCException.cpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCException.hpp">
+				RelativePath="ODBCException.hpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCParams.cpp">
+				RelativePath="ODBCParams.cpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCParams.hpp">
+				RelativePath="ODBCParams.hpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCSource.cpp">
+				RelativePath="ODBCSource.cpp"
+				>
 			</File>
 			<File
-				RelativePath="ODBCSource.hpp">
+				RelativePath="ODBCSource.hpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Query"
-			Filter="">
+			>
 			<File
-				RelativePath="GroupSet.cpp">
+				RelativePath="GroupSet.cpp"
+				>
 			</File>
 			<File
-				RelativePath="GroupSet.hpp">
+				RelativePath="GroupSet.hpp"
+				>
 			</File>
 			<File
-				RelativePath="Join.hpp">
+				RelativePath="Join.hpp"
+				>
 			</File>
 			<File
-				RelativePath="JoinedSet.cpp">
+				RelativePath="JoinedSet.cpp"
+				>
 			</File>
 			<File
-				RelativePath="JoinedSet.hpp">
+				RelativePath="JoinedSet.hpp"
+				>
 			</File>
 			<File
-				RelativePath="ResultSet.cpp">
+				RelativePath="ResultSet.cpp"
+				>
 			</File>
 			<File
-				RelativePath="ResultSet.hpp">
+				RelativePath="ResultSet.hpp"
+				>
 			</File>
 			<File
-				RelativePath="SortColumns.hpp">
+				RelativePath="SortColumns.hpp"
+				>
 			</File>
 			<File
-				RelativePath="ValueSet.hpp">
+				RelativePath="ValueSet.hpp"
+				>
 			</File>
 			<File
-				RelativePath="Where.hpp">
+				RelativePath="Where.hpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereCmp.cpp">
+				RelativePath="WhereCmp.cpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereCmp.hpp">
+				RelativePath="WhereCmp.hpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereExp.cpp">
+				RelativePath="WhereExp.cpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereExp.hpp">
+				RelativePath="WhereExp.hpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereIn.cpp">
+				RelativePath="WhereIn.cpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereIn.hpp">
+				RelativePath="WhereIn.hpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereNot.cpp">
+				RelativePath="WhereNot.cpp"
+				>
 			</File>
 			<File
-				RelativePath="WhereNot.hpp">
+				RelativePath="WhereNot.hpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Source"
-			Filter="">
+			>
 			<File
-				RelativePath="AutoTrans.hpp">
+				RelativePath="AutoTrans.hpp"
+				>
 			</File>
 			<File
-				RelativePath="SQLCursor.hpp">
+				RelativePath="SQLCursor.hpp"
+				>
 			</File>
 			<File
-				RelativePath="SQLException.cpp">
+				RelativePath="SQLException.cpp"
+				>
 			</File>
 			<File
-				RelativePath="SQLException.hpp">
+				RelativePath="SQLException.hpp"
+				>
 			</File>
 			<File
-				RelativePath="SQLParams.hpp">
+				RelativePath="SQLParams.hpp"
+				>
 			</File>
 			<File
-				RelativePath="SQLSource.hpp">
+				RelativePath="SQLSource.hpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Type"
-			Filter="">
+			>
 			<File
-				RelativePath="MDBLTypes.hpp">
+				RelativePath="MDBLTypes.hpp"
+				>
 			</File>
 			<File
-				RelativePath="TimeStamp.cpp">
+				RelativePath="TimeStamp.cpp"
+				>
 			</File>
 			<File
-				RelativePath="TimeStamp.hpp">
+				RelativePath="TimeStamp.hpp"
+				>
 			</File>
 			<File
-				RelativePath="Value.hpp">
+				RelativePath="Value.hpp"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\DevNotes.txt">
+			RelativePath=".\DevNotes.txt"
+			>
 		</File>
 		<File
-			RelativePath=".\Doxygen.cfg">
+			RelativePath=".\Doxygen.cfg"
+			>
 		</File>
 		<File
-			RelativePath="ReadMe.txt">
+			RelativePath="ReadMe.txt"
+			>
 		</File>
 		<File
-			RelativePath="TODO.txt">
+			RelativePath="TODO.txt"
+			>
 		</File>
 	</Files>
 	<Globals>
