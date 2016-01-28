@@ -31,7 +31,6 @@ enum STGTYPE
 	MDST_CHAR,		// Single character.
 	MDST_STRING,	// String of characters.
 	MDST_BOOL,      // True or False.
-	MDST_TIME_T,    // time_t.
 	MDST_TIMESTAMP, // CTimeStamp.
 	MDST_POINTER,	// Generic pointer.
 };
@@ -53,9 +52,9 @@ enum COLTYPE
 	MDCT_VARSTR,	// MDST_STRING (using variable length buffer).
 	MDCT_BOOL,		// MDST_BOOL
 	MDCT_IDENTITY,	// MDST_INT (Identity column).
-	MDCT_DATETIME,	// MDST_TIME_T.
-	MDCT_DATE,		// MDST_TIME_T.
-	MDCT_TIME,		// MDST_TIME_T.
+	MDCT_DATETIME,	// MDST_INT64.
+	MDCT_DATE,		// MDST_INT64.
+	MDCT_TIME,		// MDST_INT64.
 	MDCT_TIMESTAMP, // CTimeStamp.
 	MDCT_VOIDPTR,	// MDST_POINTER (using void*).
 	MDCT_ROWPTR,	// MDST_POINTER (using CRow*).

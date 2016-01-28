@@ -151,7 +151,7 @@ bool CField::GetBool() const
 time_t CField::GetDateTime() const
 {
 	ASSERT(m_bNull   != true);
-	ASSERT(m_oColumn.StgType() == MDST_TIME_T);
+	ASSERT(m_oColumn.StgType() == MDST_INT64);
 
 	return *m_pTimeT;
 }
@@ -180,7 +180,6 @@ CValue CField::GetValue() const
 		case MDST_CHAR:			return *m_pChar;
 		case MDST_STRING:		return m_pString;
 		case MDST_BOOL:			return *m_pBool;
-		case MDST_TIME_T:		return *m_pTimeT;
 		case MDST_TIMESTAMP:	return static_cast<time_t>(*m_pTimeStamp);
 		case MDST_POINTER:		return m_pVoidPtr;
 		default:				ASSERT_FALSE();	break;
@@ -427,7 +426,7 @@ void CField::SetBool(bool bValue)
 
 void CField::SetDateTime(time_t tValue)
 {
-	ASSERT(m_oColumn.StgType() == MDST_TIME_T);
+	ASSERT(m_oColumn.StgType() == MDST_INT64);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
@@ -483,7 +482,6 @@ void CField::SetField(const CField& oValue)
 			case MDST_CHAR:		SetChar    (*oValue.m_pChar);	break;
 			case MDST_STRING:	SetString  (oValue.m_pString);	break;
 			case MDST_BOOL:		SetBool    (*oValue.m_pBool);	break;
-			case MDST_TIME_T:	SetDateTime(*oValue.m_pTimeT);	break;
 
 			case MDST_NULL:
 			case MDST_TIMESTAMP:
@@ -636,7 +634,6 @@ bool CField::operator==(const CValue& oValue) const
 		case MDST_CHAR:		return (*m_pChar    == oValue.m_cValue);
 		case MDST_STRING:	return (StrCmp(oValue.m_sValue) == 0);
 		case MDST_BOOL:		return (*m_pBool    == oValue.m_bValue);
-		case MDST_TIME_T:	return (*m_pTimeT   == oValue.m_tValue);
 		case MDST_POINTER:	return (m_pVoidPtr  == oValue.m_pValue);
 
 		case MDST_NULL:
@@ -697,7 +694,6 @@ int CField::Compare(const CField& oValue) const
 		case MDST_CHAR:			nCmp = (*m_pChar  - *oValue.m_pChar);			break;
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_pString);				break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - *oValue.m_pBool);			break;
-		case MDST_TIME_T:		nCmp = ::Compare(*m_pTimeT, *oValue.m_pTimeT);	break;
 
 		case MDST_NULL:
 		case MDST_TIMESTAMP:
@@ -729,7 +725,6 @@ int CField::Compare(const CValue& oValue) const
 		case MDST_CHAR:			nCmp = (*m_pChar  - oValue.m_cValue);			break;
 		case MDST_STRING:		nCmp = StrCmp(oValue.m_sValue);					break;
 		case MDST_BOOL:			nCmp = (*m_pBool  - oValue.m_bValue);			break;
-		case MDST_TIME_T:		nCmp = ::Compare(*m_pTimeT, oValue.m_tValue);	break;
 
 		case MDST_NULL:
 		case MDST_TIMESTAMP:
@@ -843,7 +838,6 @@ CString CField::DbgFormat() const
 		case MDST_CHAR:			str.Format(TXT("%c"), *m_pChar);					break;
 		case MDST_STRING:		str = m_pString;									break;
 		case MDST_BOOL:			str = FormatBool(TXT("N|Y"));						break;
-		case MDST_TIME_T:		str = FormatTimeT(TXT("%d/%m/%y %H:%M:%S"));		break;
 		case MDST_TIMESTAMP:	str = FormatTimeStamp(TXT("%d/%m/%y %H:%M:%S"));	break;
 		case MDST_POINTER:		str.Format(TXT("%p"), m_pVoidPtr);					break;
 

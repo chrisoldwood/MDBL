@@ -16,6 +16,7 @@
 #endif
 
 #include "MDBLTypes.hpp"
+#include <WCL/String.hpp>
 
 /******************************************************************************
 **
@@ -38,9 +39,6 @@ public:
 	CValue(const tchar* sValue);
 	CValue(const CString& sValue);
 	CValue(bool bValue);
-#ifndef _M_X64
-	CValue(time_t tValue);
-#endif
 	CValue(void* pValue);
 	~CValue();
 
@@ -61,7 +59,6 @@ union
 	tchar	m_cValue;		// Value if type is MDST_CHAR.
 	tchar*	m_sValue;		// Value if type is MDST_STRING
 	bool	m_bValue;		// Value if type is MDST_BOOL.
-	time_t	m_tValue;		// Value if type is MDST_TIME_T.
 	void*	m_pValue;		// Value if type is MDST_POINTER.
 	byte	m_uValue[8];	// Member used when copying.
 };
@@ -131,16 +128,6 @@ inline CValue::CValue(bool bValue)
 	, m_bValue(bValue)
 {
 }
-
-// time_t is a long on x86 and __int64 on x64
-#ifndef _M_X64
-inline CValue::CValue(time_t tValue)
-	: m_eType(MDST_TIME_T)
-	, m_bNull(false)
-	, m_tValue(tValue)
-{
-}
-#endif
 
 inline CValue::CValue(void* pValue)
 	: m_eType(MDST_POINTER)

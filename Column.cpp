@@ -120,9 +120,9 @@ STGTYPE CColumn::ColToStgType(COLTYPE eType)
 		case MDCT_VARSTR:		return MDST_STRING;
 		case MDCT_BOOL:			return MDST_BOOL;
 		case MDCT_IDENTITY:		return MDST_INT;
-		case MDCT_DATETIME:		return MDST_TIME_T;
-		case MDCT_DATE:			return MDST_TIME_T;
-		case MDCT_TIME:			return MDST_TIME_T;
+		case MDCT_DATETIME:		return MDST_INT64;
+		case MDCT_DATE:			return MDST_INT64;
+		case MDCT_TIME:			return MDST_INT64;
 		case MDCT_TIMESTAMP:	return MDST_TIMESTAMP;
 		case MDCT_VOIDPTR:		return MDST_POINTER;
 		case MDCT_ROWPTR:		return MDST_POINTER;
@@ -203,7 +203,6 @@ size_t CColumn::DisplayWidth(bool bDebug) const
 			case MDST_CHAR:			return std::max<size_t>(nMin, 1u);
 			case MDST_STRING:		return std::max<size_t>(nMin, m_nLength);
 			case MDST_BOOL:			return std::max<size_t>(nMin, 1u);
-			case MDST_TIME_T:		return std::max<size_t>(nMin, 17u);
 			case MDST_TIMESTAMP:	return std::max<size_t>(nMin, 17u);
 			case MDST_POINTER:		return std::max<size_t>(nMin, 10u);
 

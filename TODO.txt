@@ -37,3 +37,5 @@
 - Use strncpy instead of strcpy.
 
 - Move INNER and OUTER join enum to outer scope so its stored as an enum.
+
+- Reconsider need for POINTER value.
