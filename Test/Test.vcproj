@@ -193,6 +193,22 @@
 		/>
 	</References>
 	<Files>
+		<Filter
+			Name="Database"
+			>
+			<File
+				RelativePath=".\Database\Schema.ini"
+				>
+			</File>
+			<File
+				RelativePath=".\Database\Values.csv"
+				>
+			</File>
+		</Filter>
+		<File
+			RelativePath=".\ODBCSourceTests.cpp"
+			>
+		</File>
 		<File
 			RelativePath=".\stdafx.cpp"
 			>

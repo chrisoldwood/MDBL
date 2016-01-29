@@ -37,6 +37,7 @@ public:
 	// Connection methods.
 	//
 	virtual void Open(const tchar* pszConnection) = 0;
+			void Open(const tstring& connection);
 	virtual void Close() = 0;
 
 	virtual bool IsOpen() const = 0;
@@ -76,6 +77,11 @@ inline CSQLSource::CSQLSource()
 
 inline CSQLSource::~CSQLSource()
 {
+}
+
+inline void CSQLSource::Open(const tstring& connection)
+{
+	Open(connection.c_str());
 }
 
 #endif //SQLSOURCE_HPP

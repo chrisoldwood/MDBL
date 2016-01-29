@@ -43,6 +43,7 @@ public:
 	// Connection methods.
 	//
 	virtual void Open(const tchar* pszConnection);
+	using CSQLSource::Open;
 	virtual void Close();
 
 	virtual bool IsOpen() const;
