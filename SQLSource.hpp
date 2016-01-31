@@ -16,6 +16,7 @@
 #endif
 
 #include "FwdDecls.hpp"
+#include "SQLCursor.hpp"
 
 /******************************************************************************
 ** 
@@ -37,7 +38,7 @@ public:
 	// Connection methods.
 	//
 	virtual void Open(const tchar* pszConnection) = 0;
-			void Open(const tstring& connection);
+			void Open(const tstring& connection); // throw(CSQLException)
 	virtual void Close() = 0;
 
 	virtual bool IsOpen() const = 0;
@@ -48,7 +49,7 @@ public:
 	virtual CSQLParams* CreateParams(const tchar* pszStmt, size_t nParams) = 0;
 	virtual void        ExecStmt(const tchar* pszStmt) = 0;
 	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams) = 0;
-	virtual CSQLCursor* ExecQuery(const tchar* pszQuery) = 0;
+	virtual SQLCursorPtr ExecQuery(const tchar* pszQuery) = 0;
 
 	//
 	// Transaction methods.

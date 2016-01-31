@@ -22,7 +22,7 @@
 *******************************************************************************
 */
 
-class CSQLException
+class CSQLException : public Core::Exception
 {
 public:
 	//
@@ -48,7 +48,6 @@ public:
 	// Members.
 	//
 	int		m_eError;		// Error code.
-	CString	m_strError;		// Human readable error message.
 };
 
 /******************************************************************************

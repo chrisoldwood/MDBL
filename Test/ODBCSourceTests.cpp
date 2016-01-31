@@ -20,40 +20,21 @@ TEST_SET(ODBCSource)
 	tstring connection = TXT("Driver={Microsoft Text Driver (*.txt; *.csv)};");
 	connection += Core::fmt(TXT("Dbq=%s;"), databaseFolder.c_str());
 
-	CODBCSource source;
-	source.Open(connection);
+	CODBCSource source(connection);
 
 TEST_CASE("Executing a query returns a cursor to the result set")
 {
-	try
-	{
-		const tstring query = TXT("SELECT * FROM TestValues.csv");
+	const tstring query = TXT("SELECT * FROM TestValues.csv");
 
-		CSQLCursor* cursor = source.ExecQuery(query.c_str());
+	SQLCursorPtr cursor = source.ExecQuery(query.c_str());
 
-		TEST_TRUE(cursor != nullptr);
-
-		delete cursor;
-	}
-	catch (const CODBCException& e)
-	{
-		TEST_FAILED_STR(e.m_strError);
-	}
+	TEST_FALSE(cursor.empty());
 }
 TEST_CASE_END
 
 TEST_CASE("Executing a query throws when an error occurs")
 {
-	try
-	{
-		source.ExecQuery(TXT("a malformed SQL query"));
-
-		TEST_FAILED("No exception thrown");
-	}
-	catch (const CODBCException&)
-	{
-		TEST_PASSED("Exception was thrown");
-	}
+	TEST_THROWS(source.ExecQuery(TXT("a malformed SQL query")));
 }
 TEST_CASE_END
 

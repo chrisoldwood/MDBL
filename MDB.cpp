@@ -15,6 +15,7 @@
 #include "JoinedSet.hpp"
 #include "Join.hpp"
 #include <malloc.h>
+#include <Core/UniquePtr.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -96,48 +97,34 @@ CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const t
 		pszQuery = strQuery;
 	}
 
-	CTable*		pTable  = new CTable(*this, pszName);
-	CSQLCursor*	pCursor = NULL;
+	Core::UniquePtr<CTable> pTable(new CTable(*this, pszName));
+	SQLCursorPtr pCursor(oConnection.ExecQuery(pszQuery));
 
-	try
+	if (pCursor->NumColumns() != 0)
 	{
-		pCursor = oConnection.ExecQuery(pszQuery);
-
-		if (pCursor->NumColumns() != 0)
+		// Setup the tables' schema.
+		for (size_t i = 0; i < pCursor->NumColumns(); ++i)
 		{
-			// Setup the tables' schema.
-			for (size_t i = 0; i < pCursor->NumColumns(); ++i)
-			{
-				SQLColumn& oColumn = pCursor->Column(i);
+			SQLColumn& oColumn = pCursor->Column(i);
 
-				pTable->AddColumn(oColumn.m_strName, oColumn.m_eMDBColType, oColumn.m_nSize, oColumn.m_nFlags);
-			}
-
-			// For all rows.
-			while (pCursor->Fetch())
-			{
-				// Allocate the row.
-				CRow& oRow = pTable->CreateRow();
-
-				// Copy the data.
-				pCursor->GetRow(oRow);
-
-				// Append to table.
-				pTable->InsertRow(oRow, false);
-			}
+			pTable->AddColumn(oColumn.m_strName, oColumn.m_eMDBColType, oColumn.m_nSize, oColumn.m_nFlags);
 		}
 
-		// Cleanup.
-		delete pCursor;
-	}
-	catch (const CSQLException&)
-	{
-		delete pCursor;
-		delete pTable;
-		throw;
+		// For all rows.
+		while (pCursor->Fetch())
+		{
+			// Allocate the row.
+			CRow& oRow = pTable->CreateRow();
+
+			// Copy the data.
+			pCursor->GetRow(oRow);
+
+			// Append to table.
+			pTable->InsertRow(oRow, false);
+		}
 	}
 
-	return *pTable;
+	return *(pTable.detach());
 }
 
 /******************************************************************************

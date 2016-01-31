@@ -58,7 +58,7 @@ CODBCException::~CODBCException()
 *******************************************************************************
 */
 
-CString CODBCException::LastError(SQLHANDLE hHandle, SQLSMALLINT nType) const
+CString CODBCException::LastError(SQLHANDLE hHandle, SQLSMALLINT nType)
 {
 	if (hHandle == NULL)
 		return TXT("No error details available.");

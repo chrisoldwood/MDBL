@@ -52,6 +52,17 @@ CODBCSource::CODBCSource()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//! Construct the source and open the connection.
+
+CODBCSource::CODBCSource(const tstring& connection)
+	: m_hEnv(SQL_NULL_HENV)
+	, m_hDBC(SQL_NULL_HDBC)
+	, m_bInTrans(false)
+{
+	Open(connection);
+}
+
 /******************************************************************************
 ** Method:		Destructor.
 **
@@ -277,26 +288,17 @@ void CODBCSource::ExecStmt(const tchar* pszStmt, CSQLParams& oParams)
 *******************************************************************************
 */
 
-CSQLCursor* CODBCSource::ExecQuery(const tchar* pszQuery)
+SQLCursorPtr CODBCSource::ExecQuery(const tchar* pszQuery)
 {
 	ASSERT(IsOpen() == true);
 
 	// Allocate a cursor for the result set.
-	CODBCCursor* pCursor = new CODBCCursor(*this);
+	ODBCCursorPtr cursor(new CODBCCursor(*this));
 
-	try
-	{
-		// Execute it.
-		ExecQuery(pszQuery, *pCursor);
-	}
-	catch (const CODBCException&)
-	{
-		// Free cursor and re-throw exception.
-		delete pCursor;
-		throw;
-	}
+	// Execute it.
+	ExecQuery(pszQuery, cursor.getRef());
 
-	return pCursor;
+	return cursor;
 }
 
 /******************************************************************************

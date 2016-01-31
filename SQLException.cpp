@@ -25,24 +25,24 @@
 */
 
 CSQLException::CSQLException(int eErrCode, const tchar* pszSQLStmt, const CString& strSQLErr)
-	: m_eError(eErrCode)
-	, m_strError()
+	: Exception()
+	, m_eError(eErrCode)
 {
 	// Convert error to string.
 	switch(eErrCode)
 	{
-		case E_CONNECT_FAILED:	m_strError  = TXT("Failed to connect to Database:\n\n");		break;
-		case E_ALLOC_FAILED:	m_strError  = TXT("Failed to allocate handle/memory:\n\n");		break;
-		case E_EXEC_FAILED:		m_strError  = TXT("Failed to execute the statement:\n\n");		break;
-		case E_FETCH_FAILED:	m_strError  = TXT("Failed to fetch result set:\n\n");			break;
-		case E_TRANS_FAILED:	m_strError  = TXT("Failed to process transaction:\n\n");		break;
-		default:				ASSERT_FALSE();													break;
+		case E_CONNECT_FAILED:	m_details = TXT("Failed to connect to Database:\n\n");		break;
+		case E_ALLOC_FAILED:	m_details = TXT("Failed to allocate handle/memory:\n\n");	break;
+		case E_EXEC_FAILED:		m_details = TXT("Failed to execute the statement:\n\n");	break;
+		case E_FETCH_FAILED:	m_details = TXT("Failed to fetch result set:\n\n");			break;
+		case E_TRANS_FAILED:	m_details = TXT("Failed to process transaction:\n\n");		break;
+		default:				ASSERT_FALSE();												break;
 	}
 
 	// Append statement and reason.
-	m_strError += pszSQLStmt;
-	m_strError += TXT("\n\nReason:\n\n");
-	m_strError += strSQLErr;
+	m_details += pszSQLStmt;
+	m_details += TXT("\n\nReason:\n\n");
+	m_details += strSQLErr;
 }
 
 /******************************************************************************

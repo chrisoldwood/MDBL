@@ -37,13 +37,17 @@ public:
 	// Constructors/Destructor.
 	//
 	CODBCSource();
+
+	//! Construct the source and open the connection.
+	CODBCSource(const tstring& connection); // throw(CODBCException)
+
 	virtual ~CODBCSource();
 
 	//
 	// Connection methods.
 	//
 	virtual void Open(const tchar* pszConnection);
-	using CSQLSource::Open;
+	using CSQLSource::Open; // throw(CODBCException)
 	virtual void Close();
 
 	virtual bool IsOpen() const;
@@ -54,7 +58,7 @@ public:
 	virtual CSQLParams* CreateParams(const tchar* pszStmt, size_t nParams);
 	virtual void        ExecStmt(const tchar* pszStmt);
 	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams);
-	virtual CSQLCursor* ExecQuery(const tchar* pszQuery);
+	virtual SQLCursorPtr ExecQuery(const tchar* pszQuery);
 	virtual void        ExecQuery(const tchar* pszQuery, CODBCCursor& oCursor);
 
 	//

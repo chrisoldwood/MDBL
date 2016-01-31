@@ -67,6 +67,9 @@ protected:
 	//
 };
 
+//! The default SQL cursor smart pointer type.
+typedef Core::SharedPtr<CSQLCursor> SQLCursorPtr;
+
 /******************************************************************************
 **
 ** Implementation of inline functions.

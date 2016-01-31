@@ -42,7 +42,7 @@ protected:
 	//
 	// Internal methods.
 	//
-	CString LastError(SQLHANDLE hHandle, SQLSMALLINT nType) const;
+	static CString LastError(SQLHANDLE hHandle, SQLSMALLINT nType);
 };
 
 /******************************************************************************

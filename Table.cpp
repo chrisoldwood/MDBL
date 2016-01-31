@@ -966,53 +966,40 @@ void CTable::Read(CSQLSource& rSource)
 
 	ASSERT(rSource.IsOpen());
 
-	CSQLCursor*	pCursor = NULL;
+	SQLCursorPtr pCursor = rSource.ExecQuery(SQLQuery());
 
-	try
+	// Set the output column types.
+	for (size_t iTabCol = 0, iSQLCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 	{
-		pCursor = rSource.ExecQuery(SQLQuery());
+		CColumn& oTabColumn = m_vColumns[iTabCol];
 
-		// Set the output column types.
-		for (size_t iTabCol = 0, iSQLCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
+		// Ignore TRANSIENT columns.
+		if (!oTabColumn.Transient())
 		{
-			CColumn& oTabColumn = m_vColumns[iTabCol];
+			SQLColumn& oSQLColumn = pCursor->Column(iSQLCol);
 
-			// Ignore TRANSIENT columns.
-			if (!oTabColumn.Transient())
-			{
-				SQLColumn& oSQLColumn = pCursor->Column(iSQLCol);
+			ASSERT(oTabColumn.Name() == oSQLColumn.m_strName);
+			ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
 
-				ASSERT(oTabColumn.Name() == oSQLColumn.m_strName);
-				ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
+			oSQLColumn.m_nDstColumn  = iTabCol;
+			oSQLColumn.m_eMDBColType = oTabColumn.ColType();
+			oSQLColumn.m_nSize       = oTabColumn.Length();
 
-				oSQLColumn.m_nDstColumn  = iTabCol;
-				oSQLColumn.m_eMDBColType = oTabColumn.ColType();
-				oSQLColumn.m_nSize       = oTabColumn.Length();
-
-				++iSQLCol;
-			}
+			++iSQLCol;
 		}
-
-		// For all rows.
-		while (pCursor->Fetch())
-		{
-			// Allocate the row.
-			CRow& oRow = CreateRow();
-
-			// Copy the data.
-			pCursor->GetRow(oRow);
-
-			// Append to table.
-			InsertRow(oRow, false);
-		}
-
-		// Cleanup.
-		delete pCursor;
 	}
-	catch (const CSQLException&)
+
+	// For all rows.
+	while (pCursor->Fetch())
 	{
-		delete pCursor;
-		throw;
+		// Allocate the row.
+		CRow& oRow = CreateRow();
+
+		// Copy the data.
+		pCursor->GetRow(oRow);
+
+		// Append to table.
+		InsertRow(oRow, false);
 	}
 }
 

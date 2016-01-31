@@ -83,6 +83,9 @@ private:
 	CODBCCursor& operator=(const CODBCCursor&);
 };
 
+//! The default ODBC cursor smart pointer type.
+typedef Core::SharedPtr<CODBCCursor> ODBCCursorPtr;
+
 /******************************************************************************
 **
 ** Implementation of inline functions.
