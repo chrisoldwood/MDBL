@@ -50,6 +50,7 @@ public:
 	virtual void        ExecStmt(const tchar* pszStmt) = 0;
 	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams) = 0;
 	virtual SQLCursorPtr ExecQuery(const tchar* pszQuery) = 0;
+	        SQLCursorPtr ExecQuery(const tstring& query); // throw(CSQLException)
 
 	//
 	// Transaction methods.
@@ -83,6 +84,11 @@ inline CSQLSource::~CSQLSource()
 inline void CSQLSource::Open(const tstring& connection)
 {
 	Open(connection.c_str());
+}
+
+inline SQLCursorPtr CSQLSource::ExecQuery(const tstring& query)
+{
+	return ExecQuery(query.c_str());
 }
 
 #endif //SQLSOURCE_HPP

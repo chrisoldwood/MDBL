@@ -39,3 +39,7 @@
 - Move INNER and OUTER join enum to outer scope so its stored as an enum.
 
 - Reconsider need for POINTER value.
+
+- Should CSQLCursor / CODBCCursor return a const column definition?
+
+- Bug in the ODBC handling of the SQL_BIT type (value retrieved is garbage.

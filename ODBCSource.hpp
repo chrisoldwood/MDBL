@@ -59,6 +59,7 @@ public:
 	virtual void        ExecStmt(const tchar* pszStmt);
 	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams);
 	virtual SQLCursorPtr ExecQuery(const tchar* pszQuery);
+	using CSQLSource::ExecQuery; // throw(CODBCException)
 	virtual void        ExecQuery(const tchar* pszQuery, CODBCCursor& oCursor);
 
 	//

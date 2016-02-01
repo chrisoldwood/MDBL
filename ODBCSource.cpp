@@ -366,7 +366,7 @@ COLTYPE CODBCSource::MDBType(SQLSMALLINT nODBCType)
 		// Character types.
 		case SQL_CHAR:				return MDCT_FXDSTR;
 		case SQL_VARCHAR:			return MDCT_FXDSTR;
-		case SQL_LONGVARCHAR:		break;
+		case SQL_LONGVARCHAR:		return MDCT_VARSTR;
 		case SQL_WCHAR:				return MDCT_FXDSTR;
 		case SQL_WVARCHAR:			return MDCT_FXDSTR;
 		case SQL_WLONGVARCHAR:		break;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //! \file   ODBCSourceTests.cpp
-//! \brief  The integration tests for the ODBC driver component.
+//! \brief  The integration tests for the CODBCSource class.
 //! \author Chris Oldwood
 
 #include "stdafx.h"
@@ -8,7 +8,6 @@
 #include <MDBL/ODBCSource.hpp>
 #include <MDBL/ODBCCursor.hpp>
 #include <WCL/Path.hpp>
-#include <MDBL/ODBCException.hpp>
 
 TEST_SET(ODBCSource)
 {
@@ -20,13 +19,47 @@ TEST_SET(ODBCSource)
 	tstring connection = TXT("Driver={Microsoft Text Driver (*.txt; *.csv)};");
 	connection += Core::fmt(TXT("Dbq=%s;"), databaseFolder.c_str());
 
+TEST_CASE("A source is not open by default")
+{
+	CODBCSource source;
+
+	TEST_FALSE(source.IsOpen());
+}
+TEST_CASE_END
+
+TEST_CASE("A source can be opened manually")
+{
+	CODBCSource source;
+
+	source.Open(connection);
+
+	TEST_TRUE(source.IsOpen());
+}
+TEST_CASE_END
+
+TEST_CASE("A source can be opened on construction")
+{
+	CODBCSource source(connection);
+
+	TEST_TRUE(source.IsOpen());
+}
+TEST_CASE_END
+
+TEST_CASE("Failing to open a sourece throws an exception")
+{
+	CODBCSource source;
+
+	TEST_THROWS(source.Open(TXT("malformed connection string")));
+}
+TEST_CASE_END
+
 	CODBCSource source(connection);
 
 TEST_CASE("Executing a query returns a cursor to the result set")
 {
 	const tstring query = TXT("SELECT * FROM TestValues.csv");
 
-	SQLCursorPtr cursor = source.ExecQuery(query.c_str());
+	SQLCursorPtr cursor = source.ExecQuery(query);
 
 	TEST_FALSE(cursor.empty());
 }
