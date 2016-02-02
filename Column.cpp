@@ -10,6 +10,7 @@
 #include "Common.hpp"
 #include "Column.hpp"
 #include "Index.hpp"
+#include <algorithm>
 
 /******************************************************************************
 ** Method:		Constructor.

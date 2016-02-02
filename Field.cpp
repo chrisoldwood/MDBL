@@ -16,6 +16,7 @@
 #include <time.h>
 #include <tchar.h>
 #include <Core/AnsiWide.hpp>
+#include <algorithm>
 
 // The special null value.
 CNull null;
