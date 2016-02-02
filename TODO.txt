@@ -43,3 +43,5 @@
 - Should CSQLCursor / CODBCCursor return a const column definition?
 
 - Bug in the ODBC handling of the SQL_BIT type (value retrieved is garbage.
+
+- Look at use MDST_TIMESTAMP in CField as it now casues ambiguity with GCC (time_t cast).
