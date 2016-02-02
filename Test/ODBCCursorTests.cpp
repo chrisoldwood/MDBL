@@ -3,7 +3,7 @@
 //! \brief  The integration tests for the CODBCCursor class.
 //! \author Chris Oldwood
 
-#include "stdafx.h"
+#include "Common.hpp"
 #include <Core/UnitTest.hpp>
 #include <MDBL/ODBCSource.hpp>
 #include <MDBL/ODBCCursor.hpp>
