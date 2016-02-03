@@ -393,25 +393,31 @@ void CODBCCursor::GetRow(CRow& oRow)
 	// For all SQL columns.
 	for (size_t iSQLCol = 0; iSQLCol < m_nColumns; ++iSQLCol)
 	{
-		size_t iRowCol = m_pColumns[iSQLCol].m_nDstColumn;
-
-		// Calculate pointer to value.
-		const byte* pValue = pRowData + m_pOffsets[iSQLCol];
-
-		// Get null/len indicator pointer.
-		const SQLINTEGER* pLenInd = reinterpret_cast<const SQLINTEGER*>(pValue);
+		size_t            iRowCol = m_pColumns[iSQLCol].m_nDstColumn;
+		const byte*       pFieldData = pRowData + m_pOffsets[iSQLCol];
+		const SQLINTEGER* pLenInd = reinterpret_cast<const SQLINTEGER*>(pFieldData);
+		const byte*       pValue = pFieldData + sizeof(SQLINTEGER);
 
 		// Is value null?
 		if (*pLenInd == SQL_NULL_DATA)
 		{
 			oRow[iRowCol] = null;
 		}
+		// Requires conversion to MDCT_BOOL?
+		else if (m_pColumns[iSQLCol].m_eMDBColType == MDCT_BOOL)
+		{
+			ASSERT(*pLenInd == 1);
+
+			bool value = *pValue;
+
+			oRow[iRowCol].SetRaw(&value);
+		}
 		// Requires conversion to MDCT_DATETIME?
 		else if ( (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATETIME)
 			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATE)
 			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_TIME) )
 		{
-			const CTimeStamp* pTimeStamp = reinterpret_cast<const CTimeStamp*>(pValue + sizeof(SQLINTEGER));
+			const CTimeStamp* pTimeStamp = reinterpret_cast<const CTimeStamp*>(pValue);
 			time_t		      tTime      = *pTimeStamp;
 
 			oRow[iRowCol].SetRaw(&tTime);
@@ -419,14 +425,14 @@ void CODBCCursor::GetRow(CRow& oRow)
 		// Requires conversion to MDCT_CHAR?
 		else if (m_pColumns[iSQLCol].m_eMDBColType == MDCT_CHAR)
 		{
-			tchar cChar = *(reinterpret_cast<const tchar*>(pValue + sizeof(SQLINTEGER)));
+			tchar cChar = *(reinterpret_cast<const tchar*>(pValue));
 
 			oRow[iRowCol].SetRaw(&cChar);
 		}
 		// Requires no conversion.
 		else
 		{
-			oRow[iRowCol].SetRaw(pValue + sizeof(SQLINTEGER));
+			oRow[iRowCol].SetRaw(pValue);
 		}
 	}
 }

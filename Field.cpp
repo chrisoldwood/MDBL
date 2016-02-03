@@ -581,6 +581,13 @@ void CField::SetRaw(const void* pValue)
 
 		m_pString[nChars] = '\0';
 	}
+	// Boolean value (bit)?
+	else if (m_oColumn.ColType() == MDCT_BOOL)
+	{
+		const bool* value = static_cast<const bool*>(pValue);
+
+		*m_pBool = *value;
+	}
 	// POINTER based type?
 	else if (m_oColumn.StgType() == MDST_POINTER)
 	{

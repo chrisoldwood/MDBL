@@ -215,7 +215,7 @@ TEST_CASE("Once fetched the values for each column in the row can be retrieved")
 	CMDB mdb;
 	CTable table(mdb, TXT("test"));
 
-	table.AddColumn(TXT("BitValue"),       MDCT_INT,         0, CColumn::NULLABLE);
+	table.AddColumn(TXT("BitValue"),       MDCT_BOOL,        0, CColumn::NULLABLE);
 	table.AddColumn(TXT("ByteValue"),      MDCT_INT,         0, CColumn::NULLABLE);
 	table.AddColumn(TXT("ShortValue"),     MDCT_INT,         0, CColumn::NULLABLE);
 	table.AddColumn(TXT("LongValue"),      MDCT_INT,         0, CColumn::NULLABLE);
@@ -232,7 +232,7 @@ TEST_CASE("Once fetched the values for each column in the row can be retrieved")
 	cursor->GetRow(row);
 	table.InsertRow(row);
 
-	//TEST_TRUE(row[0] == 1);
+	TEST_TRUE(row[0] == true);
 	TEST_TRUE(row[1] == 2);
 	TEST_TRUE(row[2] == 3);
 	TEST_TRUE(row[3] == 4);
