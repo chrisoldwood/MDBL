@@ -105,7 +105,7 @@ CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const t
 		// Setup the tables' schema.
 		for (size_t i = 0; i < pCursor->NumColumns(); ++i)
 		{
-			SQLColumn& oColumn = pCursor->Column(i);
+			const SQLColumn& oColumn = pCursor->Column(i);
 
 			pTable->AddColumn(oColumn.m_strName, oColumn.m_eMDBColType, oColumn.m_nSize, oColumn.m_nFlags);
 		}

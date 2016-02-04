@@ -248,6 +248,10 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath=".\TableTests.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\Test.cpp"
 			>
 		</File>

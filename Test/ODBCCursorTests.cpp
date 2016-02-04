@@ -59,7 +59,7 @@ TEST_CASE("The metadata for each column can be retrieved")
 
 	for (size_t i = 0; i != numColumns; ++i)
 	{
-		SQLColumn& column = cursor->Column(i);
+		const SQLColumn& column = cursor->Column(i);
 
 		TEST_TRUE(column.m_nDstColumn == i);
 		TEST_FALSE(column.m_strName.Empty())
@@ -71,7 +71,7 @@ TEST_CASE("The SQL bit type is mapped onto the boolean column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(0);
+	const SQLColumn& column = cursor->Column(0);
 
 	TEST_TRUE(column.m_nDstColumn == 0);
 	TEST_TRUE(column.m_strName == TXT("BitValue"));
@@ -87,7 +87,7 @@ TEST_CASE("The SQL byte type is mapped onto the integer column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(1);
+	const SQLColumn& column = cursor->Column(1);
 
 	TEST_TRUE(column.m_nDstColumn == 1);
 	TEST_TRUE(column.m_strName == TXT("ByteValue"));
@@ -103,7 +103,7 @@ TEST_CASE("The SQL short type is mapped onto the integer column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(2);
+	const SQLColumn& column = cursor->Column(2);
 
 	TEST_TRUE(column.m_nDstColumn == 2);
 	TEST_TRUE(column.m_strName == TXT("ShortValue"));
@@ -119,7 +119,7 @@ TEST_CASE("The SQL long type is mapped onto the integer column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(3);
+	const SQLColumn& column = cursor->Column(3);
 
 	TEST_TRUE(column.m_nDstColumn == 3);
 	TEST_TRUE(column.m_strName == TXT("LongValue"));
@@ -135,7 +135,7 @@ TEST_CASE("The SQL real type is mapped onto the double column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(4);
+	const SQLColumn& column = cursor->Column(4);
 
 	TEST_TRUE(column.m_nDstColumn == 4);
 	TEST_TRUE(column.m_strName == TXT("SingleValue"));
@@ -151,7 +151,7 @@ TEST_CASE("The SQL double type is mapped onto the double column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(5);
+	const SQLColumn& column = cursor->Column(5);
 
 	TEST_TRUE(column.m_nDstColumn == 5);
 	TEST_TRUE(column.m_strName == TXT("DoubleValue"));
@@ -167,7 +167,7 @@ TEST_CASE("The SQL timestamp type is mapped onto the timestamp column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(6);
+	const SQLColumn& column = cursor->Column(6);
 
 	TEST_TRUE(column.m_nDstColumn == 6);
 	TEST_TRUE(column.m_strName == TXT("DateTimeValue"));
@@ -183,7 +183,7 @@ TEST_CASE("The SQL text type is mapped onto the string column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(7);
+	const SQLColumn& column = cursor->Column(7);
 
 	TEST_TRUE(column.m_nDstColumn == 7);
 	TEST_TRUE(column.m_strName == TXT("ShortTextValue"));
@@ -199,7 +199,7 @@ TEST_CASE("The SQL variable length text type is mapped onto the string column ty
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
-	SQLColumn& column = cursor->Column(8);
+	const SQLColumn& column = cursor->Column(8);
 
 	TEST_TRUE(column.m_nDstColumn == 8);
 	TEST_TRUE(column.m_strName == TXT("LongTextValue"));

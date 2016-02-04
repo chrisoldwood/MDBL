@@ -40,8 +40,6 @@
 
 - Reconsider need for POINTER value.
 
-- Should CSQLCursor / CODBCCursor return a const column definition?
-
 - Look at use of MDST_TIMESTAMP in CField as it now casues ambiguity with GCC (time_t cast).
 
 - Reconcile MDCT_DATE / TIME / DATETIME / TIMESTAMP types (time_t vs timestamp structure).

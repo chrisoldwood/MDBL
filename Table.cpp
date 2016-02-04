@@ -977,15 +977,12 @@ void CTable::Read(CSQLSource& rSource)
 		// Ignore TRANSIENT columns.
 		if (!oTabColumn.Transient())
 		{
-			SQLColumn& oSQLColumn = pCursor->Column(iSQLCol);
+			const SQLColumn& oSQLColumn = pCursor->Column(iSQLCol);
 
 			ASSERT(oTabColumn.Name() == oSQLColumn.m_strName);
 			ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
 
-			oSQLColumn.m_nDstColumn  = iTabCol;
-			oSQLColumn.m_eMDBColType = oTabColumn.ColType();
-			oSQLColumn.m_nSize       = oTabColumn.Length();
-
+			pCursor->MapColumn(iSQLCol, iTabCol, oTabColumn.ColType(), oTabColumn.Length());
 			++iSQLCol;
 		}
 	}

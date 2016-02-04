@@ -239,11 +239,25 @@ size_t CODBCCursor::NumColumns() const
 *******************************************************************************
 */
 
-SQLColumn& CODBCCursor::Column(size_t n) const
+const SQLColumn& CODBCCursor::Column(size_t n) const
 {
 	ASSERT(n < m_nColumns);
 
 	return m_pColumns[n];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Set the mapping from result set column to table column.
+
+void CODBCCursor::MapColumn(size_t sourceColumn, size_t destColumn, COLTYPE type, size_t size)
+{
+	ASSERT(sourceColumn < m_nColumns);
+
+	SQLColumn& column = m_pColumns[sourceColumn];
+
+	column.m_nDstColumn  = destColumn;
+	column.m_eMDBColType = type;
+	column.m_nSize       = size;
 }
 
 /******************************************************************************

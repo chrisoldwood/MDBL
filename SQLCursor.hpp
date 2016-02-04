@@ -56,7 +56,10 @@ public:
 	// Accessors.
 	//
 	virtual size_t NumColumns() const = 0;
-	virtual SQLColumn& Column(size_t n) const = 0;
+	virtual const SQLColumn& Column(size_t n) const = 0;
+
+	//! Set the mapping from result set column to table column.
+	virtual void MapColumn(size_t sourceColumn, size_t destColumn, COLTYPE type, size_t size) = 0;
 
 	virtual bool Fetch() = 0;
 	virtual void GetRow(CRow& oRow) = 0;

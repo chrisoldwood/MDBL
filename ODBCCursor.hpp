@@ -46,7 +46,10 @@ public:
 	//
 	virtual bool IsOpen() const;
 	virtual size_t NumColumns() const;
-	virtual SQLColumn& Column(size_t n) const;
+	virtual const SQLColumn& Column(size_t n) const;
+
+	//! Set the mapping from result set column to table column.
+	virtual void MapColumn(size_t sourceColumn, size_t destColumn, COLTYPE type, size_t size);
 
 	virtual bool Fetch();
 	virtual void GetRow(CRow& oRow);
