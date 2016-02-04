@@ -248,6 +248,10 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath=".\SqlServerTests.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\TableTests.cpp"
 			>
 		</File>
