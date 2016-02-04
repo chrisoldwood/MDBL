@@ -85,10 +85,12 @@ CString CTimeStamp::ToString(bool bDate, bool bTime) const
 
 	// Create strings.
 	if (bDate)
-		strDate.Format(TXT("%02d/%02d/%04d"), static_cast<int>(day), static_cast<int>(month), static_cast<int>(year));
+		strDate.Format(TXT("%04d-%02d-%02d"), static_cast<int>(year), static_cast<int>(month), static_cast<int>(day));
+
+	int scaledFraction = fraction / 1000000;
 
 	if (bTime)
-		strTime.Format(TXT("%02d:%02d:%02d"), static_cast<int>(hour), static_cast<int>(minute), static_cast<int>(second));
+		strTime.Format(TXT("%02d:%02d:%02d.%03d"), static_cast<int>(hour), static_cast<int>(minute), static_cast<int>(second), scaledFraction);
 
 	// Return one half only?
 	if (!bTime)		return strDate;

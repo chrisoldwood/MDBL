@@ -22,13 +22,9 @@
 
 - Fix updating of indexes when field changes.
 
-- Replace bald pointers/catch handlers with SharedPtr.
-
 - Add Forward declarations header.
 
 - Sort out handling of 64-bit time_t (i.e. VC++ 8.0 / VS2012)
-
-- Timestamp string formatting.
 
 - GetRaw() needs buffer size as argument.
 

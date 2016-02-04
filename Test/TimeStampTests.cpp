@@ -70,5 +70,13 @@ TEST_CASE("a timestamp can be converted to and from a local time_t value")
 }
 TEST_CASE_END
 
+TEST_CASE("a timestamp can be formatted as a string")
+{
+	const CTimeStamp timestamp(2001, 12, 31, 4, 5, 6, 500000000);
+
+	TEST_TRUE(timestamp.ToString() == TXT("2001-12-31 04:05:06.500"));
+}
+TEST_CASE_END
+
 }
 TEST_SET_END
