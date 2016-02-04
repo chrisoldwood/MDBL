@@ -555,7 +555,7 @@ size_t CODBCSource::ColumnSize(COLTYPE eColType, size_t nColSize)
 *******************************************************************************
 */
 
-CSQLParams* CODBCSource::CreateParams(const tchar* pszStmt, size_t nParams)
+SQLParamsPtr CODBCSource::CreateParams(const tchar* pszStmt, size_t nParams)
 {
 	SQLHSTMT hStmt = SQL_NULL_HSTMT;
 
@@ -567,7 +567,7 @@ CSQLParams* CODBCSource::CreateParams(const tchar* pszStmt, size_t nParams)
 
 	ASSERT(hStmt != SQL_NULL_HSTMT);
 
-	return new CODBCParams(*this, pszStmt, hStmt, nParams);
+	return SQLParamsPtr(new CODBCParams(*this, pszStmt, hStmt, nParams));
 }
 
 /******************************************************************************

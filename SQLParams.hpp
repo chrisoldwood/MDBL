@@ -65,6 +65,9 @@ protected:
 	//
 };
 
+//! The default SQL parameters smart pointer type.
+typedef Core::SharedPtr<CSQLParams> SQLParamsPtr;
+
 /******************************************************************************
 **
 ** Implementation of inline functions.

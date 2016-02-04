@@ -1086,55 +1086,40 @@ void CTable::WriteInsertions(CSQLSource& rSource)
 
 	ASSERT(nParams > 0);
 
-	CSQLParams* pParams = NULL;
+	// Allocate the parameters object.
+	SQLParamsPtr pParams = rSource.CreateParams(strQuery, nParams);
 
-	try
+	// Create parameter definitions.
+	for (size_t iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 	{
-		// Allocate the parameters object.
-		pParams = rSource.CreateParams(strQuery, nParams);
+		const CColumn& oColumn = m_vColumns[iTabCol];
 
-		// Create parameter definitions.
-		for (size_t iTabCol = 0, iSQLParam = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
-		{
-			const CColumn& oColumn = m_vColumns[iTabCol];
+		// Ignore TRANSIENT columns.
+		if (oColumn.Transient())
+			continue;
 
-			// Ignore TRANSIENT columns.
-			if (oColumn.Transient())
-				continue;
+		SQLParam& oParam = pParams->Param(iSQLParam);
 
-			SQLParam& oParam = pParams->Param(iSQLParam);
+		// Set the details.
+		oParam.m_nSrcColumn  = iTabCol;
+		oParam.m_eMDBColType = oColumn.ColType();
+		oParam.m_nMDBColSize = oColumn.Length();
 
-			// Set the details.
-			oParam.m_nSrcColumn  = iTabCol;
-			oParam.m_eMDBColType = oColumn.ColType();
-			oParam.m_nMDBColSize = oColumn.Length();
-
-			++iSQLParam;
-		}
-
-		// For all rows.
-		for (size_t i = 0; i < RowCount(); ++i)
-		{
-			CRow& oRow = m_vRows[i];
-
-			// Ignore if not inserted OR already deleted.
-			if (!oRow.Inserted() || oRow.Deleted())
-				continue;
-
-			// Set the params and execute.
-			pParams->SetRow(oRow);
-			rSource.ExecStmt(strQuery, *pParams);
-		}
-
-		// Cleanup.
-		delete pParams;
+		++iSQLParam;
 	}
-	catch (const CODBCException&)
-	{
-		// Cleanup and rethrow.
-		delete pParams;
 
-		throw;
+	// For all rows.
+	for (size_t i = 0; i < RowCount(); ++i)
+	{
+		CRow& oRow = m_vRows[i];
+
+		// Ignore if not inserted OR already deleted.
+		if (!oRow.Inserted() || oRow.Deleted())
+			continue;
+
+		// Set the params and execute.
+		pParams->SetRow(oRow);
+		rSource.ExecStmt(strQuery, *pParams);
 	}
 }
 
@@ -1211,73 +1196,58 @@ void CTable::WriteUpdates(CSQLSource& rSource)
 
 		ASSERT(nParams > 0);
 
-		CSQLParams* pParams = NULL;
+		// Allocate the parameters object.
+		SQLParamsPtr pParams = rSource.CreateParams(strQuery, nParams);
 
-		try
+		int iSQLParam = 0;
+
+		// Create modified column parameter definitions.
+		for (size_t iTabCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 		{
-			// Allocate the parameters object.
-			pParams = rSource.CreateParams(strQuery, nParams);
+			const CColumn& oColumn = m_vColumns[iTabCol];
 
-			int iSQLParam = 0;
+			// Ignore TRANSIENT columns.
+			if (oColumn.Transient())
+				continue;
 
-			// Create modified column parameter definitions.
-			for (size_t iTabCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
+			if (oRow[iTabCol].Modified())
 			{
-				const CColumn& oColumn = m_vColumns[iTabCol];
+				SQLParam& oParam = pParams->Param(iSQLParam);
 
-				// Ignore TRANSIENT columns.
-				if (oColumn.Transient())
-					continue;
+				// Set the details.
+				oParam.m_nSrcColumn  = iTabCol;
+				oParam.m_eMDBColType = oColumn.ColType();
+				oParam.m_nMDBColSize = oColumn.Length();
 
-				if (oRow[iTabCol].Modified())
-				{
-					SQLParam& oParam = pParams->Param(iSQLParam);
-
-					// Set the details.
-					oParam.m_nSrcColumn  = iTabCol;
-					oParam.m_eMDBColType = oColumn.ColType();
-					oParam.m_nMDBColSize = oColumn.Length();
-
-					++iSQLParam;
-				}
+				++iSQLParam;
 			}
-
-			// Create primary key column parameter definitions.
-			for (size_t iTabCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
-			{
-				const CColumn& oColumn = m_vColumns[iTabCol];
-
-				// Ignore TRANSIENT columns.
-				if (oColumn.Transient())
-					continue;
-
-				if (oColumn.PrimaryKey())
-				{
-					SQLParam& oParam = pParams->Param(iSQLParam);
-
-					// Set the details.
-					oParam.m_nSrcColumn  = iTabCol;
-					oParam.m_eMDBColType = oColumn.ColType();
-					oParam.m_nMDBColSize = oColumn.Length();
-
-					++iSQLParam;
-				}
-			}
-
-			// Set the params and execute.
-			pParams->SetRow(oRow);
-			rSource.ExecStmt(strQuery, *pParams);
-
-			// Cleanup.
-			delete pParams;
 		}
-		catch (const CODBCException&)
+
+		// Create primary key column parameter definitions.
+		for (size_t iTabCol = 0; iTabCol < m_vColumns.Count(); ++iTabCol)
 		{
-			// Cleanup and rethrow.
-			delete pParams;
+			const CColumn& oColumn = m_vColumns[iTabCol];
 
-			throw;
+			// Ignore TRANSIENT columns.
+			if (oColumn.Transient())
+				continue;
+
+			if (oColumn.PrimaryKey())
+			{
+				SQLParam& oParam = pParams->Param(iSQLParam);
+
+				// Set the details.
+				oParam.m_nSrcColumn  = iTabCol;
+				oParam.m_eMDBColType = oColumn.ColType();
+				oParam.m_nMDBColSize = oColumn.Length();
+
+				++iSQLParam;
+			}
 		}
+
+		// Set the params and execute.
+		pParams->SetRow(oRow);
+		rSource.ExecStmt(strQuery, *pParams);
 	}
 }
 

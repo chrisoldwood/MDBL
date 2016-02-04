@@ -17,6 +17,7 @@
 
 #include "FwdDecls.hpp"
 #include "SQLCursor.hpp"
+#include "SQLParams.hpp"
 
 /******************************************************************************
 ** 
@@ -46,7 +47,7 @@ public:
 	//
 	// Statement methods.
 	//
-	virtual CSQLParams* CreateParams(const tchar* pszStmt, size_t nParams) = 0;
+	virtual SQLParamsPtr CreateParams(const tchar* pszStmt, size_t nParams) = 0;
 	virtual void        ExecStmt(const tchar* pszStmt) = 0;
 	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams) = 0;
 	virtual SQLCursorPtr ExecQuery(const tchar* pszQuery) = 0;

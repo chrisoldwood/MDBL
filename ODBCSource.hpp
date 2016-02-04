@@ -55,7 +55,7 @@ public:
 	//
 	// Statement methods.
 	//
-	virtual CSQLParams* CreateParams(const tchar* pszStmt, size_t nParams);
+	virtual SQLParamsPtr CreateParams(const tchar* pszStmt, size_t nParams);
 	virtual void        ExecStmt(const tchar* pszStmt);
 	virtual void        ExecStmt(const tchar* pszStmt, CSQLParams& oParams);
 	virtual SQLCursorPtr ExecQuery(const tchar* pszQuery);
