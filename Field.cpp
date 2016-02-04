@@ -889,7 +889,9 @@ CString CField::FormatTimeT(const tchar* pszFormat) const
 		pTM = localtime(m_pTimeT);
 
 	// Format.
-	_tcsftime(szTime, sizeof(szTime), pszFormat, pTM);
+	size_t written = _tcsftime(szTime, ARRAY_SIZE(szTime), pszFormat, pTM);
+
+	DEBUG_USE_ONLY(written);
 
 	return szTime;
 }
@@ -925,7 +927,7 @@ CString CField::FormatTimeStamp(const tchar* pszFormat) const
 	oTM.tm_isdst = (m_oColumn.Flags() & CColumn::TZ_GMT) ? 0 : 1;
 
 	// Format.
-	_tcsftime(szTime, sizeof(szTime), pszFormat, &oTM);
+	_tcsftime(szTime, ARRAY_SIZE(szTime), pszFormat, &oTM);
 
 	return szTime;
 }

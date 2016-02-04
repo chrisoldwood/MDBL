@@ -10,6 +10,7 @@
 #include <WCL/Path.hpp>
 #include <MDBL/Column.hpp>
 #include <MDBL/MDB.hpp>
+#include <MDBL/TimeStamp.hpp>
 
 TEST_SET(ODBCCursor)
 {
@@ -232,15 +233,15 @@ TEST_CASE("Once fetched the values for each column in the row can be retrieved")
 	cursor->GetRow(row);
 	table.InsertRow(row);
 
-	TEST_TRUE(row[0] == true);
-	TEST_TRUE(row[1] == 2);
-	TEST_TRUE(row[2] == 3);
-	TEST_TRUE(row[3] == 4);
-	TEST_TRUE(row[4] == 5.0);
-	TEST_TRUE(row[5] == 6.0);
-	//TEST_TRUE(row[6] == null);
-	TEST_TRUE(row[7] == TXT("short text"));
-	TEST_TRUE(row[8] == TXT("long text"));
+	TEST_TRUE(row[0].GetBool() == true);
+	TEST_TRUE(row[1].GetInt() == 2);
+	TEST_TRUE(row[2].GetInt() == 3);
+	TEST_TRUE(row[3].GetInt() == 4);
+	TEST_TRUE(row[4].GetDouble() == 5.0);
+	TEST_TRUE(row[5].GetDouble() == 6.0);
+	TEST_TRUE(row[6].GetTimeStamp() == CTimeStamp(2006, 5, 4, 1, 2, 3));
+	TEST_TRUE(row[7].GetString() == tstring(TXT("short text")));
+	TEST_TRUE(row[8].GetString() == tstring(TXT("long text")));
 }
 TEST_CASE_END
 

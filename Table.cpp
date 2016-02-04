@@ -91,6 +91,7 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 {
 	ASSERT(m_vRows.Count() == 0);
 	ASSERT(!((eType == MDCT_IDENTITY) && (m_nIdentCol != Core::npos)));
+	ASSERT(!((eType == MDCT_IDENTITY) && (nFlags & CColumn::NULLABLE)));
 
 	// Apply table settings to all columns.
 	if (ReadOnly())		nFlags |= CColumn::READ_ONLY;
@@ -361,9 +362,9 @@ void CTable::DropIndex(size_t nColumn)
 *******************************************************************************
 */
 
-CRow& CTable::CreateRow()
+CRow& CTable::CreateRow(bool bNull)
 {
-	return *(new CRow(*this));
+	return *(new CRow(*this, bNull));
 }
 
 /******************************************************************************

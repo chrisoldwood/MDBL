@@ -35,11 +35,24 @@ public:
 	// Constructors/Destructor.
 	//
 	CTimeStamp();
+
+	//! Construction from the discrete timestamp fields.
+	CTimeStamp(SQLSMALLINT year_, SQLUSMALLINT month_, SQLUSMALLINT day_,
+				SQLUSMALLINT hour_, SQLUSMALLINT minute_, SQLUSMALLINT second_,
+				SQLUINTEGER fraction_ = 0);
+
 	~CTimeStamp();
 
 	//
 	// Conversion methods.
 	//
+
+	//! Convert the timestamp to a time_t value.
+	time_t ToTimeT() const;
+
+	//! Initalise the timestamp from a time_t value.
+	void FromTimeT(time_t time);
+
 	CString ToString(bool bDate = true, bool bTime = true) const;
 
 	//
@@ -62,6 +75,17 @@ protected:
 **
 *******************************************************************************
 */
+
+inline CTimeStamp::operator time_t() const
+{
+	return ToTimeT();
+}
+
+inline CTimeStamp& CTimeStamp::operator=(time_t tTime)
+{
+	FromTimeT(tTime);
+	return *this;
+}
 
 inline bool CTimeStamp::operator==(const CTimeStamp& oRHS) const
 {

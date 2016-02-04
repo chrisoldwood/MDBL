@@ -67,7 +67,7 @@ public:
 	virtual CRow& Row(size_t n) const;
 	virtual CRow& operator[](size_t n) const;
 
-	virtual CRow& CreateRow();
+	virtual CRow& CreateRow(bool bNull = false);
 	virtual size_t InsertRow(CRow& oRow, bool bNew = true);
 	virtual void  DeleteRow(size_t nRow);
 	virtual void  DeleteRow(CRow& oRow);

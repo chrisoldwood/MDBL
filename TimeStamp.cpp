@@ -25,6 +25,29 @@
 
 CTimeStamp::CTimeStamp()
 {
+	year = 0;
+	month = 0;
+	day = 0;
+	hour = 0;
+	minute = 0;
+	second = 0;
+	fraction = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Construction from the discrete timestamp fields.
+
+CTimeStamp::CTimeStamp(SQLSMALLINT year_, SQLUSMALLINT month_, SQLUSMALLINT day_,
+						SQLUSMALLINT hour_, SQLUSMALLINT minute_, SQLUSMALLINT second_,
+						SQLUINTEGER fraction_)
+{
+	year = year_;
+	month = month_;
+	day = day_;
+	hour = hour_;
+	minute = minute_;
+	second = second_;
+	fraction = fraction_;
 }
 
 /******************************************************************************
@@ -81,19 +104,10 @@ CString CTimeStamp::ToString(bool bDate, bool bTime) const
 	return strDateTime;
 }
 
-/******************************************************************************
-** Method:		operator time_t()
-**
-** Description:	Convert the timestamp to a time_t.
-**
-** Parameters:	None.
-**
-** Returns:		A time_t.
-**
-*******************************************************************************
-*/
+////////////////////////////////////////////////////////////////////////////////
+//! Convert the timestamp to a time_t value.
 
-CTimeStamp::operator time_t() const
+time_t CTimeStamp::ToTimeT() const
 {
 	struct tm oTime;
 
@@ -111,21 +125,12 @@ CTimeStamp::operator time_t() const
 	return mktime(&oTime);
 }
 
-/******************************************************************************
-** Method:		operator=()
-**
-** Description:	Convert the time_t to a timestamp.
-**
-** Parameters:	tTime	The date & time as a time_t.
-**
-** Returns:		Nothing.
-**
-*******************************************************************************
-*/
+////////////////////////////////////////////////////////////////////////////////
+//! Initalise the timestamp from a time_t value.
 
-CTimeStamp& CTimeStamp::operator=(time_t tTime)
+void CTimeStamp::FromTimeT(time_t time)
 {
-	struct tm* pTime = localtime(&tTime);
+	struct tm* pTime = localtime(&time);
 
 	year     = static_cast<SQLSMALLINT> (pTime->tm_year + 1900);
 	month    = static_cast<SQLUSMALLINT>(pTime->tm_mon  + 1);
@@ -134,6 +139,4 @@ CTimeStamp& CTimeStamp::operator=(time_t tTime)
 	minute   = static_cast<SQLUSMALLINT>(pTime->tm_min);
 	second   = static_cast<SQLUSMALLINT>(pTime->tm_sec);
 	fraction = 0;
-
-	return *this;
 }

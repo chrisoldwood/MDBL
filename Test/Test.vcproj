@@ -216,6 +216,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\FieldTests.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\ODBCCursorTests.cpp"
 			>
 		</File>
@@ -245,6 +249,10 @@
 		</File>
 		<File
 			RelativePath=".\Test.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TimeStampTests.cpp"
 			>
 		</File>
 		<File

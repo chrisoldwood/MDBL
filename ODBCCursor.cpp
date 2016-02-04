@@ -393,6 +393,14 @@ void CODBCCursor::GetRow(CRow& oRow)
 	// For all SQL columns.
 	for (size_t iSQLCol = 0; iSQLCol < m_nColumns; ++iSQLCol)
 	{
+#ifdef _DEBUG
+		// There is currently no ODBC -> COLTYPE mapping for these MDBL column types.
+		const COLTYPE colType = m_pColumns[iSQLCol].m_eMDBColType;
+		ASSERT( (colType != MDCT_CHAR) && (colType != MDCT_IDENTITY) );
+		ASSERT( (colType != MDCT_DATETIME) && (colType != MDCT_DATE) && (colType != MDCT_TIME) );
+		ASSERT( (colType != MDCT_VOIDPTR) && (colType != MDCT_ROWPTR) && (colType != MDCT_ROWSETPTR) );
+#endif
+
 		size_t            iRowCol = m_pColumns[iSQLCol].m_nDstColumn;
 		const byte*       pFieldData = pRowData + m_pOffsets[iSQLCol];
 		const SQLINTEGER* pLenInd = reinterpret_cast<const SQLINTEGER*>(pFieldData);
@@ -411,23 +419,6 @@ void CODBCCursor::GetRow(CRow& oRow)
 			bool value = *pValue;
 
 			oRow[iRowCol].SetRaw(&value);
-		}
-		// Requires conversion to MDCT_DATETIME?
-		else if ( (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATETIME)
-			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_DATE)
-			   || (m_pColumns[iSQLCol].m_eMDBColType == MDCT_TIME) )
-		{
-			const CTimeStamp* pTimeStamp = reinterpret_cast<const CTimeStamp*>(pValue);
-			time_t		      tTime      = *pTimeStamp;
-
-			oRow[iRowCol].SetRaw(&tTime);
-		}
-		// Requires conversion to MDCT_CHAR?
-		else if (m_pColumns[iSQLCol].m_eMDBColType == MDCT_CHAR)
-		{
-			tchar cChar = *(reinterpret_cast<const tchar*>(pValue));
-
-			oRow[iRowCol].SetRaw(&cChar);
 		}
 		// Requires no conversion.
 		else
