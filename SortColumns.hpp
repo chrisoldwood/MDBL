@@ -16,7 +16,7 @@
 #pragma once
 #endif
 
-#include <Legacy/TArray.hpp>
+#include <vector>
 
 /******************************************************************************
 **
@@ -55,8 +55,8 @@ protected:
 	//
 	// Members.
 	//
-	TArray<size_t>	m_aiColumns;	// The list of columns.
-	TArray<Dir>		m_aiSortDirs;	// The list of column sort directions.
+	std::vector<size_t>		m_aiColumns;	// The list of columns.
+	std::vector<Dir>		m_aiSortDirs;	// The list of column sort directions.
 };
 
 /******************************************************************************
@@ -85,7 +85,7 @@ inline CSortColumns::~CSortColumns()
 
 inline size_t CSortColumns::Count() const
 {
-	return m_aiColumns.Size();
+	return m_aiColumns.size();
 }
 
 inline size_t CSortColumns::Column(size_t n) const
@@ -100,8 +100,8 @@ inline CSortColumns::Dir CSortColumns::Direction(size_t n) const
 
 inline void CSortColumns::Add(size_t nColumn, Dir eDir)
 {
-	m_aiColumns.Add(nColumn);
-	m_aiSortDirs.Add(eDir);
+	m_aiColumns.push_back(nColumn);
+	m_aiSortDirs.push_back(eDir);
 }
 
 #endif //SORTCOLUMNS_HPP

@@ -16,11 +16,11 @@
 #endif
 
 #include "UniqIndex.hpp"
-#include <Legacy/IntPtrMap.hpp>
 #include "Row.hpp"
+#include <map>
 
 /******************************************************************************
-** 
+**
 ** This class is used to index int columns using a MAP.
 **
 *******************************************************************************
@@ -34,7 +34,7 @@ public:
 	//
 	CIntMapIndex(CTable& oTable, size_t nColumn);
 	virtual ~CIntMapIndex();
-	
+
 	//
 	// Methods.
 	//
@@ -50,10 +50,13 @@ public:
 	virtual void Capacity(size_t nRows);
 
 protected:
+	//! The underlying collection type.
+	typedef std::map<int, CRow*> IntRowMap;
+
 	//
 	// Members.
 	//
-	CIntPtrMap	m_oMap;
+	IntRowMap	m_oMap;
 };
 
 /******************************************************************************
@@ -65,29 +68,34 @@ protected:
 
 inline size_t CIntMapIndex::RowCount() const
 {
-	return m_oMap.Count();
+	return m_oMap.size();
 }
 
 inline void CIntMapIndex::AddRow(CRow& oRow)
 {
 	ASSERT(FindRow(oRow[m_nColumn].GetValue()) == NULL);
 
-	m_oMap.Add(oRow[m_nColumn], &oRow);
+	m_oMap[oRow[m_nColumn]] = &oRow;
 }
 
 inline void CIntMapIndex::RemoveRow(CRow& oRow)
 {
-	m_oMap.Remove(oRow[m_nColumn]);
+	m_oMap.erase(oRow[m_nColumn]);
 }
 
 inline void CIntMapIndex::Truncate()
 {
-	m_oMap.RemoveAll();
+	m_oMap.clear();
 }
 
 inline CRow* CIntMapIndex::FindRow(int nKey) const
 {
-	return static_cast<CRow*>(m_oMap.Find(nKey));
+	IntRowMap::const_iterator it = m_oMap.find(nKey);
+
+	if (it == m_oMap.end())
+		return NULL;
+
+	return it->second;
 }
 
 inline CRow* CIntMapIndex::FindRow(const CValue& oValue) const
@@ -104,9 +112,9 @@ inline CResultSet CIntMapIndex::FindRows(const CValue& oValue) const
 	return CResultSet(m_oTable, FindRow(oValue.m_iValue));
 }
 
-inline void CIntMapIndex::Capacity(size_t nRows)
+inline void CIntMapIndex::Capacity(size_t /*nRows*/)
 {
-	m_oMap.Reserve(nRows);
+	// std::map<> does not optimise based on expected size.
 }
 
 #endif //INTMAPINDEX_HPP

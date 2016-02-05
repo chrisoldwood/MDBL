@@ -85,11 +85,14 @@ CResultSet::CResultSet(const CTable& oTable, CRow* pRow)
 */
 
 CResultSet::CResultSet(const CResultSet& oResultSet)
-	: TPtrArray<CRow>()
+    : Collection()
 	, m_pTable(oResultSet.m_pTable)
 {
 	// Copy rows.
-	ShallowCopy(oResultSet);
+	Collection::reserve(oResultSet.Count());
+
+	for (size_t i = 0; i < oResultSet.Count(); ++i)
+		Collection::push_back(&oResultSet[i]);
 }
 
 /******************************************************************************
@@ -108,7 +111,10 @@ CResultSet::CResultSet(const CTable& oTable, const CRowSet& oRowSet)
 	: m_pTable(&oTable)
 {
 	// Copy rows.
-	ShallowCopy(oRowSet);
+	Collection::reserve(oRowSet.Count());
+
+	for (size_t i = 0; i < oRowSet.Count(); ++i)
+		Collection::push_back(&oRowSet[i]);
 }
 
 /******************************************************************************
@@ -144,13 +150,16 @@ CResultSet& CResultSet::operator=(const CResultSet& oRHS)
 	ASSERT(this != &oRHS);
 
 	// Clear state.
-	RemoveAll();
+	Collection::clear();
 
 	// Copy members.
 	m_pTable = oRHS.m_pTable;
 
 	// Copy rows.
-	ShallowCopy(oRHS);
+	Collection::reserve(oRHS.Count());
+
+	for (size_t i = 0; i < oRHS.Count(); ++i)
+		Collection::push_back(&oRHS[i]);
 
 	return *this;
 }
@@ -181,7 +190,8 @@ void CResultSet::OrderBy(const CSortColumns& oColumns)
 	g_pSortOrder = &oColumns;
 
 	// Sort it...
-	qsort(m_pData, Count(), sizeof(CRow*), Compare);
+	CRow* data = Collection::front();
+	qsort(data, Count(), sizeof(CRow*), Compare);
 
 	g_pSortOrder = NULL;
 }
@@ -484,7 +494,7 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 {
 	ASSERT(m_pTable != NULL);
 
-	TArray<size_t>	aiColWidths;
+	std::vector<size_t>	aiColWidths;
 	CString			strColList;
 	size_t			nRowWidth = 0;
 
@@ -528,7 +538,7 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 		rStream.Write(" ", 1);
 
 		// Track widths.
-		aiColWidths.Add(nWidth);
+		aiColWidths.push_back(nWidth);
 		nRowWidth += ++nWidth;
 	}
 
@@ -539,7 +549,7 @@ void CResultSet::Dump(WCL::IOutputStream& rStream) const
 	tchar* psUnderline = static_cast<tchar*>(_alloca(Core::numBytes<tchar>(nRowWidth)));
 	std::fill(psUnderline, psUnderline+nRowWidth, TXT('='));
 
-	for (size_t j = 0, pos = 0; j < aiColWidths.Size(); ++j)
+	for (size_t j = 0, pos = 0; j < aiColWidths.size(); ++j)
 	{
 		pos += aiColWidths[j];
 		psUnderline[pos++] = TXT(' ');

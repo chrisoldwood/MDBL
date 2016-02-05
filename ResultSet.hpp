@@ -15,7 +15,6 @@
 #pragma once
 #endif
 
-#include <Legacy/TArray.hpp>
 #include "FwdDecls.hpp"
 #include "Value.hpp"
 #include "SortColumns.hpp"
@@ -27,7 +26,7 @@
 *******************************************************************************
 */
 
-class CResultSet : protected TPtrArray<CRow>
+class CResultSet : private std::vector<CRow*>
 {
 public:
 	//
@@ -99,6 +98,9 @@ private:
 	//
 	static const CSortColumns* g_pSortOrder;
 	static int Compare(const void* ppRow1, const void* ppRow2);
+
+	//! The underlying collection type.
+	typedef std::vector<CRow*> Collection;
 };
 
 /******************************************************************************
@@ -110,31 +112,33 @@ private:
 
 inline size_t CResultSet::Count() const
 {
-	return TPtrArray<CRow>::Size();
+	return Collection::size();
 }
 
 inline CRow& CResultSet::Row(size_t n) const
 {
 	ASSERT(n < Count());
 
-	return *(TPtrArray<CRow>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline CRow& CResultSet::operator[](size_t n) const
 {
 	ASSERT(n < Count());
 
-	return *(TPtrArray<CRow>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline size_t CResultSet::Add(CRow& oRow)
 {
-	return TPtrArray<CRow>::Add(&oRow);
+	size_t index = Count();
+	Collection::push_back(&oRow);
+	return index;
 }
 
 inline void CResultSet::Truncate()
 {
-	TPtrArray<CRow>::RemoveAll();
+	Collection::clear();
 }
 
 inline void CResultSet::OrderBy(size_t nColumn, CSortColumns::Dir eDir)

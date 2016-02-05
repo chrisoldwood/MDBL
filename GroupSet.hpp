@@ -16,7 +16,6 @@
 #pragma once
 #endif
 
-#include <Legacy/TArray.hpp>
 #include "ResultSet.hpp"
 
 /******************************************************************************
@@ -47,7 +46,7 @@ public:
 
 protected:
 	// Template shorthands.
-	typedef TPtrArray<CResultSet> CResultSets;
+	typedef std::vector<CResultSet*> CResultSets;
 
 	//
 	// Members.
@@ -70,7 +69,7 @@ private:
 
 inline size_t CGroupSet::Count() const
 {
-	return m_oResSets.Size();
+	return m_oResSets.size();
 }
 
 inline CResultSet& CGroupSet::ResultSet(size_t n) const
@@ -85,7 +84,7 @@ inline CResultSet& CGroupSet::operator[](size_t n) const
 
 inline void CGroupSet::Add(const CResultSet& oRS)
 {
-	m_oResSets.Add(new CResultSet(oRS));
+	m_oResSets.push_back(new CResultSet(oRS));
 }
 
 #endif // GROUPSET_HPP

@@ -43,7 +43,12 @@ CGroupSet::CGroupSet()
 CGroupSet::CGroupSet(const CGroupSet& oSet)
 	: m_oResSets()
 {
-	m_oResSets.DeepCopy(oSet.m_oResSets);
+	m_oResSets.reserve(oSet.Count());
+
+	for (size_t i = 0; i < oSet.Count(); ++i)
+	{
+		m_oResSets.push_back(new CResultSet(oSet[i]));
+	}
 }
 
 /******************************************************************************
@@ -60,5 +65,8 @@ CGroupSet::CGroupSet(const CGroupSet& oSet)
 
 CGroupSet::~CGroupSet()
 {
-	m_oResSets.DeleteAll();
+	for (size_t i = 0; i != m_oResSets.size(); ++i)
+		delete m_oResSets[i];
+
+	m_oResSets.clear();
 }

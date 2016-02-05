@@ -15,8 +15,8 @@
 #pragma once
 #endif
 
-#include <Legacy/TArray.hpp>
 #include "FwdDecls.hpp"
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 ** 
@@ -25,7 +25,7 @@
 *******************************************************************************
 */
 
-class CTableSet : protected TPtrArray<CTable>
+class CTableSet : private std::vector<CTable*>
 {
 public:
 	//
@@ -56,6 +56,9 @@ private:
 	//
 	CTableSet(const CTableSet&);
 	void operator=(const CTableSet&);
+
+	//! The underlying collection type.
+	typedef std::vector<CTable*> Collection;
 };
 
 /******************************************************************************
@@ -67,32 +70,29 @@ private:
 
 inline size_t CTableSet::Count() const
 {
-	return Size();
+	return Collection::size();
 }
 
 inline CTable& CTableSet::Table(size_t n) const
 {
-	return *(TPtrArray<CTable>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline CTable& CTableSet::operator[](size_t n) const
 {
-	return *(TPtrArray<CTable>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline size_t CTableSet::Add(CTable& oTable)
 {
-	return TPtrArray<CTable>::Add(&oTable);
+	size_t index = Count();
+	Collection::push_back(&oTable);
+	return index;
 }
 
 inline void CTableSet::Remove(size_t nTable)
 {
-	TPtrArray<CTable>::Remove(nTable);
-}
-
-inline void CTableSet::Delete(size_t nTable)
-{
-	TPtrArray<CTable>::Delete(nTable);
+	Core::eraseAt(*this, nTable);
 }
 
 #endif //TABLESET_HPP

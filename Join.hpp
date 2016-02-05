@@ -47,7 +47,7 @@ public:
 *******************************************************************************
 */
 
-class CJoin : protected TPtrArray<CJoinTable>
+class CJoin : private std::vector<CJoinTable*>
 {
 public:
 	//
@@ -76,6 +76,9 @@ protected:
 	//
 	// Members.
 	//
+
+	//! The underlying collection type.
+	typedef std::vector<CJoinTable*> Collection;
 };
 
 /******************************************************************************
@@ -87,36 +90,39 @@ protected:
 
 inline CJoin::CJoin(size_t nTable)
 {
-	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, 0, -1, 0));
+	Collection::push_back(new CJoinTable(nTable, 0, -1, 0));
 }
 
 inline CJoin::~CJoin()
 {
-	TPtrArray<CJoinTable>::DeleteAll();
+	for (size_t i = 0; i < Count(); ++i)
+		delete &Join(i);
+
+	Collection::clear();
 }
 
 inline size_t CJoin::Count() const
 {
-	return Size();
+	return Collection::size();
 }
 
 inline CJoinTable& CJoin::Join(size_t n) const
 {
 	ASSERT(n < Count());
 
-	return *(TPtrArray<CJoinTable>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline CJoinTable& CJoin::operator[](size_t n) const
 {
 	ASSERT(n < Count());
 
-	return *(TPtrArray<CJoinTable>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline void CJoin::Add(size_t nTable, size_t nLHSColumn, Type eType, size_t nRHSColumn)
 {
-	TPtrArray<CJoinTable>::Add(new CJoinTable(nTable, nLHSColumn, eType, nRHSColumn));
+	Collection::push_back(new CJoinTable(nTable, nLHSColumn, eType, nRHSColumn));
 }
 
 inline CJoinTable::CJoinTable(size_t nTable, size_t nLHSColumn, int nType, size_t nRHSColumn)

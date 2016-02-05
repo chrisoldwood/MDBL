@@ -9,6 +9,7 @@
 
 #include "Common.hpp"
 #include "ColumnSet.hpp"
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -79,8 +80,7 @@ size_t CColumnSet::AllocSize() const
 
 void CColumnSet::Delete(size_t n)
 {
-	delete &Column(n);
-	Remove(n);
+	Core::deleteAt(*this, n);
 }
 
 /******************************************************************************
@@ -97,10 +97,7 @@ void CColumnSet::Delete(size_t n)
 
 void CColumnSet::DeleteAll()
 {
-	for (size_t i = 0; i < Count(); ++i)
-		delete &Column(i);
-
-	RemoveAll();
+	Core::deleteAll(*this);
 }
 
 /******************************************************************************

@@ -10,6 +10,7 @@
 #include "Common.hpp"
 #include "TableSet.hpp"
 #include "Table.hpp"
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 ** Method:		Constructor.
@@ -41,4 +42,9 @@ CTableSet::CTableSet()
 
 CTableSet::~CTableSet()
 {
+}
+
+void CTableSet::Delete(size_t nTable)
+{
+	Core::deleteAt(*this, nTable);
 }

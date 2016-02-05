@@ -16,11 +16,11 @@
 #endif
 
 #include "UniqIndex.hpp"
-#include <Legacy/StrPtrMap.hpp>
 #include "Row.hpp"
+#include <map>
 
 /******************************************************************************
-** 
+**
 ** This class is used to index String columns using a MAP.
 **
 *******************************************************************************
@@ -34,7 +34,7 @@ public:
 	//
 	CStrMapIndex(CTable& oTable, size_t nColumn);
 	virtual ~CStrMapIndex();
-	
+
 	//
 	// Methods.
 	//
@@ -50,10 +50,13 @@ public:
 	virtual void Capacity(size_t nRows);
 
 protected:
+	//! The underlying collection type.
+	typedef std::map<CString, CRow*> StrRowMap;
+
 	//
 	// Members.
 	//
-	CStrPtrMap	m_oMap;
+	StrRowMap	m_oMap;
 };
 
 /******************************************************************************
@@ -65,29 +68,34 @@ protected:
 
 inline size_t CStrMapIndex::RowCount() const
 {
-	return m_oMap.Count();
+	return m_oMap.size();
 }
 
 inline void CStrMapIndex::AddRow(CRow& oRow)
 {
 	ASSERT(FindRow(oRow[m_nColumn].GetValue()) == NULL);
 
-	m_oMap.Add(oRow[m_nColumn].GetString(), &oRow);
+	m_oMap[oRow[m_nColumn].GetString()] = &oRow;
 }
 
 inline void CStrMapIndex::RemoveRow(CRow& oRow)
 {
-	m_oMap.Remove(oRow[m_nColumn].GetString());
+	m_oMap.erase(oRow[m_nColumn].GetString());
 }
 
 inline void CStrMapIndex::Truncate()
 {
-	m_oMap.RemoveAll();
+	m_oMap.clear();
 }
 
 inline CRow* CStrMapIndex::FindRow(const tchar* strKey) const
 {
-	return static_cast<CRow*>(m_oMap.Find(strKey));
+	StrRowMap::const_iterator it = m_oMap.find(strKey);
+
+	if (it == m_oMap.end())
+		return NULL;
+
+	return it->second;
 }
 
 inline CRow* CStrMapIndex::FindRow(const CValue& oValue) const
@@ -104,9 +112,9 @@ inline CResultSet CStrMapIndex::FindRows(const CValue& oValue) const
 	return CResultSet(m_oTable, FindRow(oValue.m_sValue));
 }
 
-inline void CStrMapIndex::Capacity(size_t nRows)
+inline void CStrMapIndex::Capacity(size_t /*nRows*/)
 {
-	m_oMap.Reserve(nRows);
+	// std::map<> does not optimise based on expected size.
 }
 
 #endif //STRMAPINDEX_HPP

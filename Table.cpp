@@ -1413,7 +1413,7 @@ void CTable::CheckColumn(CRow& /*oRow*/, size_t /*nColumn*/, const CValue& /*oVa
 
 void CTable::Dump(WCL::IOutputStream& rStream) const
 {
-	TArray<size_t>	aiColWidths;
+	std::vector<size_t>	aiColWidths;
 	CString			strColList;
 	size_t			nRowWidth = 0;
 
@@ -1457,7 +1457,7 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 		rStream.Write(" ", 1);
 
 		// Track widths.
-		aiColWidths.Add(nWidth);
+		aiColWidths.push_back(nWidth);
 		nRowWidth += ++nWidth;
 	}
 
@@ -1468,7 +1468,7 @@ void CTable::Dump(WCL::IOutputStream& rStream) const
 	tchar* psUnderline = static_cast<tchar*>(_alloca(nRowWidth));
 	std::fill(psUnderline, psUnderline+nRowWidth, TXT('='));
 
-	for (size_t j = 0, pos = 0; j < aiColWidths.Size(); ++j)
+	for (size_t j = 0, pos = 0; j < aiColWidths.size(); ++j)
 	{
 		pos += aiColWidths[j];
 		psUnderline[pos++] = TXT(' ');

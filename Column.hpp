@@ -29,6 +29,13 @@ class CColumn /*: private NotCopyable*/
 {
 public:
 	//
+	// Constructors/Destructor.
+	//
+	CColumn(CTable& oTable, const tchar* pszName, COLTYPE eType, size_t nLength, size_t nAllocSize, uint nFlags);
+	CColumn(CTable& oTable, const tchar* pszName, CTable& oFKTable, size_t nFKColumn, const CColumn& oFKColumn, uint nFlags);
+	virtual ~CColumn();
+
+	//
 	// Accessors.
 	//
 	CTable& Table() const;
@@ -95,13 +102,6 @@ public:
 
 protected:
 	//
-	// Constructors/Destructor.
-	//
-	CColumn(CTable& oTable, const tchar* pszName, COLTYPE eType, size_t nLength, size_t nAllocSize, uint nFlags);
-	CColumn(CTable& oTable, const tchar* pszName, CTable& oFKTable, size_t nFKColumn, const CColumn& oFKColumn, uint nFlags);
-	virtual ~CColumn();
-
-	//
 	// Members.
 	//
 	CTable&	m_oTable;		// The parent table.
@@ -114,12 +114,6 @@ protected:
 	CTable*	m_pFKTable;		// Foreign key table, if one.
 	size_t	m_nFKColumn;	// Foreign key column, if one.
 	CIndex*	m_pIndex;		// The index, if one.
-
-	//
-	// Friends.
-	//
-	friend class CColumnSet;
-	friend class CTable;
 
 private:
 	// NotCopyable.

@@ -1,7 +1,5 @@
 - Non-Unique index support.
 
-- Switch to Template based indexes.
-
 - Support case insensitive indexes (CStrPtrMap).
 
 - Where clause on joins.
@@ -21,8 +19,6 @@
 - Add CField operator= for CValue.
 
 - Fix updating of indexes when field changes.
-
-- Add Forward declarations header.
 
 - Sort out handling of 64-bit time_t (i.e. VC++ 8.0 / VS2012)
 

@@ -15,8 +15,8 @@
 #pragma once
 #endif
 
-#include <Legacy/TArray.hpp>
 #include "Row.hpp"
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 ** 
@@ -25,7 +25,7 @@
 *******************************************************************************
 */
 
-class CRowSet : protected TPtrArray<CRow>
+class CRowSet : private std::vector<CRow*>
 {
 public:
 	//
@@ -60,6 +60,9 @@ private:
 	// Friends.
 	//
 	friend class CResultSet;
+
+	//! The underlying collection type.
+	typedef std::vector<CRow*> Collection;
 };
 
 /******************************************************************************
@@ -80,37 +83,39 @@ inline CRowSet::~CRowSet()
 
 inline size_t CRowSet::Count() const
 {
-	return TPtrArray<CRow>::Size();
+	return Collection::size();
 }
 
 inline CRow& CRowSet::Row(size_t n) const
 {
-	return *(TPtrArray<CRow>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline CRow& CRowSet::operator[](size_t n) const
 {
-	return *(TPtrArray<CRow>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline size_t CRowSet::Add(CRow& oRow)
 {
-	return TPtrArray<CRow>::Add(&oRow);
+	size_t index = Count();
+	Collection::push_back(&oRow);
+	return index;
 }
 
 inline void CRowSet::Remove(size_t nRow)
 {
-	TPtrArray<CRow>::Remove(nRow);
+	Core::eraseAt(*this, nRow);
 }
 
 inline void CRowSet::Delete(size_t nRow)
 {
-	TPtrArray<CRow>::Delete(nRow);
+	Core::deleteAt(*this, nRow);
 }
 
 inline void CRowSet::DeleteAll()
 {
-	TPtrArray<CRow>::DeleteAll();
+	Core::deleteAll(*this);
 }
 
 inline bool CRowSet::Modified() const

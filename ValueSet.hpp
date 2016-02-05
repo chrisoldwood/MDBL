@@ -15,9 +15,9 @@
 #pragma once
 #endif
 
-#include <Legacy/TArray.hpp>
 #include <WCL/StrArray.hpp>
 #include "Value.hpp"
+#include <Core/Algorithm.hpp>
 
 /******************************************************************************
 **
@@ -26,7 +26,7 @@
 *******************************************************************************
 */
 
-class CValueSet : protected TPtrArray<CValue>
+class CValueSet : private std::vector<CValue*>
 {
 public:
 	//
@@ -58,6 +58,9 @@ private:
 	// Disallow copy and assignment.
 	//
 	void operator=(const CValueSet&);
+
+	//! The underlying collection type.
+	typedef std::vector<CValue*> Collection;
 };
 
 /******************************************************************************
@@ -74,13 +77,16 @@ inline CValueSet::CValueSet()
 inline CValueSet::CValueSet(const CStrArray& astrStrings)
 {
 	for (size_t i = 0; i < astrStrings.Size(); ++i)
-		TPtrArray<CValue>::Add(new CValue(astrStrings[i]));
+		Collection::push_back(new CValue(astrStrings[i]));
 }
 
 inline CValueSet::CValueSet(const CValueSet& oRHS)
-	: TPtrArray<CValue>()
+    : Collection()
 {
-	DeepCopy(oRHS);
+	Collection::reserve(oRHS.Count());
+
+	for (size_t i = 0; i < oRHS.Count(); ++i)
+		Collection::push_back(new CValue(oRHS[i]));
 }
 
 inline CValueSet::~CValueSet()
@@ -90,32 +96,34 @@ inline CValueSet::~CValueSet()
 
 inline size_t CValueSet::Count() const
 {
-	return TPtrArray<CValue>::Size();
+	return Collection::size();
 }
 
 inline CValue& CValueSet::Value(size_t n) const
 {
-	return *(TPtrArray<CValue>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline CValue& CValueSet::operator[](size_t n) const
 {
-	return *(TPtrArray<CValue>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline size_t CValueSet::Add(const CValue& oValue)
 {
-	return TPtrArray<CValue>::Add(new CValue(oValue));
+	size_t index = Count();
+	Collection::push_back(new CValue(oValue));
+	return index;
 }
 
 inline void CValueSet::Delete(size_t nValue)
 {
-	TPtrArray<CValue>::Delete(nValue);
+	Core::deleteAt(*this, nValue);
 }
 
 inline void CValueSet::DeleteAll()
 {
-	TPtrArray<CValue>::DeleteAll();
+	Core::deleteAll(*this);
 }
 
 #endif //VALUESET_HPP

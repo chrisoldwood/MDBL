@@ -16,16 +16,16 @@
 #endif
 
 #include "Column.hpp"
-#include <Legacy/TArray.hpp>
+#include <vector>
 
 /******************************************************************************
-** 
+**
 ** The class used to store the columns which belong to a table.
 **
 *******************************************************************************
 */
 
-class CColumnSet : protected TPtrArray<CColumn>
+class CColumnSet : private std::vector<CColumn*>
 {
 public:
 	//
@@ -33,7 +33,7 @@ public:
 	//
 	CColumnSet();
 	~CColumnSet();
-	
+
 	//
 	// Methods.
 	//
@@ -59,6 +59,9 @@ private:
 	//
 	CColumnSet(const CColumnSet&);
 	void operator=(const CColumnSet&);
+
+	//! The underlying collection type.
+	typedef std::vector<CColumn*> Collection;
 };
 
 /******************************************************************************
@@ -70,22 +73,24 @@ private:
 
 inline size_t CColumnSet::Count() const
 {
-	return TPtrArray<CColumn>::Size();
+	return Collection::size();
 }
 
 inline CColumn& CColumnSet::Column(size_t n) const
 {
-	return *(TPtrArray<CColumn>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline CColumn& CColumnSet::operator[](size_t n) const
 {
-	return *(TPtrArray<CColumn>::At(n));
+	return *(Collection::operator[](n));
 }
 
 inline size_t CColumnSet::Add(CColumn& oColumn)
 {
-	return TPtrArray<CColumn>::Add(&oColumn);
+	size_t index = Count();
+	Collection::push_back(&oColumn);
+	return index;
 }
 
 #endif //COLUMNSET_HPP
