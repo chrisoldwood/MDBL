@@ -16,7 +16,7 @@
 #endif
 
 /******************************************************************************
-** 
+**
 ** This is the exception class thrown by Data Source objects.
 **
 *******************************************************************************
@@ -29,8 +29,8 @@ public:
 	// Constructors/Destructor.
 	//
 	CSQLException(int eErrCode, const tchar* pszSQLStmt, const CString& strSQLErr);
-	virtual ~CSQLException();
-	
+	virtual ~CSQLException() throw();
+
 	//
 	// Exception codes (0 - 9).
 	//

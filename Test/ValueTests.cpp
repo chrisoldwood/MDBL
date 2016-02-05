@@ -52,7 +52,7 @@ TEST_CASE("Value can be created from all signed integer value types")
 	TEST_TRUE(value.m_iValue == rawValue);
 }
 {
-	long rawValue = 42;
+	int rawValue = 42;
 
 	const CValue value(rawValue);
 

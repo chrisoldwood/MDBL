@@ -20,20 +20,20 @@
 #include <sqlext.h>
 
 /******************************************************************************
-** 
+**
 ** This is the exception class thrown by ODBC data source objects.
 **
 *******************************************************************************
 */
 
-class CODBCException : public CSQLException  
+class CODBCException : public CSQLException
 {
 public:
 	//
 	// Constructors/Destructor.
 	//
 	CODBCException(int eErrCode, const tchar* pszSQLStmt, SQLHANDLE hHandle, SQLSMALLINT nType);
-	virtual ~CODBCException();
+	virtual ~CODBCException() throw();
 
 protected:
 	// Max size of error buffer.

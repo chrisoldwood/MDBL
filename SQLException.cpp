@@ -57,6 +57,6 @@ CSQLException::CSQLException(int eErrCode, const tchar* pszSQLStmt, const CStrin
 *******************************************************************************
 */
 
-CSQLException::~CSQLException()
+CSQLException::~CSQLException() throw()
 {
 }

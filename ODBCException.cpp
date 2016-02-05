@@ -40,7 +40,7 @@ CODBCException::CODBCException(int eErrCode, const tchar* pszSQLStmt, SQLHANDLE 
 *******************************************************************************
 */
 
-CODBCException::~CODBCException()
+CODBCException::~CODBCException() throw()
 {
 
 }
