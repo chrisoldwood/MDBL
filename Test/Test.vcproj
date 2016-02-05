@@ -193,10 +193,6 @@
 			ReferencedProjectIdentifier="{9B0335B6-93BE-4604-8497-27431874D758}"
 			RelativePathToProject="..\..\WCL\Wcl.vcproj"
 		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{AED77F84-49CF-4B84-B319-2D07025ECA06}"
-			RelativePathToProject="..\..\Legacy\Legacy.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
