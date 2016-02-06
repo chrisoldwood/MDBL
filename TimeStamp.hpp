@@ -58,8 +58,6 @@ public:
 	//
 	// Operators.
 	//
-	     operator time_t() const;
-	CTimeStamp& operator=(time_t tTime);
 	bool operator==(const CTimeStamp& oRHS) const;
 	bool operator!=(const CTimeStamp& oRHS) const;
 
@@ -75,17 +73,6 @@ protected:
 **
 *******************************************************************************
 */
-
-inline CTimeStamp::operator time_t() const
-{
-	return ToTimeT();
-}
-
-inline CTimeStamp& CTimeStamp::operator=(time_t tTime)
-{
-	FromTimeT(tTime);
-	return *this;
-}
 
 inline bool CTimeStamp::operator==(const CTimeStamp& oRHS) const
 {

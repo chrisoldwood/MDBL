@@ -214,8 +214,8 @@ void CODBCParams::SetRow(CRow& oRow)
 		{
 			CTimeStamp* pTimeStamp = reinterpret_cast<CTimeStamp*>(pValue + sizeof(SQLINTEGER));
 
-			*pTimeStamp = oRow[iRowCol].GetDateTime();
-			*pLenInd    = m_pParams[iParam].m_nBufSize;
+			pTimeStamp->FromTimeT(oRow[iRowCol].GetTimeT());
+			*pLenInd = m_pParams[iParam].m_nBufSize;
 		}
 		// Requires conversion from MDCT_CHAR?
 		else if (m_pParams[iParam].m_eMDBColType == MDCT_CHAR)

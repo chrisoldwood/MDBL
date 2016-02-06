@@ -134,15 +134,15 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 			break;
 
 		case MDCT_DATETIME:
-			pColumn = new CColumn(*this, pszName, MDCT_DATETIME,  0,       sizeof(time_t),     nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_DATETIME,  0,       sizeof(int64),      nFlags);
 			break;
 
 		case MDCT_DATE:
-			pColumn = new CColumn(*this, pszName, MDCT_DATE,      0,       sizeof(time_t),     nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_DATE,      0,       sizeof(int64),      nFlags);
 			break;
 
 		case MDCT_TIME:
-			pColumn = new CColumn(*this, pszName, MDCT_TIME,      0,       sizeof(time_t),     nFlags);
+			pColumn = new CColumn(*this, pszName, MDCT_TIME,      0,       sizeof(int64),      nFlags);
 			break;
 
 		case MDCT_TIMESTAMP:
@@ -1362,7 +1362,7 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 
 		ASSERT(!(!bCanBeNull && bIsNull));
 
-		CheckColumn(oRow, k, oRow[k], bUpdate);
+		CheckColumn(oRow, k, oRow[k].ToValue(), bUpdate);
 
 		CTable* pFKTable  = m_vColumns[k].FKTable();
 		size_t  nFKColumn = m_vColumns[k].FKColumn();
@@ -1370,7 +1370,7 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 		if ( (pFKTable == NULL) || (bIsNull) )
 			continue;
 
-		ASSERT(pFKTable->SelectRow(nFKColumn, oRow[k]) != NULL);
+		ASSERT(pFKTable->SelectRow(nFKColumn, oRow[k].ToValue()) != NULL);
 	}
 #endif
 }

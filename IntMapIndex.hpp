@@ -73,7 +73,7 @@ inline size_t CIntMapIndex::RowCount() const
 
 inline void CIntMapIndex::AddRow(CRow& oRow)
 {
-	ASSERT(FindRow(oRow[m_nColumn].GetValue()) == NULL);
+	ASSERT(FindRow(oRow[m_nColumn].ToValue()) == NULL);
 
 	m_oMap[oRow[m_nColumn]] = &oRow;
 }

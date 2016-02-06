@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="MDBL"
 	ProjectGUID="{9E405156-9B1D-483A-9BBD-B86240FA86BE}"
+	RootNamespace="MDBL"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>

@@ -16,11 +16,7 @@
 
 - Add LIKE and In where clauses.
 
-- Add CField operator= for CValue.
-
 - Fix updating of indexes when field changes.
-
-- Sort out handling of 64-bit time_t (i.e. VC++ 8.0 / VS2012)
 
 - GetRaw() needs buffer size as argument.
 
@@ -31,9 +27,5 @@
 - Move INNER and OUTER join enum to outer scope so its stored as an enum.
 
 - Reconsider need for POINTER value.
-
-- Look at use of MDST_TIMESTAMP in CField as it now casues ambiguity with GCC (time_t cast).
-
-- Reconcile MDCT_DATE / TIME / DATETIME / TIMESTAMP types (time_t vs timestamp structure).
 
 - Add test data row with minimum and maximum values.

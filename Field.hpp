@@ -43,9 +43,8 @@ public:
 	tchar             GetChar()      const;
 	const tchar*      GetString()    const;
 	bool              GetBool()      const;
-	time_t	          GetDateTime()  const;
+	time_t	          GetTimeT()     const;
 	const CTimeStamp& GetTimeStamp() const;
-	CValue            GetValue()     const;
 	void*             GetPtr()       const;
 	CRow*             GetRowPtr()    const;
 	CRow**            GetRowSetPtr() const;
@@ -61,7 +60,7 @@ public:
 	void SetChar(tchar cValue);
 	void SetString(const tchar* sValue);
 	void SetBool(bool bValue);
-	void SetDateTime(time_t tValue);
+	void SetTimeT(time_t tValue);
 	void SetTimeStamp(const CTimeStamp& tsValue);
 	void SetField(const CField& oValue);
 	void SetPtr(void* pValue);
@@ -77,13 +76,10 @@ public:
 	operator tchar()             const;
 	operator const tchar*()      const;
 	operator bool()              const;
-	operator time_t()            const;
 	operator const CTimeStamp&() const;
-	operator CValue()            const;
 	operator void*()             const;
 	operator CRow*()             const;
 	operator CRow**()            const;
-
 
 	CField& operator=(const CNull& oNull);
 	CField& operator=(int iValue);
@@ -91,12 +87,13 @@ public:
 	CField& operator=(tchar cValue);
 	CField& operator=(const tchar* sValue);
 	CField& operator=(bool bValue);
-	CField& operator=(time_t tValue);
 	CField& operator=(const CTimeStamp& tsValue);
 	CField& operator=(const CField& oValue);
 	CField& operator=(void* pValue);
 	CField& operator=(CRow* pValue);
 	CField& operator=(CRow** pValue);
+
+	CValue ToValue() const;
 
 	//
 	// Comparison operators.
@@ -144,12 +141,11 @@ protected:
 union
 {
 	int*		m_pInt;			// Pointer to value if type is MDCT_INT or MDCT_IDENTITY.
-	int64*		m_pInt64;		// Pointer to value if type is MDCT_INT64.
+	int64*		m_pInt64;		// Pointer to value if type is MDCT_INT64 or MDCT_DATETIME or MDCT_DATE or MDCT_TIME.
 	double*		m_pDouble;		// Pointer to value if type is MDCT_DOUBLE.
 	tchar*		m_pChar;		// Pointer to value if type is MDCT_CHAR.
 	tchar*		m_pString;		// Pointer to value if type is MDCT_FXDSTR or MDCT_VARSTR.
 	bool*		m_pBool;		// Pointer to value if type is MDCT_BOOL.
-	time_t*		m_pTimeT;		// Pointer to value if type is MDCT_DATETIME or MDCT_DATE or MDCT_TIME.
 	CTimeStamp*	m_pTimeStamp;	// Pointer to value if type is MDCT_TIMESTAMP.
 	void*		m_pVoidPtr;		// Value if type is MDCT_VOIDPTR.
 	CRow*		m_pRowPtr;		// Value if type is MDCT_ROWPTR.
@@ -255,19 +251,9 @@ inline CField::operator bool() const
 	return GetBool();
 }
 
-inline CField::operator time_t() const
-{
-	return GetDateTime();
-}
-
 inline CField::operator const CTimeStamp&() const
 {
 	return GetTimeStamp();
-}
-
-inline CField::operator CValue() const
-{
-	return GetValue();
 }
 
 inline CField::operator void*() const
@@ -323,13 +309,6 @@ inline CField& CField::operator=(const tchar* sValue)
 inline CField& CField::operator=(bool bValue)
 {
 	SetBool(bValue);
-
-	return *this;
-}
-
-inline CField& CField::operator=(time_t tValue)
-{
-	SetDateTime(tValue);
 
 	return *this;
 }
@@ -436,7 +415,7 @@ inline bool CField::operator!=(const CValue& oValue) const
 
 inline bool CField::operator==(const CField& oValue) const
 {
-	return operator==(oValue.GetValue());
+	return operator==(oValue.ToValue());
 }
 
 inline bool CField::operator!=(const CField& oValue) const

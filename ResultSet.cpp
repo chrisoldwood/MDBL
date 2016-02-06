@@ -297,7 +297,7 @@ CValue CResultSet::Min(size_t nColumn) const
 
 		// Is first non-null value OR smaller?
 		if ( (oSum.m_bNull) || (oField.Compare(oSum) < 0) )
-			oSum = oField;
+			oSum = oField.ToValue();
 	}
 
 	return oSum;
@@ -320,7 +320,7 @@ CValue CResultSet::Max(size_t nColumn) const
 
 		// Is first non-null value OR smaller?
 		if ( (oSum.m_bNull) || (oField.Compare(oSum) > 0) )
-			oSum = oField;
+			oSum = oField.ToValue();
 	}
 
 	return oSum;
@@ -359,7 +359,7 @@ CValueSet CResultSet::Distinct(size_t nColumn) const
 			// First value OR row value differs?
 			if ( (pCurrValue == NULL) || (oRow[nColumn] != *pCurrValue) )
 			{
-				oSet.Add(oRow[nColumn]);
+				oSet.Add(oRow[nColumn].ToValue());
 				pCurrValue = &oRow[nColumn];
 			}
 		}

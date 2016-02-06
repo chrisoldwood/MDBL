@@ -149,12 +149,12 @@ bool CField::GetBool() const
 	return *m_pBool;
 }
 
-time_t CField::GetDateTime() const
+time_t CField::GetTimeT() const
 {
 	ASSERT(m_bNull   != true);
 	ASSERT(m_oColumn.StgType() == MDST_INT64);
 
-	return *m_pTimeT;
+	return *m_pInt64;
 }
 
 const CTimeStamp& CField::GetTimeStamp() const
@@ -165,7 +165,7 @@ const CTimeStamp& CField::GetTimeStamp() const
 	return *m_pTimeStamp;
 }
 
-CValue CField::GetValue() const
+CValue CField::ToValue() const
 {
 	// Check for null first.
 	if (m_bNull)
@@ -181,7 +181,7 @@ CValue CField::GetValue() const
 		case MDST_CHAR:			return *m_pChar;
 		case MDST_STRING:		return m_pString;
 		case MDST_BOOL:			return *m_pBool;
-		case MDST_TIMESTAMP:	return static_cast<time_t>(*m_pTimeStamp);
+		case MDST_TIMESTAMP:	return m_pTimeStamp->ToTimeT();
 		case MDST_POINTER:		return m_pVoidPtr;
 		default:				ASSERT_FALSE();	break;
 	}
@@ -425,13 +425,13 @@ void CField::SetBool(bool bValue)
 	Updated();
 }
 
-void CField::SetDateTime(time_t tValue)
+void CField::SetTimeT(time_t tValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_INT64);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
 	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
 
-	if ( (m_bNull == false) && (*m_pTimeT == tValue) )
+	if ( (m_bNull == false) && (*m_pInt64 == tValue) )
 		return;
 
 #ifdef _DEBUG
@@ -439,7 +439,7 @@ void CField::SetDateTime(time_t tValue)
 		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tValue, true);
 #endif //_DEBUG
 
-	*m_pTimeT = tValue;
+	*m_pInt64 = tValue;
 	m_bNull = false;
 
 	Updated();
@@ -456,7 +456,7 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, static_cast<time_t>(tsValue), true);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tsValue.ToTimeT(), true);
 #endif //_DEBUG
 
 	*m_pTimeStamp = tsValue;
@@ -884,9 +884,9 @@ CString CField::FormatTimeT(const tchar* pszFormat) const
 
 	// Convert the tm struct.
 	if (m_oColumn.Flags() & CColumn::TZ_GMT)
-		pTM = gmtime(m_pTimeT);
+		pTM = gmtime(m_pInt64);
 	else
-		pTM = localtime(m_pTimeT);
+		pTM = localtime(m_pInt64);
 
 	// Format.
 	size_t written = _tcsftime(szTime, ARRAY_SIZE(szTime), pszFormat, pTM);
@@ -897,7 +897,7 @@ CString CField::FormatTimeT(const tchar* pszFormat) const
 }
 
 /******************************************************************************
-** Methods:		FormatTimeT()
+** Methods:		FormatTimeStamp()
 **
 ** Description:	Convert the TimeStamp value to a string.
 **
@@ -927,7 +927,9 @@ CString CField::FormatTimeStamp(const tchar* pszFormat) const
 	oTM.tm_isdst = (m_oColumn.Flags() & CColumn::TZ_GMT) ? 0 : 1;
 
 	// Format.
-	_tcsftime(szTime, ARRAY_SIZE(szTime), pszFormat, &oTM);
+	size_t written = _tcsftime(szTime, ARRAY_SIZE(szTime), pszFormat, &oTM);
+
+	DEBUG_USE_ONLY(written);
 
 	return szTime;
 }

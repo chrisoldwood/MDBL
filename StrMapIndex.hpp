@@ -73,7 +73,7 @@ inline size_t CStrMapIndex::RowCount() const
 
 inline void CStrMapIndex::AddRow(CRow& oRow)
 {
-	ASSERT(FindRow(oRow[m_nColumn].GetValue()) == NULL);
+	ASSERT(FindRow(oRow[m_nColumn].ToValue()) == NULL);
 
 	m_oMap[oRow[m_nColumn].GetString()] = &oRow;
 }
