@@ -181,7 +181,7 @@ CValue CField::ToValue() const
 		case MDST_CHAR:			return *m_pChar;
 		case MDST_STRING:		return m_pString;
 		case MDST_BOOL:			return *m_pBool;
-		case MDST_TIMESTAMP:	return m_pTimeStamp->ToTimeT();
+		case MDST_TIMESTAMP:	return static_cast<int64>(m_pTimeStamp->ToTimeT());
 		case MDST_POINTER:		return m_pVoidPtr;
 		default:				ASSERT_FALSE();	break;
 	}
@@ -436,7 +436,7 @@ void CField::SetTimeT(time_t tValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tValue, true);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, static_cast<int64>(tValue), true);
 #endif //_DEBUG
 
 	*m_pInt64 = tValue;
@@ -456,7 +456,7 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 
 #ifdef _DEBUG
 	if (m_oRow.InTable())
-		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, tsValue.ToTimeT(), true);
+		m_oRow.Table().CheckColumn(m_oRow, m_nColumn, static_cast<int64>(tsValue.ToTimeT()), true);
 #endif //_DEBUG
 
 	*m_pTimeStamp = tsValue;
@@ -882,11 +882,13 @@ CString CField::FormatTimeT(const tchar* pszFormat) const
 	tchar szTime[100] = { 0 };
 	tm*   pTM = NULL;
 
+	const time_t time = *m_pInt64;
+
 	// Convert the tm struct.
 	if (m_oColumn.Flags() & CColumn::TZ_GMT)
-		pTM = gmtime(m_pInt64);
+		pTM = gmtime(&time);
 	else
-		pTM = localtime(m_pInt64);
+		pTM = localtime(&time);
 
 	// Format.
 	size_t written = _tcsftime(szTime, ARRAY_SIZE(szTime), pszFormat, pTM);

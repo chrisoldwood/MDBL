@@ -82,6 +82,12 @@
 			<Option compile="1" />
 			<Option weight="0" />
 		</Unit>
+		<Unit filename="Database/Schema.ini">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="Database/TestValues.csv">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="FieldTests.cpp" />
 		<Unit filename="ODBCCursorTests.cpp" />
 		<Unit filename="ODBCSourceTests.cpp" />
