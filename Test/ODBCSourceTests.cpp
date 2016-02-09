@@ -45,7 +45,7 @@ TEST_CASE("A source can be opened on construction")
 }
 TEST_CASE_END
 
-TEST_CASE("Failing to open a sourece throws an exception")
+TEST_CASE("Failing to open a source throws an exception")
 {
 	CODBCSource source;
 

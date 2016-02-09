@@ -72,7 +72,7 @@ TEST_CASE("Value can be created from all signed integer value types")
 }
 TEST_CASE_END
 
-TEST_CASE("Value can be created from all floting point types")
+TEST_CASE("Value can be created from all floating point types")
 {
 {
 	float rawValue = 42;

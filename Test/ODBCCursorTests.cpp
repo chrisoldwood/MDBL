@@ -52,7 +52,7 @@ TEST_CASE("The number of columns in the result set can be retrieved")
 }
 TEST_CASE_END
 
-TEST_CASE("The metadata for each column can be retrieved")
+TEST_CASE("The meta-data for each column can be retrieved")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 	const size_t numColumns = cursor->NumColumns();
@@ -163,7 +163,7 @@ TEST_CASE("The SQL double type is mapped onto the double column type")
 }
 TEST_CASE_END
 
-TEST_CASE("The SQL timestamp type is mapped onto the timestamp column type")
+TEST_CASE("The SQL time-stamp type is mapped onto the time-stamp column type")
 {
 	SQLCursorPtr cursor = source.ExecQuery(query);
 
