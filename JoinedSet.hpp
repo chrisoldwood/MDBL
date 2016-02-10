@@ -64,14 +64,14 @@ private:
 
 inline size_t CJoinedSet::Count() const
 {
-	ASSERT(m_pResSets != NULL);
+	ASSERT(m_pResSets != nullptr);
 
 	return m_pResSets[0].Count();
 }
 
 inline CResultSet& CJoinedSet::ResultSet(size_t n) const
 {
-	ASSERT(m_pResSets != NULL);
+	ASSERT(m_pResSets != nullptr);
 	ASSERT(n < m_nTables);
 
 	return m_pResSets[n];
@@ -79,7 +79,7 @@ inline CResultSet& CJoinedSet::ResultSet(size_t n) const
 
 inline CResultSet& CJoinedSet::operator[](size_t n) const
 {
-	ASSERT(m_pResSets != NULL);
+	ASSERT(m_pResSets != nullptr);
 	ASSERT(n < m_nTables);
 
 	return m_pResSets[n];

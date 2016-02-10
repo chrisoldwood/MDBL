@@ -36,8 +36,8 @@ CODBCParams::CODBCParams(CODBCSource& oSource, const tchar* pszStmt, SQLHSTMT hS
 	, m_nParams(static_cast<SQLSMALLINT>(nParams))
 	, m_pParams(new SQLParam[nParams])
 	, m_nRowLen(0)
-	, m_pOffsets(NULL)
-	, m_pRowData(NULL)
+	, m_pOffsets(nullptr)
+	, m_pRowData(nullptr)
 	, m_bDoneBind(false)
 {
 	ASSERT(hStmt   != SQL_NULL_HSTMT);

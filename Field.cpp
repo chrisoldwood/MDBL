@@ -63,7 +63,7 @@ CField::CField(CRow& oRow, CColumn& oColumn, size_t nColumn, bool bNull, void* p
 {
 	// POINTER fields store their values 'in-place'.
 	if (m_oColumn.StgType() == MDST_POINTER)
-		m_pVoidPtr = NULL;
+		m_pVoidPtr = nullptr;
 
 	// VARSTR fields store their values in a separate buffer.
 	if (m_oColumn.ColType() == MDCT_VARSTR)
@@ -268,7 +268,7 @@ void CField::SetNull()
 {
 	ASSERT(m_oColumn.Nullable());
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if (m_bNull == true)
 		return;
@@ -282,16 +282,16 @@ void CField::SetInt(int iValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_INT);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 #ifdef _DEBUG
 	CTable* pFKTable  = m_oColumn.FKTable();
 	size_t  nFKColumn = m_oColumn.FKColumn();
 
 	// If foreign key column, check value exists.
-	if (pFKTable != NULL)
+	if (pFKTable != nullptr)
 	{
-		ASSERT(pFKTable->SelectRow(nFKColumn, iValue) != NULL);
+		ASSERT(pFKTable->SelectRow(nFKColumn, iValue) != nullptr);
 	}
 #endif //_DEBUG
 
@@ -313,16 +313,16 @@ void CField::SetInt64(int64 iValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_INT64);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 #ifdef _DEBUG
 	CTable* pFKTable  = m_oColumn.FKTable();
 	size_t  nFKColumn = m_oColumn.FKColumn();
 
 	// If foreign key column, check value exists.
-	if (pFKTable != NULL)
+	if (pFKTable != nullptr)
 	{
-		ASSERT(pFKTable->SelectRow(nFKColumn, iValue) != NULL);
+		ASSERT(pFKTable->SelectRow(nFKColumn, iValue) != nullptr);
 	}
 #endif //_DEBUG
 
@@ -344,7 +344,7 @@ void CField::SetDouble(double dValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_DOUBLE);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if ( (m_bNull == false) && (*m_pDouble == dValue) )
 		return;
@@ -364,7 +364,7 @@ void CField::SetChar(tchar cValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_CHAR);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if ( (m_bNull == false) && (*m_pChar == cValue) )
 		return;
@@ -385,7 +385,7 @@ void CField::SetString(const tchar* sValue)
 	ASSERT(m_oColumn.StgType() == MDST_STRING);
 	ASSERT(static_cast<size_t>(m_oColumn.Length())  >= tstrlen(sValue));
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if ( (m_bNull == false) && (tstrcmp(m_pString, sValue) == 0) )
 		return;
@@ -409,7 +409,7 @@ void CField::SetBool(bool bValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_BOOL);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if ( (m_bNull == false) && (*m_pBool == bValue) )
 		return;
@@ -429,7 +429,7 @@ void CField::SetTimeT(time_t tValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_INT64);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if ( (m_bNull == false) && (*m_pInt64 == tValue) )
 		return;
@@ -449,7 +449,7 @@ void CField::SetTimeStamp(const CTimeStamp& tsValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_TIMESTAMP);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != NULL)));
+	ASSERT(!(m_oRow.InTable() && (m_oColumn.Index() != nullptr)));
 
 	if ( (m_bNull == false) && (*m_pTimeStamp == tsValue) )
 		return;
@@ -496,7 +496,7 @@ void CField::SetPtr(void* pValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_POINTER);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(pValue != NULL);
+	ASSERT(pValue != nullptr);
 
 	if ( (m_bNull == false) && (m_pVoidPtr == pValue) )
 		return;
@@ -511,7 +511,7 @@ void CField::SetRowPtr(CRow* pValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_POINTER);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(pValue != NULL);
+	ASSERT(pValue != nullptr);
 
 	if ( (m_bNull == false) && (m_pRowPtr == pValue) )
 		return;
@@ -526,7 +526,7 @@ void CField::SetRowSetPtr(CRow** pValue)
 {
 	ASSERT(m_oColumn.StgType() == MDST_POINTER);
 	ASSERT(!(m_oRow.InTable() && m_oColumn.ReadOnly()));
-	ASSERT(pValue != NULL);
+	ASSERT(pValue != nullptr);
 
 	if ( (m_bNull == false) && (m_pRowSetPtr == pValue) )
 		return;
@@ -786,10 +786,10 @@ CString CField::Format(const tchar* pszFormat) const
 		return TXT("");
 
 	// Use default specifier, if not supplied.
-	if (pszFormat == NULL)
+	if (pszFormat == nullptr)
 		pszFormat = pszFormats[m_oColumn.ColType()];
 
-	ASSERT(pszFormat != NULL);
+	ASSERT(pszFormat != nullptr);
 
 	CString str;
 
@@ -877,10 +877,10 @@ CString CField::DbgFormat() const
 
 CString CField::FormatTimeT(const tchar* pszFormat) const
 {
-	ASSERT(pszFormat != NULL);
+	ASSERT(pszFormat != nullptr);
 
 	tchar szTime[100] = { 0 };
-	tm*   pTM = NULL;
+	tm*   pTM = nullptr;
 
 	const time_t time = *m_pInt64;
 
@@ -912,7 +912,7 @@ CString CField::FormatTimeT(const tchar* pszFormat) const
 
 CString CField::FormatTimeStamp(const tchar* pszFormat) const
 {
-	ASSERT(pszFormat != NULL);
+	ASSERT(pszFormat != nullptr);
 
 	tchar szTime[100] = { 0 };
 	tm	  oTM;
@@ -951,8 +951,8 @@ CString CField::FormatTimeStamp(const tchar* pszFormat) const
 
 CString CField::FormatBool(const tchar* pszFormat) const
 {
-	ASSERT(pszFormat != NULL);
-	ASSERT(tstrchr(pszFormat, TXT('|')) != NULL);
+	ASSERT(pszFormat != nullptr);
+	ASSERT(tstrchr(pszFormat, TXT('|')) != nullptr);
 
 	// Copy the whole string and find
 	// the length and pos of the separator.

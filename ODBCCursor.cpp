@@ -32,12 +32,12 @@ CODBCCursor::CODBCCursor(CODBCSource& oSource)
 	, m_strStmt()
 	, m_hStmt(SQL_NULL_HSTMT)
 	, m_nColumns(0)
-	, m_pColumns(NULL)
+	, m_pColumns(nullptr)
 	, m_nRowLen(0)
 	, m_nTotalLen(0)
-	, m_pOffsets(NULL)
-	, m_pRowData(NULL)
-	, m_pRowStatus(NULL)
+	, m_pOffsets(nullptr)
+	, m_pRowData(nullptr)
+	, m_pRowStatus(nullptr)
 	, m_bDoneBind(false)
 	, m_nFetched(0)
 	, m_nCurRow(static_cast<SQLUINTEGER>(-1))
@@ -182,12 +182,12 @@ void CODBCCursor::Close()
 	// Reset members.
 	m_hStmt      = SQL_NULL_HSTMT;
 	m_nColumns   = 0;
-	m_pColumns   = NULL;
+	m_pColumns   = nullptr;
 	m_nRowLen    = 0;
 	m_nTotalLen  = 0;
-	m_pOffsets   = NULL;
-	m_pRowData   = NULL;
-	m_pRowStatus = NULL;
+	m_pOffsets   = nullptr;
+	m_pRowData   = nullptr;
+	m_pRowStatus = nullptr;
 	m_bDoneBind  = false;
 	m_nFetched   = 0;
 	m_nCurRow    = static_cast<SQLUINTEGER>(-1);

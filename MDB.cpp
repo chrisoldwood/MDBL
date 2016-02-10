@@ -64,7 +64,7 @@ CMDB::~CMDB()
 
 CTable& CMDB::CreateTable(const tchar* pszName)
 {
-	ASSERT(pszName != NULL);
+	ASSERT(pszName != nullptr);
 
 	return *(new CTable(*this, pszName));
 }
@@ -85,13 +85,13 @@ CTable& CMDB::CreateTable(const tchar* pszName)
 
 CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery)
 {
-	ASSERT(pszName != NULL);
+	ASSERT(pszName != nullptr);
 	ASSERT(oConnection.IsOpen());
 
 	CString strQuery;
 
 	// Only table name specified?
-	if (pszQuery == NULL)
+	if (pszQuery == nullptr)
 	{
 		strQuery.Format(TXT("SELECT * FROM %s"), pszName);
 		pszQuery = strQuery;

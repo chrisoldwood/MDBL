@@ -114,7 +114,7 @@ void CColumnSet::DeleteAll()
 
 size_t CColumnSet::Find(const tchar* pszName)
 {
-	ASSERT(pszName != NULL);
+	ASSERT(pszName != nullptr);
 
 	for (size_t i = 0; i < Count(); ++i)
 	{

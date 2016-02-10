@@ -51,7 +51,7 @@ CJoinedSet::CJoinedSet(const CJoinedSet& oJoinedSet)
 {
 	CJoinedSet* pRHS = const_cast<CJoinedSet*>(&oJoinedSet);
 
-	pRHS->m_pResSets = NULL;
+	pRHS->m_pResSets = nullptr;
 }
 
 /******************************************************************************

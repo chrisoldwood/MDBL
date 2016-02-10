@@ -28,7 +28,7 @@
 
 CRow::CRow(CTable& oTable, bool bNull)
 	: m_oTable(oTable)
-	, m_aFields(NULL)
+	, m_aFields(nullptr)
 	, m_nColumns(oTable.m_vColumns.Count())
 	, m_eStatus(ALLOCATED)
 {
@@ -80,7 +80,7 @@ CRow::~CRow()
 	for (size_t i = 0; i < m_nColumns; ++i)
 		delete &m_aFields[i];
 
-	if (m_aFields != NULL)
+	if (m_aFields != nullptr)
 		free(m_aFields);
 }
 

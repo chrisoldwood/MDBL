@@ -126,7 +126,7 @@ public:
 	//
 	// String formatting methods.
 	//
-	CString Format(const tchar* pszFormat = NULL) const;
+	CString Format(const tchar* pszFormat = nullptr) const;
 	CString DbgFormat() const;
 
 protected:

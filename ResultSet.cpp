@@ -32,7 +32,7 @@
 */
 
 CResultSet::CResultSet()
-	: m_pTable(NULL)
+	: m_pTable(nullptr)
 {
 }
 
@@ -68,7 +68,7 @@ CResultSet::CResultSet(const CTable& oTable)
 CResultSet::CResultSet(const CTable& oTable, CRow* pRow)
 	: m_pTable(&oTable)
 {
-	if (pRow != NULL)
+	if (pRow != nullptr)
 		Add(*pRow);
 }
 
@@ -181,7 +181,7 @@ CResultSet& CResultSet::operator=(const CResultSet& oRHS)
 
 void CResultSet::OrderBy(const CSortColumns& oColumns)
 {
-	ASSERT(g_pSortOrder == NULL);
+	ASSERT(g_pSortOrder == nullptr);
 
 	// Nothing to sort?
 	if (Count() == 0)
@@ -193,11 +193,11 @@ void CResultSet::OrderBy(const CSortColumns& oColumns)
 	CRow* data = Collection::front();
 	qsort(data, Count(), sizeof(CRow*), Compare);
 
-	g_pSortOrder = NULL;
+	g_pSortOrder = nullptr;
 }
 
 // Used by qsort().
-const CSortColumns* CResultSet::g_pSortOrder = NULL;
+const CSortColumns* CResultSet::g_pSortOrder = nullptr;
 
 /******************************************************************************
 ** Methods:		Compare()
@@ -213,7 +213,7 @@ const CSortColumns* CResultSet::g_pSortOrder = NULL;
 
 int CResultSet::Compare(const void* ppRow1, const void* ppRow2)
 {
-	ASSERT(g_pSortOrder != NULL);
+	ASSERT(g_pSortOrder != nullptr);
 
 	CRow* pRow1  = *((CRow**) ppRow1);
 	CRow* pRow2  = *((CRow**) ppRow2);
@@ -346,7 +346,7 @@ CValueSet CResultSet::Distinct(size_t nColumn) const
 	if (Count() > 0)
 	{
 		CResultSet    oRS(*this);
-		const CField* pCurrValue = NULL;
+		const CField* pCurrValue = nullptr;
 
 		// Sort a copy of the result set.
 		oRS.OrderBy(nColumn, CSortColumns::ASC);
@@ -357,7 +357,7 @@ CValueSet CResultSet::Distinct(size_t nColumn) const
 			CRow& oRow = oRS[i];
 
 			// First value OR row value differs?
-			if ( (pCurrValue == NULL) || (oRow[nColumn] != *pCurrValue) )
+			if ( (pCurrValue == nullptr) || (oRow[nColumn] != *pCurrValue) )
 			{
 				oSet.Add(oRow[nColumn].ToValue());
 				pCurrValue = &oRow[nColumn];
@@ -492,7 +492,7 @@ bool CResultSet::Exists(const CWhere& oQuery) const
 
 void CResultSet::Dump(WCL::IOutputStream& rStream) const
 {
-	ASSERT(m_pTable != NULL);
+	ASSERT(m_pTable != nullptr);
 
 	std::vector<size_t>	aiColWidths;
 	CString			strColList;

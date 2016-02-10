@@ -32,11 +32,11 @@ CColumn::CColumn(CTable& oTable, const tchar* pszName, COLTYPE eType, size_t nLe
 	, m_nLength(nLength)
 	, m_nAllocSize((nAllocSize + 3) & ~3)
 	, m_nFlags(nFlags)
-	, m_pFKTable(NULL)
+	, m_pFKTable(nullptr)
 	, m_nFKColumn(0)
-	, m_pIndex(NULL)
+	, m_pIndex(nullptr)
 {
-	ASSERT(pszName      != NULL);
+	ASSERT(pszName      != nullptr);
 	ASSERT(m_eStgType   != MDST_NULL);
 	ASSERT(!(Nullable() && Unique()));
 	ASSERT(!(Nullable() && PrimaryKey()));
@@ -66,9 +66,9 @@ CColumn::CColumn(CTable& oTable, const tchar* pszName, CTable& oFKTable, size_t 
 	, m_nFlags(nFlags)
 	, m_pFKTable(&oFKTable)
 	, m_nFKColumn(nFKColumn)
-	, m_pIndex(NULL)
+	, m_pIndex(nullptr)
 {
-	ASSERT(pszName      != NULL);
+	ASSERT(pszName      != nullptr);
 	ASSERT(m_eStgType   != MDST_NULL);
 	ASSERT(m_nAllocSize >  0);
 	ASSERT(!(Nullable() && Unique()));

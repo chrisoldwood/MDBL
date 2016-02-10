@@ -45,13 +45,13 @@ CTable::CTable(CMDB& oDB, const tchar* pszName, uint nFlags)
 	, m_nDeletions(0)
 	, m_nIdentCol(Core::npos)
 	, m_nIdentVal(0)
-	, m_pNullRow(NULL)
+	, m_pNullRow(nullptr)
 	, m_strSQLTable()
 	, m_strSQLWhere()
 	, m_strSQLGroup()
 	, m_strSQLOrder()
 {
-	ASSERT(pszName != NULL);
+	ASSERT(pszName != nullptr);
 }
 
 /******************************************************************************
@@ -97,7 +97,7 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 	if (ReadOnly())		nFlags |= CColumn::READ_ONLY;
 	if (Transient())	nFlags |= CColumn::TRANSIENT;
 
-	CColumn* pColumn = NULL;
+	CColumn* pColumn = nullptr;
 
 	switch (eType)
 	{
@@ -167,7 +167,7 @@ size_t CTable::AddColumn(const tchar* pszName, COLTYPE eType, size_t nLength, ui
 
 	}
 
-	ASSERT(pColumn != NULL);
+	ASSERT(pColumn != nullptr);
 
 	// Add to the table.
 	size_t i = m_vColumns.Add(*pColumn);
@@ -203,7 +203,7 @@ size_t CTable::AddColumn(const tchar* pszName, CTable& oTable, size_t nColumn, u
 	ASSERT(m_vRows.Count() == 0);
 	ASSERT(FindColumn(pszName) == Core::npos);
 	ASSERT(oTable.m_vColumns[nColumn].Unique());
-	ASSERT(oTable.m_vColumns[nColumn].Index() != NULL);
+	ASSERT(oTable.m_vColumns[nColumn].Index() != nullptr);
 	ASSERT(nFlags & CColumn::FOREIGN_KEY);
 
 	// Create the column based on the foreign columns details.
@@ -278,9 +278,9 @@ void CTable::DropAllColumns()
 void CTable::AddIndex(size_t nColumn)
 {
 	ASSERT(m_vRows.Count() == 0);
-	ASSERT(m_vColumns[nColumn].Index() == NULL);
+	ASSERT(m_vColumns[nColumn].Index() == nullptr);
 
-	CIndex* pIndex = NULL;
+	CIndex* pIndex = nullptr;
 
 	// Get column details.
 	const CColumn& oColumn = m_vColumns[nColumn];
@@ -326,7 +326,7 @@ void CTable::AddIndex(size_t nColumn)
 			break;
 	}
 
-	ASSERT(pIndex != NULL);
+	ASSERT(pIndex != nullptr);
 
 	m_vColumns[nColumn].Index(pIndex);
 }
@@ -347,7 +347,7 @@ void CTable::DropIndex(size_t nColumn)
 {
 	ASSERT(m_vColumns[nColumn].ColType() != MDCT_IDENTITY);
 
-	m_vColumns[nColumn].Index(NULL);
+	m_vColumns[nColumn].Index(nullptr);
 }
 
 /******************************************************************************
@@ -406,7 +406,7 @@ size_t CTable::InsertRow(CRow& oRow, bool bNew)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
-		if (pIndex != NULL)
+		if (pIndex != nullptr)
 			pIndex->AddRow(oRow);
 	}
 
@@ -455,7 +455,7 @@ void CTable::DeleteRow(size_t nRow)
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
-		if (pIndex != NULL)
+		if (pIndex != nullptr)
 			pIndex->RemoveRow(oRow);
 	}
 
@@ -581,7 +581,7 @@ void CTable::CopyTable(const CTable& oTable)
 CRow& CTable::NullRow()
 {
 	// Create NUll row if not already.
-	if (m_pNullRow == NULL)
+	if (m_pNullRow == nullptr)
 		m_pNullRow = new CRow(*this, true);
 
 	return *m_pNullRow;
@@ -606,7 +606,7 @@ void CTable::TruncateIndexes()
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
-		if (pIndex != NULL)
+		if (pIndex != nullptr)
 			pIndex->Truncate();
 	}
 }
@@ -645,7 +645,7 @@ CRow* CTable::SelectRow(size_t nColumn, const CValue& oValue) const
 {
 	ASSERT(oValue.m_bNull == false);
 	ASSERT(m_vColumns[nColumn].Unique());
-	ASSERT(m_vColumns[nColumn].Index() != NULL);
+	ASSERT(m_vColumns[nColumn].Index() != nullptr);
 
 	// Use index, to find it.
 	CUniqIndex* pIndex = static_cast<CUniqIndex*>(m_vColumns[nColumn].Index());
@@ -800,7 +800,7 @@ void CTable::Read(WCL::IInputStream& rStream)
 	{
 		CIndex* pIndex = m_vColumns[n].Index();
 
-		if (pIndex != NULL)
+		if (pIndex != nullptr)
 			pIndex->Capacity(nRows);
 	}
 
@@ -823,7 +823,7 @@ void CTable::Read(WCL::IInputStream& rStream)
 		{
 			CIndex* pIndex = m_vColumns[n].Index();
 
-			if (pIndex != NULL)
+			if (pIndex != nullptr)
 				pIndex->AddRow(oRow);
 		}
 	}
@@ -1326,7 +1326,7 @@ void CTable::CheckIndexes() const
 	{
 		CIndex* pIndex = m_vColumns[i].Index();
 
-		if (pIndex == NULL)
+		if (pIndex == nullptr)
 			continue;
 
 		ASSERT(pIndex->RowCount() == m_vRows.Count());
@@ -1367,10 +1367,10 @@ void CTable::CheckRow(CRow& oRow, bool bUpdate) const
 		CTable* pFKTable  = m_vColumns[k].FKTable();
 		size_t  nFKColumn = m_vColumns[k].FKColumn();
 
-		if ( (pFKTable == NULL) || (bIsNull) )
+		if ( (pFKTable == nullptr) || (bIsNull) )
 			continue;
 
-		ASSERT(pFKTable->SelectRow(nFKColumn, oRow[k].ToValue()) != NULL);
+		ASSERT(pFKTable->SelectRow(nFKColumn, oRow[k].ToValue()) != nullptr);
 	}
 #endif
 }

@@ -704,7 +704,7 @@ void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
 {
 	size_t nChars    = 1024;
 	WORD   wRetSize  = 0;
-	tchar* pszBuffer = NULL;
+	tchar* pszBuffer = nullptr;
 
 	// Until buffer big enough.
 	for(;;)
@@ -725,7 +725,7 @@ void CODBCSource::InstalledDrivers(CStrArray& astrDrivers)
 		nChars *= 2;
 	}
 
-	ASSERT(pszBuffer != NULL);
+	ASSERT(pszBuffer != nullptr);
 
 	tchar* pszName = pszBuffer;
 
