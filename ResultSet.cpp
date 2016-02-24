@@ -190,8 +190,7 @@ void CResultSet::OrderBy(const CSortColumns& oColumns)
 	g_pSortOrder = &oColumns;
 
 	// Sort it...
-	CRow* data = Collection::front();
-	qsort(data, Count(), sizeof(CRow*), Compare);
+	qsort(&Collection::front(), Count(), sizeof(CRow*), Compare);
 
 	g_pSortOrder = nullptr;
 }

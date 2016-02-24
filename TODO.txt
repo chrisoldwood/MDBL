@@ -29,3 +29,5 @@
 - Reconsider need for POINTER value.
 
 - Add test data row with minimum and maximum values.
+
+- Replace use of qsort() with std::sort();
