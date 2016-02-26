@@ -213,8 +213,7 @@ TEST_CASE_END
 
 TEST_CASE("Once fetched the values for each column in the row can be retrieved")
 {
-	CMDB mdb;
-	CTable table(mdb, TXT("test"));
+	CTable table(TXT("test"));
 
 	table.AddColumn(TXT("BitValue"),       MDCT_BOOL,        0, CColumn::NULLABLE);
 	table.AddColumn(TXT("ByteValue"),      MDCT_INT,         0, CColumn::NULLABLE);

@@ -5,7 +5,7 @@
 
 #include "Common.hpp"
 #include <Core/UnitTest.hpp>
-#include <MDBL/MDB.hpp>
+#include <MDBL/Table.hpp>
 #include <MDBL/TimeStamp.hpp>
 
 TEST_SET(Field)
@@ -13,8 +13,7 @@ TEST_SET(Field)
 
 TEST_CASE("A null field value will be formatted as an empty string")
 {
-	CMDB mdb;
-	CTable table(mdb, TXT("test"));
+	CTable table(TXT("test"));
 
 	table.AddColumn(TXT("MDCT_INT"),       MDCT_INT,        0, CColumn::NULLABLE);
 	table.AddColumn(TXT("MDCT_INT64"),     MDCT_INT64,      0, CColumn::NULLABLE);
@@ -42,8 +41,7 @@ TEST_CASE_END
 
 TEST_CASE("A field value will be formatted using a default template when none provided")
 {
-	CMDB mdb;
-	CTable table(mdb, TXT("test"));
+	CTable table(TXT("test"));
 
 	table.AddColumn(TXT("MDCT_INT"),       MDCT_INT,        0, CColumn::DEFAULTS);
 	table.AddColumn(TXT("MDCT_INT64"),     MDCT_INT64,      0, CColumn::DEFAULTS);
@@ -108,8 +106,7 @@ TEST_CASE_END
 
 TEST_CASE("A field can be converted to a value")
 {
-	CMDB mdb;
-	CTable table(mdb, TXT("test"));
+	CTable table(TXT("test"));
 
 	table.AddColumn(TXT("MDCT_INT"),       MDCT_INT,        0, CColumn::DEFAULTS);
 	table.AddColumn(TXT("MDCT_INT64"),     MDCT_INT64,      0, CColumn::DEFAULTS);

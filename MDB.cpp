@@ -66,7 +66,7 @@ CTable& CMDB::CreateTable(const tchar* pszName)
 {
 	ASSERT(pszName != nullptr);
 
-	return *(new CTable(*this, pszName));
+	return *(new CTable(pszName));
 }
 
 /******************************************************************************
@@ -97,7 +97,7 @@ CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const t
 		pszQuery = strQuery;
 	}
 
-	Core::UniquePtr<CTable> pTable(new CTable(*this, pszName));
+	Core::UniquePtr<CTable> pTable(new CTable(pszName));
 	SQLCursorPtr pCursor(oConnection.ExecQuery(pszQuery));
 
 	if (pCursor->NumColumns() != 0)

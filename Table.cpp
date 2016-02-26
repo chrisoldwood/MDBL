@@ -34,9 +34,8 @@
 *******************************************************************************
 */
 
-CTable::CTable(CMDB& oDB, const tchar* pszName, uint nFlags)
-	: m_oDB(oDB)
-	, m_strName(pszName)
+CTable::CTable(const tchar* pszName, uint nFlags)
+	: m_strName(pszName)
 	, m_nFlags(nFlags)
 	, m_vColumns()
 	, m_vRows()

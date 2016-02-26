@@ -8,7 +8,6 @@
 #include <MDBL/Table.hpp>
 #include <WCL/Path.hpp>
 #include <MDBL/ODBCSource.hpp>
-#include <MDBL/MDB.hpp>
 #include <MDBL/TimeStamp.hpp>
 
 TEST_SET(Table)
@@ -25,8 +24,7 @@ TEST_SET(Table)
 
 TEST_CASE("The table can be populated by executing a query against a SQL data source")
 {
-	CMDB mdb;
-	CTable table(mdb, TXT("TestValues.csv"));
+	CTable table(TXT("TestValues.csv"));
 
 	table.AddColumn(TXT("BitValue"),       MDCT_BOOL,        0, CColumn::NULLABLE);
 	table.AddColumn(TXT("ByteValue"),      MDCT_INT,         0, CColumn::NULLABLE);
@@ -58,8 +56,7 @@ TEST_CASE_END
 
 TEST_CASE("When populating a table from a query transient columns should be skipped")
 {
-	CMDB mdb;
-	CTable table(mdb, TXT("TestValues.csv"));
+	CTable table(TXT("TestValues.csv"));
 
 	table.AddColumn(TXT("TransientColumn"), MDCT_INT,     0, CColumn::TRANSIENT);
 	table.AddColumn(TXT("ShortTextValue"),  MDCT_FXDSTR, 42, CColumn::NULLABLE);

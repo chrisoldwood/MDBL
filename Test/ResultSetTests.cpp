@@ -6,7 +6,6 @@
 #include "Common.hpp"
 #include <Core/UnitTest.hpp>
 #include <MDBL/ResultSet.hpp>
-#include <MDBL/MDB.hpp>
 #include <MDBL/Table.hpp>
 
 namespace
@@ -22,11 +21,10 @@ static void createRows(CTable& table, size_t count)
 
 TEST_SET(ResultSet)
 {
-	CMDB   mdb;
 
 TEST_CASE("a result set can be sorted by a nullable integer column in ascending order")
 {
-	CTable table(mdb, TXT("Test"));
+	CTable table(TXT("Test"));
 	table.AddColumn(TXT("Value"), MDCT_INT, 0, CColumn::NULLABLE);
 	createRows(table, 5);
 
@@ -50,7 +48,7 @@ TEST_CASE_END
 
 TEST_CASE("a result set can be sorted by a nullable integer column in descending order")
 {
-	CTable table(mdb, TXT("Test"));
+	CTable table(TXT("Test"));
 	table.AddColumn(TXT("Value"), MDCT_INT, 0, CColumn::NULLABLE);
 	createRows(table, 5);
 
@@ -74,7 +72,7 @@ TEST_CASE_END
 
 TEST_CASE("a result set can be sorted by a nullable, case-sensitive string column in ascending order")
 {
-	CTable table(mdb, TXT("Test"));
+	CTable table(TXT("Test"));
 	table.AddColumn(TXT("Value"), MDCT_VARSTR, 50, CColumn::NULLABLE | CColumn::COMPARE_CASE);
 	createRows(table, 5);
 
@@ -98,7 +96,7 @@ TEST_CASE_END
 
 TEST_CASE("a result set can be sorted by a nullable, case-sensitive string column in descending order")
 {
-	CTable table(mdb, TXT("Test"));
+	CTable table(TXT("Test"));
 	table.AddColumn(TXT("Value"), MDCT_VARSTR, 50, CColumn::NULLABLE | CColumn::COMPARE_CASE);
 	createRows(table, 5);
 
@@ -122,7 +120,7 @@ TEST_CASE_END
 
 TEST_CASE("a result set can be sorted by a nullable, case-insensitive string column in ascending order")
 {
-	CTable table(mdb, TXT("Test"));
+	CTable table(TXT("Test"));
 	table.AddColumn(TXT("Value"), MDCT_VARSTR, 50, CColumn::NULLABLE | CColumn::IGNORE_CASE);
 	createRows(table, 5);
 
@@ -146,7 +144,7 @@ TEST_CASE_END
 
 TEST_CASE("a result set can be sorted by a nullable, case-insensitive string column in descending order")
 {
-	CTable table(mdb, TXT("Test"));
+	CTable table(TXT("Test"));
 	table.AddColumn(TXT("Value"), MDCT_VARSTR, 50, CColumn::NULLABLE | CColumn::IGNORE_CASE);
 	createRows(table, 5);
 

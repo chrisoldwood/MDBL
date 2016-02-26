@@ -31,7 +31,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CTable(CMDB& oDB, const tchar* pszName, uint nFlags = DEFAULTS);
+	CTable(const tchar* pszName, uint nFlags = DEFAULTS);
 	virtual ~CTable();
 
 	//
@@ -40,8 +40,6 @@ public:
 	const CString& Name() const;
 	bool Transient() const;
 	bool ReadOnly() const;
-
-	CMDB& DB() const;
 
 	//
 	// Column methods.
@@ -135,7 +133,6 @@ protected:
 	//
 	// Members.
 	//
-	CMDB&		m_oDB;			// The parent database.
 	CString		m_strName;		// The name.
 	uint		m_nFlags;		// Flags..
 	CColumnSet	m_vColumns;		// The set of columns.
@@ -208,11 +205,6 @@ inline bool CTable::Transient() const
 inline bool CTable::ReadOnly() const
 {
 	return (m_nFlags & READ_ONLY);
-}
-
-inline CMDB& CTable::DB() const
-{
-	return m_oDB;
 }
 
 inline size_t CTable::ColumnCount() const

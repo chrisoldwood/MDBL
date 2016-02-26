@@ -9,7 +9,7 @@
 #include <Core/UnitTest.hpp>
 #include <MDBL/ODBCSource.hpp>
 #include <MDBL/ODBCCursor.hpp>
-#include <MDBL/MDB.hpp>
+#include <MDBL/Table.hpp>
 #include <MDBL/TimeStamp.hpp>
 
 TEST_SET(SqlServer)
@@ -34,8 +34,7 @@ TEST_CASE("The SQL Server types are mapped to the MDBL column types")
 	TXT(", cast('2006-05-04T01:02:03' as datetime)      as [datetime]")
 	TXT(";");
 
-	CMDB mdb;
-	CTable table(mdb, TXT("test"));
+	CTable table(TXT("test"));
 
 	table.AddColumn(TXT("bit"),           MDCT_BOOL,      0, CColumn::NULLABLE);
 	table.AddColumn(TXT("tinyint"),       MDCT_INT,       0, CColumn::NULLABLE);
