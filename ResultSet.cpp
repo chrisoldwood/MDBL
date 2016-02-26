@@ -164,6 +164,48 @@ CResultSet& CResultSet::operator=(const CResultSet& oRHS)
 	return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//! The comparison functor used to compare two rows when sorting.
+
+class Comparator
+{
+public:
+	Comparator(const CSortColumns& sortOrder)
+		: m_sortOrder(sortOrder)
+	{ }
+
+	//! Query if the lhs < rhs.
+	bool operator()(const CRow* row1, const CRow* row2)
+	{
+		return (compare(row1, row2) < 0);
+	}
+
+private:
+	const CSortColumns& m_sortOrder;
+
+	//! Provide a full comparsion of the two rows.
+	int compare(const CRow* row1, const CRow* row2);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+//! Provide a full comparsion of the two rows.
+
+int Comparator::compare(const CRow* row1, const CRow* row2)
+{
+	for (size_t k = 0; k < m_sortOrder.Count(); ++k)
+	{
+		size_t column = m_sortOrder.Column(k);
+		int    direction = m_sortOrder.Direction(k);
+
+		int result = row1->Field(column).Compare(row2->Field(column));
+
+		if (result != 0)
+			return (direction == CSortColumns::ASC) ? result : -result;
+	}
+
+	return 0;
+}
+
 /******************************************************************************
 ** Method:		OrderBy()
 **
@@ -181,59 +223,7 @@ CResultSet& CResultSet::operator=(const CResultSet& oRHS)
 
 void CResultSet::OrderBy(const CSortColumns& oColumns)
 {
-	ASSERT(g_pSortOrder == nullptr);
-
-	// Nothing to sort?
-	if (Count() == 0)
-		return;
-
-	g_pSortOrder = &oColumns;
-
-	// Sort it...
-	qsort(&Collection::front(), Count(), sizeof(CRow*), Compare);
-
-	g_pSortOrder = nullptr;
-}
-
-// Used by qsort().
-const CSortColumns* CResultSet::g_pSortOrder = nullptr;
-
-/******************************************************************************
-** Methods:		Compare()
-**
-** Description:	The compare function used by qsort().
-**
-** Parameters:	ppRow1/2	Pointers to the rows to compare.
-**
-** Returns:		See qsort().
-**
-*******************************************************************************
-*/
-
-int CResultSet::Compare(const void* ppRow1, const void* ppRow2)
-{
-	ASSERT(g_pSortOrder != nullptr);
-
-	CRow* pRow1  = *((CRow**) ppRow1);
-	CRow* pRow2  = *((CRow**) ppRow2);
-
-	// Compare all columns.
-	for (size_t k = 0; k < g_pSortOrder->Count(); ++k)
-	{
-		// Get the column and direction.
-		size_t nColumn = g_pSortOrder->Column(k);
-		int    nDir    = g_pSortOrder->Direction(k);
-
-		// Compare the column values.
-		int nCmp = pRow1->Field(nColumn).Compare(pRow2->Field(nColumn));
-
-		// Differ?
-		if (nCmp != 0)
-			return (nDir == CSortColumns::ASC) ? nCmp : -nCmp;
-	}
-
-	// Rows are equal.
-	return 0;
+	std::sort(begin(), end(), Comparator(oColumns));
 }
 
 /******************************************************************************

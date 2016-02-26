@@ -93,12 +93,6 @@ private:
 	//
 	friend class CJoinedSet;
 
-	//
-	// qsort() helpers.
-	//
-	static const CSortColumns* g_pSortOrder;
-	static int Compare(const void* ppRow1, const void* ppRow2);
-
 	//! The underlying collection type.
 	typedef std::vector<CRow*> Collection;
 };
