@@ -101,6 +101,13 @@ CField::~CField()
 *******************************************************************************
 */
 
+bool CField::IsNull() const
+{
+	ASSERT(m_oColumn.Nullable());
+
+	return m_bNull;
+}
+
 int CField::GetInt() const
 {
 	ASSERT(m_bNull   != true);

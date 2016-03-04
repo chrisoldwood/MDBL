@@ -37,6 +37,7 @@ public:
 	//
 	// Accessors.
 	//
+	bool              IsNull()       const;
 	int               GetInt()       const;
 	int64             GetInt64()     const;
 	double            GetDouble()    const;
@@ -72,6 +73,7 @@ public:
 	// Conversion operators.
 	//
 	operator int()               const;
+	operator int64()             const;
 	operator double()            const;
 	operator tchar()             const;
 	operator const tchar*()      const;
@@ -83,6 +85,7 @@ public:
 
 	CField& operator=(const CNull& oNull);
 	CField& operator=(int iValue);
+	CField& operator=(int64 iValue);
 	CField& operator=(double dValue);
 	CField& operator=(tchar cValue);
 	CField& operator=(const tchar* sValue);
@@ -231,6 +234,11 @@ inline CField::operator int() const
 	return GetInt();
 }
 
+inline CField::operator int64() const
+{
+	return GetInt64();
+}
+
 inline CField::operator double() const
 {
 	return GetDouble();
@@ -281,6 +289,13 @@ inline CField& CField::operator=(const CNull&)
 inline CField& CField::operator=(int iValue)
 {
 	SetInt(iValue);
+
+	return *this;
+}
+
+inline CField& CField::operator=(int64 iValue)
+{
+	SetInt64(iValue);
 
 	return *this;
 }
