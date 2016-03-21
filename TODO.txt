@@ -31,3 +31,5 @@
 - Add test data row with minimum and maximum values.
 
 - Move MDB::CreateTable(query) to Table class.
+
+- Add CField overload for query values (e.g. SelectRow, CWhereCmp, ...).
