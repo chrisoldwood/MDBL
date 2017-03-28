@@ -976,11 +976,12 @@ void CTable::Read(CSQLSource& rSource)
 		// Ignore TRANSIENT columns.
 		if (!oTabColumn.Transient())
 		{
+#ifdef _DEBUG
 			const SQLColumn& oSQLColumn = pCursor->Column(iSQLCol);
 
 			ASSERT(oTabColumn.Name() == oSQLColumn.m_strName);
 			ASSERT(!((oTabColumn.ColType() == MDCT_FXDSTR) && (oTabColumn.Length() < oSQLColumn.m_nSize)));
-
+#endif
 			pCursor->MapColumn(iSQLCol, iTabCol, oTabColumn.ColType(), oTabColumn.Length());
 			++iSQLCol;
 		}
