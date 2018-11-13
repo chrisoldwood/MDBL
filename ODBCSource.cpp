@@ -23,6 +23,11 @@
 #pragma comment(lib, "odbccp32")
 #endif
 
+#if _MSC_VER > 1900
+// Resolves "LNK2019: unresolved external symbol __vsnwprintf_s" for VC++ 14.0+
+#pragma comment(lib, "legacy_stdio_definitions")
+#endif
+
 /******************************************************************************
 **
 ** Constants.
