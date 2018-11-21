@@ -41,8 +41,8 @@ public:
 	virtual CTable& Table(size_t n) const;
 	virtual CTable& operator[](size_t n) const;
 
-	virtual CTable& CreateTable(const tchar* pszName);
-	virtual CTable& CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery = nullptr);
+	virtual CTable::Ptr CreateTable(const tchar* pszName);
+	virtual CTable::Ptr CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery = nullptr);
 	virtual size_t  AddTable(CTable& oTable);
 	virtual size_t  FindTable(const tchar* pszName);
 

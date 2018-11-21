@@ -202,12 +202,36 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Mocks"
+			>
+			<File
+				RelativePath=".\Mocks\MockSQLCursor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mocks\MockSQLCursor.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mocks\MockSQLSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mocks\MockSQLSource.hpp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Common.hpp"
 			>
 		</File>
 		<File
 			RelativePath=".\FieldTests.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MDBTests.cpp"
 			>
 		</File>
 		<File

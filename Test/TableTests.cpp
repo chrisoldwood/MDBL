@@ -9,6 +9,10 @@
 #include <WCL/Path.hpp>
 #include <MDBL/ODBCSource.hpp>
 #include <MDBL/TimeStamp.hpp>
+#include "Mocks/MockSQLSource.hpp"
+#include "Mocks/MockSQLCursor.hpp"
+
+using namespace Mocks;
 
 TEST_SET(Table)
 {
@@ -22,7 +26,7 @@ TEST_SET(Table)
 
 	CODBCSource source(connection);
 
-TEST_CASE("The table can be populated by executing a query against a SQL data source")
+TEST_CASE("A table can be populated by executing an implicit query against a SQL data source")
 {
 	CTable table(TXT("TestValues.csv"));
 
@@ -54,7 +58,7 @@ TEST_CASE("The table can be populated by executing a query against a SQL data so
 }
 TEST_CASE_END
 
-TEST_CASE("When populating a table from a query transient columns should be skipped")
+TEST_CASE("When populating a table from an implicit query transient columns should be skipped")
 {
 	CTable table(TXT("TestValues.csv"));
 
@@ -68,6 +72,31 @@ TEST_CASE("When populating a table from a query transient columns should be skip
 	const CRow& row = table[0];
 
 	TEST_TRUE(row[1].GetString() == tstring(TXT("short text")));
+}
+TEST_CASE_END
+
+TEST_CASE("A table can be created from the result set of an explicit query")
+{
+	const tchar* anyConnection = TXT("any SQL connection");
+	const tchar* anyQuery = TXT("any SQL query");
+
+	SQLColumn column = { 0, TXT("column"), 0, MDCT_VARSTR, 0, 0, CColumn::NULLABLE };
+	MockSQLCursor::Columns columns;
+	columns.push_back(column);
+
+	MockSQLCursorPtr mockCursor(new MockSQLCursor);
+	mockCursor->SetColumns(columns);
+
+	MockSQLSource mockSource;
+	mockSource.Open(anyConnection);
+	mockSource.SetCursor(mockCursor);
+
+	CTable::Ptr table = CTable::Create(mockSource, anyQuery);
+
+	TEST_TRUE(table->Name() == TXT(""));
+	TEST_TRUE(table->ColumnCount() == 1);
+	TEST_TRUE(table->Column(0).Name() == TXT("column"));
+	TEST_TRUE(table->RowCount() == 0);
 }
 TEST_CASE_END
 

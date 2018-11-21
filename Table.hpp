@@ -29,10 +29,24 @@ class CTable /*: private NotCopyable*/
 {
 public:
 	//
+	// Types.
+	//
+
+	//! The default smart pointer type.
+	typedef Core::SharedPtr<CTable> Ptr;
+
+public:
+	//
 	// Constructors/Destructor.
 	//
 	CTable(const tchar* pszName, uint nFlags = DEFAULTS);
 	virtual ~CTable();
+
+	//! Create a table from the result set of a query.
+	static Ptr Create(CSQLSource& connection, const tchar* query);
+
+	//! Create a table from the result set of a query.
+	static Ptr Create(const tchar* name, CSQLSource& connection, const tchar* query);
 
 	//
 	// Accessors.

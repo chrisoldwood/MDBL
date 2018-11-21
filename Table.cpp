@@ -70,6 +70,45 @@ CTable::~CTable()
 	delete m_pNullRow;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//! Create a table from the result set of a query.
+
+CTable::Ptr CTable::Create(CSQLSource& connection, const tchar* query)
+{
+	return Create(TXT(""), connection, query);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//! Create a table from the result set of a query.
+
+CTable::Ptr CTable::Create(const tchar* name, CSQLSource& connection, const tchar* query)
+{
+	ASSERT(connection.IsOpen());
+	ASSERT(query != nullptr);
+
+	Ptr table(new CTable(name));
+	SQLCursorPtr cursor(connection.ExecQuery(query));
+
+	if (cursor->NumColumns() != 0)
+	{
+		for (size_t i = 0; i < cursor->NumColumns(); ++i)
+		{
+			const SQLColumn& column = cursor->Column(i);
+
+			table->AddColumn(column.m_strName, column.m_eMDBColType, column.m_nSize, column.m_nFlags);
+		}
+
+		while (cursor->Fetch())
+		{
+			CRow& row = table->CreateRow();
+			cursor->GetRow(row);
+			table->InsertRow(row, false);
+		}
+	}
+
+	return table;
+}
+
 /******************************************************************************
 ** Method:		AddColumn()
 **

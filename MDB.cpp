@@ -62,11 +62,11 @@ CMDB::~CMDB()
 *******************************************************************************
 */
 
-CTable& CMDB::CreateTable(const tchar* pszName)
+CTable::Ptr CMDB::CreateTable(const tchar* pszName)
 {
 	ASSERT(pszName != nullptr);
 
-	return *(new CTable(pszName));
+	return CTable::Ptr(new CTable(pszName));
 }
 
 /******************************************************************************
@@ -83,7 +83,7 @@ CTable& CMDB::CreateTable(const tchar* pszName)
 *******************************************************************************
 */
 
-CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery)
+CTable::Ptr CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const tchar* pszQuery)
 {
 	ASSERT(pszName != nullptr);
 	ASSERT(oConnection.IsOpen());
@@ -97,34 +97,7 @@ CTable& CMDB::CreateTable(const tchar* pszName, CSQLSource& oConnection, const t
 		pszQuery = strQuery;
 	}
 
-	Core::UniquePtr<CTable> pTable(new CTable(pszName));
-	SQLCursorPtr pCursor(oConnection.ExecQuery(pszQuery));
-
-	if (pCursor->NumColumns() != 0)
-	{
-		// Setup the tables' schema.
-		for (size_t i = 0; i < pCursor->NumColumns(); ++i)
-		{
-			const SQLColumn& oColumn = pCursor->Column(i);
-
-			pTable->AddColumn(oColumn.m_strName, oColumn.m_eMDBColType, oColumn.m_nSize, oColumn.m_nFlags);
-		}
-
-		// For all rows.
-		while (pCursor->Fetch())
-		{
-			// Allocate the row.
-			CRow& oRow = pTable->CreateRow();
-
-			// Copy the data.
-			pCursor->GetRow(oRow);
-
-			// Append to table.
-			pTable->InsertRow(oRow, false);
-		}
-	}
-
-	return *(pTable.detach());
+	return CTable::Create(pszName, oConnection, pszQuery);
 }
 
 /******************************************************************************
