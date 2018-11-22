@@ -231,6 +231,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MDBQueryTests.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\MDBTests.cpp"
 			>
 		</File>

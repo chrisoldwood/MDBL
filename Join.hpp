@@ -15,6 +15,17 @@
 #pragma once
 #endif
 
+#include <limits>
+
+////////////////////////////////////////////////////////////////////////////////
+//! The type of join.
+
+enum JoinType
+{
+	INNER_JOIN,
+	OUTER_JOIN,
+};
+
 /******************************************************************************
 **
 ** The class used to hold a table used in a CJoin query.
@@ -28,7 +39,7 @@ public:
 	//
 	// Constructors/Destructor.
 	//
-	CJoinTable(size_t nTable, size_t nLHSColumn, int nType, size_t nRHSColumn);
+	CJoinTable(size_t nTable, size_t nLHSColumn, JoinType eJoinType, size_t nRHSColumn);
 	~CJoinTable();
 
 	//
@@ -36,7 +47,7 @@ public:
 	//
 	size_t	m_nTable;		// The table to join onto.
 	size_t	m_nLHSColumn;	// The left hand tables' column.
-	int		m_nType;		// The join type (INNER or OUTER).
+	JoinType m_eJoinType;	// The join type (INNER or OUTER).
 	size_t	m_nRHSColumn;	// The right hand tables' column.
 };
 
@@ -56,13 +67,6 @@ public:
 	CJoin(size_t nTable);
 	~CJoin();
 
-	// Join types
-	enum Type
-	{
-		INNER,
-		OUTER,
-	};
-
 	//
 	// Methods.
 	//
@@ -70,7 +74,7 @@ public:
 	CJoinTable& Join(size_t n) const;
 	CJoinTable& operator[](size_t n) const;
 
-	void Add(size_t nTable, size_t nLHSColumn, Type eType, size_t nRHSColumn);
+	void Add(size_t nTable, size_t nLHSColumn, JoinType eJoinType, size_t nRHSColumn);
 
 protected:
 	//
@@ -90,7 +94,11 @@ protected:
 
 inline CJoin::CJoin(size_t nTable)
 {
-	Collection::push_back(new CJoinTable(nTable, 0, -1, 0));
+	const size_t anyColumn = std::numeric_limits<size_t>::max();
+	const JoinType anyJoinType = INNER_JOIN;
+
+	// The leftmost table is implicitly joined.
+	Add(nTable, anyColumn, anyJoinType, anyColumn);
 }
 
 inline CJoin::~CJoin()
@@ -120,15 +128,15 @@ inline CJoinTable& CJoin::operator[](size_t n) const
 	return *(Collection::operator[](n));
 }
 
-inline void CJoin::Add(size_t nTable, size_t nLHSColumn, Type eType, size_t nRHSColumn)
+inline void CJoin::Add(size_t nTable, size_t nLHSColumn, JoinType eJoinType, size_t nRHSColumn)
 {
-	Collection::push_back(new CJoinTable(nTable, nLHSColumn, eType, nRHSColumn));
+	Collection::push_back(new CJoinTable(nTable, nLHSColumn, eJoinType, nRHSColumn));
 }
 
-inline CJoinTable::CJoinTable(size_t nTable, size_t nLHSColumn, int nType, size_t nRHSColumn)
+inline CJoinTable::CJoinTable(size_t nTable, size_t nLHSColumn, JoinType eJoinType, size_t nRHSColumn)
 	: m_nTable(nTable)
 	, m_nLHSColumn(nLHSColumn)
-	, m_nType(nType)
+	, m_eJoinType(eJoinType)
 	, m_nRHSColumn(nRHSColumn)
 {
 }

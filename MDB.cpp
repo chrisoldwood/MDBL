@@ -228,7 +228,7 @@ size_t CMDB::DoJoin(const CJoin& oQuery, size_t nJoin, const CRow& oLHSRow, CJoi
 				nMatches += nRows;
 			}
 			// Join failed, but OUTER join requested?
-			else if (oQuery[nJoin+1].m_nType == CJoin::OUTER)
+			else if (oQuery[nJoin+1].m_eJoinType == OUTER_JOIN)
 			{
 				// Add this row.
 				oJS[nJoin].Add(oRHSRow);
