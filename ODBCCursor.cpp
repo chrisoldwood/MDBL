@@ -115,7 +115,7 @@ void CODBCCursor::Open(const tchar* pszStmt, SQLHSTMT hStmt)
 	}
 
 	// Allocate column list.
-	m_pColumns = new SQLColumn[m_nColumns];
+	m_pColumns = new ODBCColumn[m_nColumns];
 
 	// Retrieve column definitions.
 	for (size_t i = 0; i < m_nColumns; ++i)

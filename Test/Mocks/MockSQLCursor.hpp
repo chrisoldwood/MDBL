@@ -18,6 +18,16 @@ namespace Mocks
 {
 
 ////////////////////////////////////////////////////////////////////////////////
+//! A mock SQL result set column.
+
+struct MockSQLColumn : public SQLColumn
+{
+	MockSQLColumn(size_t index, CString name, COLTYPE type, size_t size, uint flags)
+	 : SQLColumn(index, name, type, size, flags)
+	{}
+};
+
+////////////////////////////////////////////////////////////////////////////////
 //! A mock SQL result set cursor.
 
 class MockSQLCursor : public CSQLCursor
@@ -28,7 +38,7 @@ public:
 	//
 
 	//! The collection of columns in the result set.
-	typedef std::vector<SQLColumn> Columns;
+	typedef std::vector<MockSQLColumn> Columns;
 
 public:
 	//! Default constructor.

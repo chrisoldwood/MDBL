@@ -29,11 +29,21 @@ struct SQLColumn
 {
 	size_t	m_nDstColumn;		// The destination column.
 	CString	m_strName;			// The name.
-	int		m_nSQLColType;		// The native SQL column type.
 	COLTYPE	m_eMDBColType;		// The nearest MDB column type.
-	int		m_nSQLFetchType;	// The SQL type used to fetch the data.
 	size_t	m_nSize;			// The length.
 	uint	m_nFlags;			// MDB column Flags.
+
+	SQLColumn()
+	 : m_nDstColumn(), m_strName(), m_eMDBColType(), m_nSize(), m_nFlags()
+	{}
+
+	SQLColumn(size_t index, CString name, COLTYPE type, size_t size, uint flags)
+	 : m_nDstColumn(index), m_strName(name), m_eMDBColType(type), m_nSize(size), m_nFlags(flags)
+	{}
+
+protected:
+	// Make abstract
+	~SQLColumn() {};
 };
 
 /******************************************************************************

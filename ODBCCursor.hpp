@@ -23,6 +23,19 @@
 class CODBCSource;
 
 /******************************************************************************
+** 
+** The type used to return column information.
+**
+*******************************************************************************
+*/
+
+struct ODBCColumn : public SQLColumn
+{
+	int		m_nSQLColType;		// The native SQL column type.
+	int		m_nSQLFetchType;	// The SQL type used to fetch the data.
+};
+
+/******************************************************************************
 **
 ** This is the SQL cursor type returned for ODBC queries.
 **
@@ -65,7 +78,7 @@ protected:
 	CString			m_strStmt;		// The statment executed.
 	SQLHSTMT		m_hStmt;		// The statement handle.
 	size_t			m_nColumns;		// Number of columns returned.
-	SQLColumn*		m_pColumns;		// The array of column definitions.
+	ODBCColumn*		m_pColumns;		// The array of column definitions.
 	size_t			m_nRowLen;		// Size of a row.
 	size_t			m_nTotalLen;	// Total size of the buffer.
 	size_t*			m_pOffsets;		// The array of value offsets.

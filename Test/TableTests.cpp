@@ -80,7 +80,7 @@ TEST_CASE("A table can be created from the result set of an explicit query")
 	const tchar* anyConnection = TXT("any SQL connection");
 	const tchar* anyQuery = TXT("any SQL query");
 
-	SQLColumn column = { 0, TXT("column"), 0, MDCT_VARSTR, 0, 0, CColumn::NULLABLE };
+	MockSQLColumn column(0, TXT("column"), MDCT_VARSTR, 99, CColumn::NULLABLE);
 	MockSQLCursor::Columns columns;
 	columns.push_back(column);
 

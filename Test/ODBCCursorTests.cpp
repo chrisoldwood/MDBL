@@ -75,11 +75,14 @@ TEST_CASE("The SQL bit type is mapped onto the boolean column type")
 
 	TEST_TRUE(column.m_nDstColumn == 0);
 	TEST_TRUE(column.m_strName == TXT("BitValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_BIT);
 	TEST_TRUE(column.m_eMDBColType == MDCT_BOOL);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 1);
 	TEST_TRUE(column.m_nFlags == CColumn::NOT_NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_BIT);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -91,11 +94,14 @@ TEST_CASE("The SQL byte type is mapped onto the integer column type")
 
 	TEST_TRUE(column.m_nDstColumn == 1);
 	TEST_TRUE(column.m_strName == TXT("ByteValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_TINYINT);
 	TEST_TRUE(column.m_eMDBColType == MDCT_INT);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 3);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_TINYINT);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -107,11 +113,14 @@ TEST_CASE("The SQL short type is mapped onto the integer column type")
 
 	TEST_TRUE(column.m_nDstColumn == 2);
 	TEST_TRUE(column.m_strName == TXT("ShortValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_SMALLINT);
 	TEST_TRUE(column.m_eMDBColType == MDCT_INT);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 5);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_SMALLINT);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -123,11 +132,14 @@ TEST_CASE("The SQL long type is mapped onto the integer column type")
 
 	TEST_TRUE(column.m_nDstColumn == 3);
 	TEST_TRUE(column.m_strName == TXT("LongValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_INTEGER);
 	TEST_TRUE(column.m_eMDBColType == MDCT_INT);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 10);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_INTEGER);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -139,11 +151,14 @@ TEST_CASE("The SQL real type is mapped onto the double column type")
 
 	TEST_TRUE(column.m_nDstColumn == 4);
 	TEST_TRUE(column.m_strName == TXT("SingleValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_REAL);
 	TEST_TRUE(column.m_eMDBColType == MDCT_DOUBLE);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 24);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_REAL);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -155,11 +170,14 @@ TEST_CASE("The SQL double type is mapped onto the double column type")
 
 	TEST_TRUE(column.m_nDstColumn == 5);
 	TEST_TRUE(column.m_strName == TXT("DoubleValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_DOUBLE);
 	TEST_TRUE(column.m_eMDBColType == MDCT_DOUBLE);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 53);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_DOUBLE);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -171,11 +189,14 @@ TEST_CASE("The SQL time-stamp type is mapped onto the time-stamp column type")
 
 	TEST_TRUE(column.m_nDstColumn == 6);
 	TEST_TRUE(column.m_strName == TXT("DateTimeValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_TYPE_TIMESTAMP);
 	TEST_TRUE(column.m_eMDBColType == MDCT_TIMESTAMP);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 19);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_TYPE_TIMESTAMP);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -187,11 +208,14 @@ TEST_CASE("The SQL text type is mapped onto the string column type")
 
 	TEST_TRUE(column.m_nDstColumn == 7);
 	TEST_TRUE(column.m_strName == TXT("ShortTextValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_VARCHAR);
 	TEST_TRUE(column.m_eMDBColType == MDCT_FXDSTR);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 42);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_VARCHAR);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
@@ -203,11 +227,14 @@ TEST_CASE("The SQL variable length text type is mapped onto the string column ty
 
 	TEST_TRUE(column.m_nDstColumn == 8);
 	TEST_TRUE(column.m_strName == TXT("LongTextValue"));
-	TEST_TRUE(column.m_nSQLColType == SQL_LONGVARCHAR);
 	TEST_TRUE(column.m_eMDBColType == MDCT_VARSTR);
-	TEST_TRUE(column.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 	TEST_TRUE(column.m_nSize == 64000);
 	TEST_TRUE(column.m_nFlags == CColumn::NULLABLE);
+
+	const ODBCColumn& odbcColumn = static_cast<const ODBCColumn&>(column);
+
+	TEST_TRUE(odbcColumn.m_nSQLColType == SQL_LONGVARCHAR);
+	TEST_TRUE(odbcColumn.m_nSQLFetchType == SQL_UNKNOWN_TYPE);
 }
 TEST_CASE_END
 
