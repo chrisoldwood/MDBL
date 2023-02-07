@@ -34,5 +34,18 @@ There is also one for upgrading to a later version of Visual C++:-
 C:\> Win32\Scripts\SetVars vc140
 C:\> Win32\Scripts\Upgrade Win32\Lib\MDBL\Test\Test.sln
 
+Test Suite
+----------
+
+The ODBC part of the test suite relies on the Microsoft Text Driver, which is
+usually installed by default, and a local SQL Server instance, such as the free
+version -- SQL Express. You can install that via Chocolatey:
+
+C:\> choco install -y sql-server-express
+
+You can test the SQL Server installation with:
+
+C:\> sqlcmd -E -S .\SQLEXPRESS -Q "select getdate();"
+
 Chris Oldwood 
-22nd October 2013
+6th June 2022
