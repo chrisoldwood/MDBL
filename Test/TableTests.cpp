@@ -17,11 +17,16 @@ using namespace Mocks;
 TEST_SET(Table)
 {
 	const CPath testRunnerFolder = CPath::ApplicationDir();
-	const CPath databaseFolder = testRunnerFolder.Parent() / TXT("Database");
+	const CPath databaseFolder = testRunnerFolder.Parent().Parent() / TXT("Database");
 
 	ASSERT(databaseFolder.Exists());
 
-	tstring connection = TXT("Driver={Microsoft Text Driver (*.txt; *.csv)};");
+#ifdef _WIN64
+	tstring driver = TXT("Microsoft Access Text Driver (*.txt, *.csv)");
+#else
+	tstring driver = TXT("Microsoft Text Driver (*.txt; *.csv)");
+#endif
+	tstring connection = Core::fmt(TXT("Driver={%s};"), driver.c_str());
 	connection += Core::fmt(TXT("Dbq=%s;"), databaseFolder.c_str());
 
 	CODBCSource source(connection);

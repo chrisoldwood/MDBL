@@ -187,9 +187,15 @@ TEST_CASE("A field value will be formatted using a default template when none pr
 	TEST_TRUE(row[ 9].Format() == TXT("04/05/06"));
 	TEST_TRUE(row[10].Format() == TXT("01:02:03"));
 	TEST_TRUE(row[11].Format() == TXT("04/05/06 01:02:03"));
+#ifndef _WIN64 
 	TEST_TRUE(row[12].Format() == TXT("FFFFFFFF"));
 	TEST_TRUE(row[13].Format() == TXT("FFFFFFFF"));
 	TEST_TRUE(row[14].Format() == TXT("FFFFFFFF"));
+#else
+	TEST_TRUE(row[12].Format() == TXT("FFFFFFFFFFFFFFFF"));
+	TEST_TRUE(row[13].Format() == TXT("FFFFFFFFFFFFFFFF"));
+	TEST_TRUE(row[14].Format() == TXT("FFFFFFFFFFFFFFFF"));
+#endif
 }
 TEST_CASE_END
 

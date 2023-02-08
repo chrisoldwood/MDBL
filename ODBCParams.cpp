@@ -134,7 +134,7 @@ void CODBCParams::Bind()
 	// Calculate the row buffer size.
 	for (size_t i = 0; i < m_nParams; ++i)
 	{
-		m_nRowLen += sizeof(SQLINTEGER);
+		m_nRowLen += sizeof(SQLLEN);
 		m_nRowLen += m_pParams[i].m_nBufSize;
 	}
 
@@ -156,7 +156,7 @@ void CODBCParams::Bind()
 		size_t       nBufSize = m_pParams[i].m_nBufSize;
 		size_t       nColSize = m_pParams[i].m_nSQLColSize;
 		byte*	     pLenInd  = m_pRowData + m_pOffsets[i];
-		byte*        pValue   = pLenInd + sizeof(SQLINTEGER);
+		byte*        pValue   = pLenInd + sizeof(SQLLEN);
 
 		SQLRETURN rc = ::SQLBindParameter(m_hStmt, nParam, SQL_PARAM_INPUT, nBufType, nSQLType,
 											nColSize, 0, pValue, nBufSize, reinterpret_cast<SQLLEN*>(pLenInd));
@@ -165,7 +165,7 @@ void CODBCParams::Bind()
 			throw CODBCException(CODBCException::E_ALLOC_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);
 
 		// Update offset.
-		nOffset += (sizeof(SQLINTEGER) + nBufSize);
+		nOffset += (sizeof(SQLLEN) + nBufSize);
 	}
 
 	m_bDoneBind = true;
@@ -212,7 +212,7 @@ void CODBCParams::SetRow(CRow& oRow)
 			   || (m_pParams[iParam].m_eMDBColType == MDCT_DATE)
 			   || (m_pParams[iParam].m_eMDBColType == MDCT_TIME) )
 		{
-			CTimeStamp* pTimeStamp = reinterpret_cast<CTimeStamp*>(pValue + sizeof(SQLINTEGER));
+			CTimeStamp* pTimeStamp = reinterpret_cast<CTimeStamp*>(pValue + sizeof(SQLLEN));
 
 			pTimeStamp->FromTimeT(oRow[iRowCol].GetTimeT());
 			*pLenInd = m_pParams[iParam].m_nBufSize;
@@ -220,7 +220,7 @@ void CODBCParams::SetRow(CRow& oRow)
 		// Requires conversion from MDCT_CHAR?
 		else if (m_pParams[iParam].m_eMDBColType == MDCT_CHAR)
 		{
-			tchar* pszChar = reinterpret_cast<tchar*>(pValue + sizeof(SQLINTEGER));
+			tchar* pszChar = reinterpret_cast<tchar*>(pValue + sizeof(SQLLEN));
 
 			pszChar[0] = oRow[iRowCol];
 			pszChar[1] = TXT('\0');
@@ -229,7 +229,7 @@ void CODBCParams::SetRow(CRow& oRow)
 		// Requires no conversion.
 		else
 		{
-			oRow[iRowCol].GetRaw(pValue + sizeof(SQLINTEGER));
+			oRow[iRowCol].GetRaw(pValue + sizeof(SQLLEN));
 
 			if (m_pParams[iParam].m_nBufType != SQL_CHAR)
 				*pLenInd = m_pParams[iParam].m_nBufSize;

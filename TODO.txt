@@ -29,3 +29,11 @@
 - Add test data row with minimum and maximum values.
 
 - Add CField overload for query values (e.g. SelectRow, CWhereCmp, ...).
+
+- Fix SQL Server tests to lookup the driver name -- SQL Native Client no longer the default
+
+- Fix SetRaw() with MDCT_FXDSTR which assumes a null terminated string, e.g. SQL Server CHAR(N).
+
+- Add a test for executing a parameterised statement.
+
+- Add test for generated insert / update statement from a Table.

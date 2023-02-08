@@ -14,7 +14,7 @@
 
 TEST_SET(SqlServer)
 {
-	tstring connection = TXT("Driver={SQL Native Client};");
+	tstring connection = TXT("Driver={SQL Server};"); // SQL Native Client
 	connection += TXT("Server=.\\SQLEXPRESS;");
 	connection += TXT("Trusted_Connection=Yes;");
 
@@ -32,6 +32,8 @@ TEST_CASE("The SQL Server types are mapped to the MDBL column types")
     TXT(", cast(1.5 as decimal(2,1))                    as [decimal]")
 	TXT(", cast('2006-05-04T01:02:03' as smalldatetime) as [smalldatetime]")
 	TXT(", cast('2006-05-04T01:02:03' as datetime)      as [datetime]")
+	TXT(", cast('fixed text' as char(10))               as [char]")
+	TXT(", cast('variable text' as varchar(1024))       as [varchar]")
 	TXT(";");
 
 	CTable table(TXT("test"));
@@ -44,6 +46,8 @@ TEST_CASE("The SQL Server types are mapped to the MDBL column types")
 	table.AddColumn(TXT("decimal"),       MDCT_DOUBLE,    0, CColumn::NULLABLE);
 	table.AddColumn(TXT("smalldatetime"), MDCT_TIMESTAMP, 0, CColumn::NULLABLE);
 	table.AddColumn(TXT("datetime"),      MDCT_TIMESTAMP, 0, CColumn::NULLABLE);
+	table.AddColumn(TXT("char"),          MDCT_FXDSTR,   10, CColumn::NULLABLE);
+	table.AddColumn(TXT("varchar"),       MDCT_VARSTR, 1024, CColumn::NULLABLE);
 
 	SQLCursorPtr cursor = source.ExecQuery(query);
 	cursor->Fetch();
@@ -60,6 +64,8 @@ TEST_CASE("The SQL Server types are mapped to the MDBL column types")
 	TEST_TRUE(row[5].GetDouble() == 1.5);
 	TEST_TRUE(row[6].GetTimeStamp() == CTimeStamp(2006, 5, 4, 1, 2, 0));
 	TEST_TRUE(row[7].GetTimeStamp() == CTimeStamp(2006, 5, 4, 1, 2, 3));
+	TEST_TRUE(row[8].GetString() == tstring(TXT("fixed text")));
+	TEST_TRUE(row[9].GetString() == tstring(TXT("variable text")));
 }
 TEST_CASE_END
 
