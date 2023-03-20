@@ -276,6 +276,8 @@ void CODBCCursor::MapColumn(size_t sourceColumn, size_t destColumn, COLTYPE type
 
 void CODBCCursor::Bind()
 {
+	SQLRETURN rc;
+
 	// Set column fetch types and sizes.
 	for (size_t i = 0; i < m_nColumns; ++i)
 	{
@@ -301,7 +303,6 @@ void CODBCCursor::Bind()
 	m_pRowStatus = new SQLUSMALLINT[FETCH_SIZE];
 
 	// Setup for bulk row fetching.
-	SQLRETURN rc;
 	rc = ::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_BIND_TYPE,    reinterpret_cast<SQLPOINTER>(m_nRowLen),    0);
 	rc = ::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_ARRAY_SIZE,   reinterpret_cast<SQLPOINTER>(FETCH_SIZE),   0);
 	rc = ::SQLSetStmtAttr(m_hStmt, SQL_ATTR_ROW_STATUS_PTR,   reinterpret_cast<SQLPOINTER>(m_pRowStatus), 0);
@@ -329,7 +330,7 @@ void CODBCCursor::Bind()
 		ASSERT(nSize > 0);
 
 		// Bind the buffer to the column.
-		SQLRETURN rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, reinterpret_cast<SQLLEN*>(pLenInd));
+		rc = ::SQLBindCol(m_hStmt, nColumn, nType, pValue, nSize, reinterpret_cast<SQLLEN*>(pLenInd));
 
 		if ( (rc != SQL_SUCCESS) && (rc != SQL_SUCCESS_WITH_INFO) )
 			throw CODBCException(CODBCException::E_FETCH_FAILED, m_strStmt, m_hStmt, SQL_HANDLE_STMT);

@@ -37,3 +37,5 @@
 - Add a test for executing a parameterised statement.
 
 - Add test for generated insert / update statement from a Table.
+
+- GCC 10.x pragma out -Werror=format-nonliteral for CField::Format().
