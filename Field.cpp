@@ -848,7 +848,7 @@ CString CField::DbgFormat() const
 	switch(m_oColumn.StgType())
 	{
 		case MDST_INT:			str.Format(TXT("%d"), *m_pInt);						break;
-		case MDST_INT64:		str.Format(TXT("I64d"), *m_pInt64);					break;
+		case MDST_INT64:		str.Format(TXT("%I64d"), *m_pInt64);				break;
 		case MDST_DOUBLE:		str.Format(TXT("%f"), *m_pDouble);					break;
 		case MDST_CHAR:			str.Format(TXT("%c"), *m_pChar);					break;
 		case MDST_STRING:		str = m_pString;									break;
