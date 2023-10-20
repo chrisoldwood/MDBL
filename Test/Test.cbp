@@ -91,6 +91,10 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="FieldTests.cpp" />
+		<Unit filename="Mocks/MockSQLCursor.cpp" />
+		<Unit filename="Mocks/MockSQLCursor.hpp" />
+		<Unit filename="Mocks/MockSQLSource.cpp" />
+		<Unit filename="Mocks/MockSQLSource.hpp" />
 		<Unit filename="ODBCCursorTests.cpp" />
 		<Unit filename="ODBCSourceTests.cpp" />
 		<Unit filename="SqlServerTests.cpp" />
