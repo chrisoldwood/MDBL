@@ -773,6 +773,11 @@ void CField::Updated()
 	}
 }
 
+#if (__GNUC__ >= 10) // GCC 10.0+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+
 /******************************************************************************
 ** Methods:		Format()
 **
@@ -942,6 +947,10 @@ CString CField::FormatTimeStamp(const tchar* pszFormat) const
 
 	return szTime;
 }
+
+#if (__GNUC__ >= 10) // GCC 10.0+
+#pragma GCC diagnostic pop
+#endif
 
 /******************************************************************************
 ** Methods:		FormatBool()

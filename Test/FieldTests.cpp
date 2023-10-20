@@ -187,7 +187,7 @@ TEST_CASE("A field value will be formatted using a default template when none pr
 	TEST_TRUE(row[ 9].Format() == TXT("04/05/06"));
 	TEST_TRUE(row[10].Format() == TXT("01:02:03"));
 	TEST_TRUE(row[11].Format() == TXT("04/05/06 01:02:03"));
-#ifndef _WIN64 
+#ifndef _WIN64
 	TEST_TRUE(row[12].Format() == TXT("FFFFFFFF"));
 	TEST_TRUE(row[13].Format() == TXT("FFFFFFFF"));
 	TEST_TRUE(row[14].Format() == TXT("FFFFFFFF"));
@@ -280,15 +280,19 @@ TEST_CASE("A field can be implicitly assigned to")
 	table.InsertRow(row);
 
 	row[ 0] = 1;
+#ifdef _MSC_VER
 	row[ 1] = 1i64;
+#endif
 	row[ 2] = 1.0;
 	row[ 3] = TXT('X');
 	row[ 4] = TXT("X");
 	row[ 5] = TXT("X");
 	row[ 6] = true;
+#ifdef _MSC_VER
 	row[ 7] = timet;
 	row[ 8] = timet;
 	row[ 9] = timet;
+#endif
 	row[10] = timestamp;
 	row[11] = pointer;
 	row[12] = rowPtr;
@@ -296,15 +300,19 @@ TEST_CASE("A field can be implicitly assigned to")
 	row[14] = null;
 
 	TEST_TRUE(row[ 0].GetInt() == 1);
+#ifdef _MSC_VER
 	TEST_TRUE(row[ 1].GetInt64() == 1);
+#endif
 	TEST_TRUE(row[ 2].GetDouble() == 1.0);
 	TEST_TRUE(row[ 3].GetChar() == TXT('X'));
 	TEST_TRUE(tstrcmp(row[ 4].GetString(), TXT("X")) == 0);
 	TEST_TRUE(tstrcmp(row[ 5].GetString(), TXT("X")) == 0);
 	TEST_TRUE(row[ 6].GetBool() == true);
+#ifdef _MSC_VER
 	TEST_TRUE(row[ 7].GetInt64() == timet);
 	TEST_TRUE(row[ 8].GetInt64() == timet);
 	TEST_TRUE(row[ 9].GetInt64() == timet);
+#endif
 	TEST_TRUE(row[10].GetTimeStamp() == timestamp);
 	TEST_TRUE(row[11].GetPtr() == pointer);
 	TEST_TRUE(row[12].GetRowPtr() == rowPtr);
